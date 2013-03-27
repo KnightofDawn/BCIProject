@@ -2595,13 +2595,6 @@ naming: grid - package width</description>
 <label x="-48.26" y="30.48" size="1.016" layer="95"/>
 </segment>
 </net>
-<net name="AUX_OUT" class="0">
-<segment>
-<pinref part="U1" gate="A" pin="AUXOUT"/>
-<wire x1="-15.24" y1="58.42" x2="-15.24" y2="50.8" width="0.1524" layer="91"/>
-<label x="-15.24" y="50.8" size="1.016" layer="95" rot="R90"/>
-</segment>
-</net>
 <net name="IN0_N" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="IN0-"/>
@@ -3012,11 +3005,25 @@ naming: grid - package width</description>
 </sheet>
 </sheets>
 <errors>
+<approved hash="104,1,-63.5,83.82,U1,GND1,GND,,,"/>
+<approved hash="104,1,-63.5,81.28,U1,GND2,GND,,,"/>
+<approved hash="104,1,-48.26,58.42,U1,GND3,GND,,,"/>
+<approved hash="202,1,-43.18,58.42,U1,!CS!-,,,,"/>
+<approved hash="202,1,-38.1,58.42,U1,SCLK-,,,,"/>
+<approved hash="202,1,-33.02,58.42,U1,MOSI-,,,,"/>
+<approved hash="104,1,0,81.28,U1,VDD3,VDD,,,"/>
+<approved hash="104,1,0,86.36,U1,VESD,GND,,,"/>
+<approved hash="202,1,0,88.9,U1,ELEC_TEST,,,,"/>
+<approved hash="104,1,-63.5,78.74,U1,VDD1,VDD,,,"/>
+<approved hash="104,1,0,71.12,U1,GND4,GND,,,"/>
+<approved hash="104,1,-20.32,58.42,U1,VDD2,VDD,,,"/>
 <approved hash="204,1,0,66.04,U1,CTR,,,,"/>
-<approved hash="209,1,-43.18,58.42,CS_N,,,,,"/>
-<approved hash="209,1,-33.02,58.42,MOSI_N,,,,,"/>
-<approved hash="209,1,0,88.9,N$10,,,,,"/>
-<approved hash="209,1,-38.1,58.42,SCLK_N,,,,,"/>
+<approved hash="106,1,-15.24,58.42,AUX_OUT,,,,,"/>
+<approved hash="108,1,20.32,76.2,GND,,,,,"/>
+<approved hash="115,1,-101.363,99.1912,JP1,,,,,"/>
+<approved hash="115,1,67.2677,94.1112,JP2,,,,,"/>
+<approved hash="115,1,-35.3229,35.6912,JP3,,,,,"/>
+<approved hash="115,1,-101.363,69.9812,JP4,,,,,"/>
 </errors>
 </schematic>
 </drawing>

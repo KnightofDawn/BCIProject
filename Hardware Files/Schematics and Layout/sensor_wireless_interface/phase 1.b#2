@@ -720,9 +720,6 @@ design rules under a new name.</description>
 <contactref element="JP3" pad="4"/>
 <wire x1="55.88" y1="17.78" x2="53.82" y2="33.415" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="AUX_OUT">
-<contactref element="U1" pad="27"/>
-</signal>
 <signal name="IN0_N">
 <contactref element="U1" pad="8"/>
 <contactref element="JP2" pad="2"/>

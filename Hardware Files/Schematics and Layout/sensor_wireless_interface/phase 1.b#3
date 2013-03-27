@@ -679,14 +679,16 @@ design rules under a new name.</description>
 <contactref element="C1" pad="2"/>
 <contactref element="C2" pad="2"/>
 <contactref element="U1" pad="32"/>
+<contactref element="U1" pad="10"/>
 <wire x1="56.5" y1="37.62" x2="56.5" y2="36.62" width="0" layer="19" extent="1-1"/>
 <wire x1="58.025" y1="36.12" x2="56.5" y2="36.62" width="0" layer="19" extent="1-1"/>
 <wire x1="49.82" y1="33.415" x2="56.5" y2="36.62" width="0" layer="19" extent="1-1"/>
 <wire x1="47.64" y1="37.12" x2="49.82" y2="33.415" width="0" layer="19" extent="1-1"/>
+<wire x1="47.64" y1="38.12" x2="47.64" y2="37.12" width="0" layer="19" extent="1-1"/>
 <wire x1="46.115" y1="37.62" x2="47.64" y2="37.12" width="0" layer="19" extent="1-1"/>
-<wire x1="29.21" y1="45.72" x2="46.115" y2="37.62" width="0" layer="19" extent="1-1"/>
-<wire x1="30.48" y1="35.56" x2="29.21" y2="45.72" width="0" layer="19" extent="1-1"/>
+<wire x1="30.48" y1="35.56" x2="46.115" y2="37.62" width="0" layer="19" extent="1-1"/>
 <wire x1="30.48" y1="27.94" x2="30.48" y2="35.56" width="0" layer="19" extent="1-1"/>
+<wire x1="29.21" y1="45.72" x2="30.48" y2="35.56" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="AUXIN2">
 <contactref element="U1" pad="15"/>
@@ -698,32 +700,20 @@ design rules under a new name.</description>
 <contactref element="JP4" pad="3"/>
 <wire x1="43.18" y1="17.78" x2="49.32" y2="34.94" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="CS_N">
-<contactref element="U1" pad="18"/>
-</signal>
 <signal name="CS_P">
 <contactref element="U1" pad="19"/>
 <contactref element="JP3" pad="1"/>
 <wire x1="48.26" y1="17.78" x2="50.82" y2="33.415" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="SCLK_N">
-<contactref element="U1" pad="20"/>
 </signal>
 <signal name="SCLK_P">
 <contactref element="U1" pad="21"/>
 <contactref element="JP3" pad="2"/>
 <wire x1="50.8" y1="17.78" x2="51.82" y2="33.415" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="MOSI_N">
-<contactref element="U1" pad="22"/>
-</signal>
 <signal name="MOSI_P">
 <contactref element="U1" pad="23"/>
 <contactref element="JP3" pad="3"/>
 <wire x1="53.34" y1="17.78" x2="52.82" y2="33.415" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="MISO_N">
-<contactref element="U1" pad="24"/>
 </signal>
 <signal name="MISO_P">
 <contactref element="U1" pad="25"/>
@@ -872,9 +862,6 @@ design rules under a new name.</description>
 <contactref element="U1" pad="34"/>
 <contactref element="JP2" pad="32"/>
 <wire x1="71.12" y1="60.96" x2="56.5" y2="38.62" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$10">
-<contactref element="U1" pad="33"/>
 </signal>
 <signal name="IN12_P">
 <contactref element="JP2" pad="25"/>
