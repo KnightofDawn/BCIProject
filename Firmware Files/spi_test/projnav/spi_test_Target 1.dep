@@ -1,0 +1,6 @@
+Dependencies for Project 'spi_test', Target 'Target 1': (DO NOT MODIFY !)
+F (..\source\main.c)(0x5119A0DC)()
+F (..\source\spi_master_config.h)(0x5119A0DC)()
+F (C:\Program Files\Keil\ARM\Device\Nordic\nrf51822\Source\templates\system_nrf51.c)(0x50CA6D92)()
+F (C:\Program Files\Keil\ARM\Device\Nordic\nrf51822\Source\templates\arm\arm_startup_nrf51.s)(0x51197630)()
+F (C:\Program Files (x86)\Keil\ARM\Device\Nordic\nrf51822\Source\spi_master\spi_master.c)(0x5119A0D0)(-c --cpu Cortex-M0 --li -g -O0 --apcs=interwork -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Device\Nordic\nRF51822\Include" -o "spi_master.o" --omf_browse "spi_master.crf" --depend "spi_master.d")

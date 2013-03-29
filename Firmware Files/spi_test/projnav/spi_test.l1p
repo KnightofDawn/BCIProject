@@ -1,0 +1,7 @@
+--cpu Cortex-M0 "main.o" ".\arm_startup_nrf51.o" "system_nrf51.o" "spi_master.o" "nrf_delay.o" "simple_uart.o" 
+--library_type=microlib 
+--feedback "spi_test.fed" --feedback_image=none 
+--strict --scatter "spi_test.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\spi_test.map" -o spi_test.axf

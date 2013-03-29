@@ -1,0 +1,28 @@
+;#<FEEDBACK># ARM Linker, 5.02 [Build 28]: Last Updated: Fri Mar 22 17:39:57 2013
+;VERSION 0.2
+;FILE arm_startup_nrf51.o
+;FILE main.o
+__asm___6_main_c_main____REV16 <= USED 0
+__asm___6_main_c_main____REVSH <= USED 0
+__asm___6_main_c_main__nrf_delay_us <= USED 0
+;FILE nrf_delay.o
+__asm___11_nrf_delay_c_532987f3____REV16 <= USED 0
+__asm___11_nrf_delay_c_532987f3____REVSH <= USED 0
+__asm___11_nrf_delay_c_532987f3__nrf_delay_us <= USED 0
+nrf_delay_ms <= USED 0
+;FILE simple_uart.o
+__asm___13_simple_uart_c_5dda6715____REV16 <= USED 0
+__asm___13_simple_uart_c_5dda6715____REVSH <= USED 0
+__asm___13_simple_uart_c_5dda6715__nrf_delay_us <= USED 0
+simple_uart_get_with_timeout <= USED 0
+simple_uart_putstring <= USED 0
+;FILE spi_master.o
+__asm___12_spi_master_c_6b526d4d____REV16 <= USED 0
+__asm___12_spi_master_c_6b526d4d____REVSH <= USED 0
+__asm___12_spi_master_c_6b526d4d__nrf_delay_us <= USED 0
+spi_master_rx <= USED 0
+spi_master_tx <= USED 0
+;FILE system_nrf51.o
+SystemCoreClockUpdate <= USED 0
+__asm___14_system_nrf51_c_5d646a67____REV16 <= USED 0
+__asm___14_system_nrf51_c_5d646a67____REVSH <= USED 0
