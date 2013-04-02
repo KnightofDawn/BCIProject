@@ -1,0 +1,25 @@
+*** Creating Trace Output File 'spi_test.tra' Ok.
+### Preparing for ADS-LD.
+### Creating ADS-LD Command Line
+### List of Objects: adding '"main.o"'
+### List of Objects: adding '".\arm_startup_nrf51.o"'
+### List of Objects: adding '"system_nrf51.o"'
+### List of Objects: adding '"spi_master.o"'
+### List of Objects: adding '"nrf_delay.o"'
+### List of Objects: adding '"simple_uart.o"'
+### ADS-LD Command completed:
+--cpu Cortex-M0 "main.o" ".\arm_startup_nrf51.o" "system_nrf51.o" "spi_master.o" "nrf_delay.o" "simple_uart.o" 
+--library_type=microlib --strict --scatter "spi_test.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\spi_test.map" -o spi_test.axf### Preparing Environment (PrepEnvAds)
+### ADS-LD Output File: 'spi_test.axf'
+### ADS-LD Command File: 'spi_test.l2p'
+### Checking for dirty Components...
+### Creating CmdFile 'spi_test.l2p', Handle=0x0000067C
+### Writing '.lnp' file
+### ADS-LD Command file 'spi_test.l2p' is ready.
+### ADS-LD: About to start ADS-LD Thread.
+### ADS-LD: executed with 0 errors
+### Updating obj list
+### LDADS_file() completed.

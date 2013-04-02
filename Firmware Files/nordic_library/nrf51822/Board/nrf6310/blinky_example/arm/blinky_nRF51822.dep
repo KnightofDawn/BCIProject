@@ -1,0 +1,42 @@
+Dependencies for Project 'blinky', Target 'nRF51822': (DO NOT MODIFY !)
+F (..\main.c)(0x5119A118)(--feedback ".\_build\blinky_arm.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\..\..\Include --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -DNRF51 -DSETUPA -DBOARD_NRF6310 -o ".\_build\main.o" --omf_browse ".\_build\main.crf" --depend ".\_build\main.d")
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x4EB1A578)
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1A574)
+I (..\..\..\..\Include\nrf_delay.h)(0x511992C6)
+I (..\..\..\..\Include\nrf.h)(0x509841B8)
+I (..\..\..\..\Include\compiler_abstraction.h)(0x511992C6)
+I (..\..\..\..\Include\nrf51.h)(0x5119681C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x5006FC72)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A2F7C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB674C)
+I (..\..\..\..\Include\system_nrf51.h)(0x50A2CD0E)
+I (..\..\..\..\Include\nrf51_bitfields.h)(0x5119681E)
+I (..\..\..\..\Include\nrf51_deprecated.h)(0x51083DAA)
+I (..\..\..\..\Include\nrf_gpio.h)(0x511992C6)
+I (..\..\..\..\Include\boards.h)(0x511992C6)
+I (..\..\..\..\Include\boards/nrf6310.h)(0x511992C8)
+F (..\..\..\..\Source\keil_arm_uv4.lnt)(0x5119A0D2)()
+F (..\..\..\..\Source\templates\arm\arm_startup_nrf51.s)(0x51197630)(--cpu Cortex-M0 --li -g --apcs=interwork --pd "__MICROLIB SETA 1" -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" --list ".\_build\startup_arm_nrf51.lst" --xref -o ".\_build\startup_arm_nrf51.o" --depend ".\_build\startup_arm_nrf51.d")
+F (..\..\..\..\Source\templates\system_nrf51.c)(0x50CA6D92)(--feedback ".\_build\blinky_arm.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\..\..\Include --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -DNRF51 -DSETUPA -DBOARD_NRF6310 -o ".\_build\system_nrf51.o" --omf_browse ".\_build\system_nrf51.crf" --depend ".\_build\system_nrf51.d")
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1A574)
+I (..\..\..\..\Include\nrf.h)(0x509841B8)
+I (..\..\..\..\Include\compiler_abstraction.h)(0x511992C6)
+I (..\..\..\..\Include\nrf51.h)(0x5119681C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x5006FC72)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A2F7C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB674C)
+I (..\..\..\..\Include\system_nrf51.h)(0x50A2CD0E)
+I (..\..\..\..\Include\nrf51_bitfields.h)(0x5119681E)
+I (..\..\..\..\Include\nrf51_deprecated.h)(0x51083DAA)
+F (..\..\..\..\Source\nrf_delay\nrf_delay.c)(0x5119A0D0)(--feedback ".\_build\blinky_arm.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\..\..\Include --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -DNRF51 -DSETUPA -DBOARD_NRF6310 -o ".\_build\nrf_delay.o" --omf_browse ".\_build\nrf_delay.crf" --depend ".\_build\nrf_delay.d")
+I (..\..\..\..\Include\compiler_abstraction.h)(0x511992C6)
+I (..\..\..\..\Include\nrf.h)(0x509841B8)
+I (..\..\..\..\Include\nrf51.h)(0x5119681C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x5006FC72)
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1A574)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A2F7C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB674C)
+I (..\..\..\..\Include\system_nrf51.h)(0x50A2CD0E)
+I (..\..\..\..\Include\nrf51_bitfields.h)(0x5119681E)
+I (..\..\..\..\Include\nrf51_deprecated.h)(0x51083DAA)
+I (..\..\..\..\Include\nrf_delay.h)(0x511992C6)

@@ -1,0 +1,44 @@
+Dependencies for Project 'uart_example', Target 'nRF51822': (DO NOT MODIFY !)
+F (..\main.c)(0x5119A102)(--feedback ".\_build\uart_example_arm.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\..\..\Include --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -DNRF51 -DBOARD_NRF6310 -o ".\_build\main.o" --omf_browse ".\_build\main.crf" --depend ".\_build\main.d")
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x4EB1B388)
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1B384)
+I (..\..\..\..\Include\nrf.h)(0x50984FC8)
+I (..\..\..\..\Include\compiler_abstraction.h)(0x5119A0D6)
+I (..\..\..\..\Include\nrf51.h)(0x5119762C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50070A82)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A3D8C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB755C)
+I (..\..\..\..\Include\system_nrf51.h)(0x50A2DB1E)
+I (..\..\..\..\Include\nrf51_bitfields.h)(0x5119762E)
+I (..\..\..\..\Include\nrf51_deprecated.h)(0x51084BBA)
+I (..\..\..\..\Include\simple_uart.h)(0x5119A0D8)
+I (..\..\..\..\Include\nrf_gpio.h)(0x5119A0D6)
+I (..\..\..\..\Include\boards.h)(0x5119A0D6)
+I (..\..\..\..\Include\boards/nrf6310.h)(0x5119A0D8)
+F (..\..\..\..\Source\templates\system_nrf51.c)(0x50CA6D92)(--feedback ".\_build\uart_example_arm.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\..\..\Include --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -DNRF51 -DBOARD_NRF6310 -o ".\_build\system_nrf51.o" --omf_browse ".\_build\system_nrf51.crf" --depend ".\_build\system_nrf51.d")
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1B384)
+I (..\..\..\..\Include\nrf.h)(0x50984FC8)
+I (..\..\..\..\Include\compiler_abstraction.h)(0x5119A0D6)
+I (..\..\..\..\Include\nrf51.h)(0x5119762C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50070A82)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A3D8C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB755C)
+I (..\..\..\..\Include\system_nrf51.h)(0x50A2DB1E)
+I (..\..\..\..\Include\nrf51_bitfields.h)(0x5119762E)
+I (..\..\..\..\Include\nrf51_deprecated.h)(0x51084BBA)
+F (..\..\..\..\Source\templates\arm\arm_startup_nrf51.s)(0x51197630)(--cpu Cortex-M0 --li -g --apcs=interwork --pd "__MICROLIB SETA 1" -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" --list ".\_build\startup_arm_nrf51.lst" --xref -o ".\_build\startup_arm_nrf51.o" --depend ".\_build\startup_arm_nrf51.d")
+F (..\..\..\..\Source\simple_uart\simple_uart.c)(0x5119A0D0)(--feedback ".\_build\uart_example_arm.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\..\..\Include --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -DNRF51 -DBOARD_NRF6310 -o ".\_build\simple_uart.o" --omf_browse ".\_build\simple_uart.crf" --depend ".\_build\simple_uart.d")
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1B384)
+I (..\..\..\..\Include\nrf.h)(0x50984FC8)
+I (..\..\..\..\Include\compiler_abstraction.h)(0x5119A0D6)
+I (..\..\..\..\Include\nrf51.h)(0x5119762C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50070A82)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A3D8C)
+I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB755C)
+I (..\..\..\..\Include\system_nrf51.h)(0x50A2DB1E)
+I (..\..\..\..\Include\nrf51_bitfields.h)(0x5119762E)
+I (..\..\..\..\Include\nrf51_deprecated.h)(0x51084BBA)
+I (..\..\..\..\Include\simple_uart.h)(0x5119A0D8)
+I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x4EB1B388)
+I (..\..\..\..\Include\nrf_delay.h)(0x5119A0D6)
+I (..\..\..\..\Include\nrf_gpio.h)(0x5119A0D6)

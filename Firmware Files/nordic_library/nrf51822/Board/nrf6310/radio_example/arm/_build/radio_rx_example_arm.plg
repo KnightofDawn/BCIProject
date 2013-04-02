@@ -1,0 +1,32 @@
+Load "C:\\Users\\Peter\\Documents\\Nordic Examples\\nrf51822\\Board\\nrf6310\\radio_example\\arm\\_build\\radio_rx_example_arm.AXF" 
+Set JLink Project File to "C:\Users\Peter\Documents\Nordic Examples\nrf51822\Board\nrf6310\radio_example\arm\JLinkSettings.ini"
+* JLink Info: Device "NRF51822" selected (256 KB flash, 8 KB RAM).
+ 
+JLink info:
+------------
+DLL: V4.64a, compiled Feb 25 2013 18:26:59
+Firmware: J-Link Lite-Cortex-M V8 compiled Aug 29 2012 15:24:23
+Hardware: V8.00
+S/N : 518003257 
+Feature(s) : GDB 
+ 
+* JLink Info: Found SWD-DP with ID 0x0BB11477
+* JLink Info: FPUnit: 4 code (BP) slots and 0 literal slots
+* JLink Info: Found Cortex-M0 r0p0, Little endian.
+ROMTableAddr = 0xE00FF003
+ 
+Target info:
+------------
+Device: nRF51
+VTarget = 3.287V
+State of Pins: 
+TCK: 0, TDI: 0, TDO: 1, TMS: 1, TRES: 1, TRST: 1
+Hardware-Breakpoints: 4
+Software-Breakpoints: 8192
+Watchpoints:          2
+JTAG speed: 2000 kHz
+ 
+Erase Done.
+Programming Done.
+Verify OK.
+Application running ...
