@@ -1,0 +1,29 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jan 24 22:17:37 2013
+
+@author: yozturk
+"""
+
+filterList = []
+from xml.etree import ElementTree
+
+with open('Phy_regspec_fusion.xml', 'rt') as f:
+    tree = ElementTree.parse(f)
+
+
+for bnode in tree.iter('block'):
+    bname = bnode.attrib.get('name')
+    boffset = bnode.get('offset')
+    for rfile in bnode.iter('regfile'):
+        rname = rfile.attrib.get('name')
+        for node in rfile.iter('reg'):
+            name = node.attrib.get('name')
+            url = node.attrib.get('offset')
+            for n in node.iter('field'):
+                n1  = n.attrib.get('name')
+                offset = n.attrib.get('offset')
+                width = n.attrib.get('width')
+                offset1 = int(offset)+int(width)-1
+                #if name and url and n1:
+                if (n1 !="RESERVED"):

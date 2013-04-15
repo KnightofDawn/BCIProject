@@ -1,0 +1,108 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+
+entity TesterFpgaTriggerSync is
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      Armed     : in std_logic;
+
+      DataIn    : in std_logic_vector(31 downto 0);
+      HdrIn     : in std_logic_vector( 3 downto 0);
+      OffsetIn  : in std_logic_vector(15 downto 0);
+      DataInEn  : in std_logic;
+
+      PktIdToComp : out std_logic_vector(1 downto 0);
+      CompNow     : out std_logic;
+
+      ConfigRegsIn   : in std_logic_vector(31 downto 0);
+      ConfigRegsOut  : out std_logic_vector(31 downto 0);
+      ConfigRegsEn   : in std_logic;
+      ConfigRegsLd   : in std_logic;
+      ConfigRegsSt   : in std_logic
+   );
+end TesterFpgaTriggerSync;
+
+architecture RTL of TesterFpgaTriggerSync is
+   type CntrArry_t is array(0 to 3) of integer range 0 to 15;
+   signal CntrArry : CntrArry_t;
+
+   -- Trigger Sync Control Register
+   -- Reg 0
+   -- | [19:16]| [15:12] | [11:8] | [7:4] | [3:0] |
+   -- | Thdhld |  Cnt 3  |  Cnt 2 | Cnt 1 | Cnt 0 |
+
+   
+   type RegisterBank_t is array (0 to 0) of std_logic_vector(31 downto 0);
+   signal RegisterBank       : RegisterBank_t;
+   signal RegisterBankStatic : RegisterBank_t;
+   signal ExpectedCsBuffs : std_logic_vector(3 downto 0);
+   
+   
+begin
+   -- process Counters
+   process(RST, CLK)
+      variable PktId   : integer range 0 to 3;
+      variable PktType : std_logic_vector(3 downto 0);
+   begin
+      if (RST='1') then
+         CntrArry    <= (others=>0);
+         PktIdToComp <= (others=>'0');
+         CompNow     <= '0';
+      elsif (CLK'event and CLK='1') then
+         CompNow     <= '0';
+         if (DataInEn='1') then
+            if ( HdrIn    = std_logic_vector(to_unsigned(6, 4)) and
+                 OffsetIn = std_logic_vector(to_unsigned(0,16)) ) then
+               PktId   := conv_integer(DataIn(21 downto 20));
+               PktType := DataIn(19 downto 16);
+               if (PktType = "1011") then -- RFIC Ctrl must always be the first CsBuff
+                  CntrArry(PktId) <= 1;
+               elsif (CntrArry(PktId) < 15) then
+                  CntrArry(PktId) <= CntrArry(PktId) + 1;
+               end if;
+            end if;
+         end if;
+         if (CntrArry(PktId) >= ExpectedCsBuffs) then
+            CntrArry(PktId) <= 0;
+            PktIdToComp     <= std_logic_vector(to_unsigned(PktId,2));
+            if (Armed = '1') then
+               CompNow <= '1';
+            end if;
+         end if;
+   end if;
+   end process;
+   
+   -- Config Registers 
+   process (RST, CLK)
+   begin
+      if RST = '1' then
+         RegisterBank       <= (others=>(others=>'0'));
+         RegisterBank(0)(19 downto 16) <= (others=>'1'); -- ExpectedCsBuffs should not be 0
+         RegisterBankStatic <= (others=>(others=>'0'));
+
+      elsif CLK'event and CLK='1' then
+         if (ConfigRegsSt = '1') then
+            RegisterBank <= RegisterBankStatic;
+         end if;
+         if (ConfigRegsLd = '1') then 
+            RegisterBankStatic <= RegisterBank;
+            RegisterBankStatic(0)(15 downto 0) <= 
+                                    std_logic_vector(to_unsigned(CntrArry(3),4)) & 
+                                    std_logic_vector(to_unsigned(CntrArry(2),4)) & 
+                                    std_logic_vector(to_unsigned(CntrArry(1),4)) & 
+                                    std_logic_vector(to_unsigned(CntrArry(0),4));
+         end if;
+         if (ConfigRegsEn = '1') then
+            RegisterBankStatic(0) <= ConfigRegsIn;
+         end if;
+      end if;
+   end process;
+   ConfigRegsOut   <= RegisterBankStatic(0);
+   ExpectedCsBuffs <= RegisterBank(0)(19 downto 16);
+end RTL;

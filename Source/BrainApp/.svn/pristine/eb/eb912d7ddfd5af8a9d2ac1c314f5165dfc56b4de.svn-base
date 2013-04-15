@@ -1,0 +1,276 @@
+module FusionTestDebugTop
+  (
+   input wire 	      clk50_clk,
+   input wire 	      reset_n,
+
+    
+   input wire [9:0]   ddr_in,
+   input wire 	      ddr_in_clk,
+   
+  
+   input wire 	      oct_rzqin,
+  
+   //output wire [2:0]  pio_external_connection_export,
+  
+   //inout wire [7:0]   lcd_0_external_data,
+   //output wire 	lcd_0_external_E,
+   //output wire 	lcd_0_external_RS,
+   //output wire 	lcd_0_external_RW,
+  
+   output wire 	      pll_0_locked_export, 
+
+   output wire [12:0] memory_mem_a,
+   output wire [2:0]  memory_mem_ba,
+   output wire [0:0]  memory_mem_ck,
+   output wire [0:0]  memory_mem_ck_n,
+   output wire [0:0]  memory_mem_cke,
+   output wire [0:0]  memory_mem_cs_n,
+   output wire [3:0]  memory_mem_dm,
+   output wire [0:0]  memory_mem_ras_n,
+   output wire [0:0]  memory_mem_cas_n,
+   output wire [0:0]  memory_mem_we_n,
+   output wire 	      memory_mem_reset_n,
+   inout wire [31:0]  memory_mem_dq,
+   inout wire [3:0]   memory_mem_dqs,
+   inout wire [3:0]   memory_mem_dqs_n,
+   output wire [0:0]  memory_mem_odt,
+  
+   output 	      enet_mdc,
+   inout 	      enet_mdio,
+   output 	      enet_resetn, 
+   input 	      enet_rx_clk,
+   input 	      enet_rx_dv,
+   input [3:0] 	      enet_rx_d,
+   output 	      enet_gtx_clk,
+   output 	      enet_tx_en,
+   output [3:0]       enet_tx_d,
+
+   input [3:0] 	      device_id_dip,
+   output 	      clk166_out,
+
+   output 	      tse_config_sleeping
+   );
+
+
+   
+   wire               enet_tx_en_wire;
+   wire [3:0]         enet_tx_d_wire;
+   wire               mdio_oen_from_the_tse_mac;
+   wire               mdio_out_from_the_tse_mac;
+   wire               eth_mode_from_the_tse_mac;
+   wire               ena_10_from_the_tse_mac;
+   wire               enet_tx_125;
+   wire               enet_tx_25;
+   wire               enet_tx_2p5;
+   wire               tx_clk_to_the_tse_mac;
+
+   /********************************** ETHERNET ***********************************************/
+   
+   /* -----\/----- EXCLUDED -----\/-----
+    
+    enet_gtx_clk_ddio_buffer   enet_gtx_clk_ddio_buffer_inst (
+    .aclr       ( !reset_n ),
+    .datain_h   ( 1'b1 ),
+    .datain_l   ( 1'b0 ),
+    .outclock   ( tx_clk_to_the_tse_mac ),
+    .dataout    ( enet_gtx_clk )
+    );
+    -----/\----- EXCLUDED -----/\----- */
+   
+   
+   assign tx_clk_to_the_tse_mac = (eth_mode_from_the_tse_mac)?(enet_tx_125) :  //GbE Mode = 125MHz
+                                  (ena_10_from_the_tse_mac)?(enet_tx_2p5) :    //10Mb Mode = 2.5MHz
+                                  (enet_tx_25);                                //100Mb Mode = 25MHz
+   
+   assign enet_mdio = ( !mdio_oen_from_the_tse_mac ) ? ( mdio_out_from_the_tse_mac ) : ( 1'bz );
+
+
+   parameter MSB = 19; // PHY interface: need minimum 10ms delay for POR
+
+   reg [MSB:0]        epcount; 
+   
+   always @(posedge clk50_clk)
+     begin 
+        if (reset_n == 1'b0)
+          epcount <= MSB + 1'b0;
+        else
+          if (epcount[MSB] == 1'b0)
+            epcount <= epcount + 1;
+          else
+            epcount <= epcount;
+     end
+   
+   assign enet_resetn = !epcount[MSB-1];
+
+   /****************************************** END ETHERNET *************************************/
+
+   
+   
+   nios2 nios2_qsys
+     (
+      .clk50_clk    (clk50_clk), 
+      .clk166_clk   (clk166),
+      .oct_rzqin    (oct_rzqin),
+      //.pio_external_connection_export    (pio_external_connection_export),
+      
+      //.lcd_0_external_data    (lcd_0_external_data),
+      //.lcd_0_external_E       (lcd_0_external_E),
+      //.lcd_0_external_RS      (lcd_0_external_RS),
+      //.lcd_0_external_RW      (lcd_0_external_RW),
+      
+      .reset_reset_n          (reset_n),
+      .enet_pll_outclk0_clk   (enet_tx_125),
+      .enet_pll_outclk1_clk   (enet_tx_25),
+      .enet_pll_outclk2_clk   (enet_tx_2p5),		    
+      .enet_pll_outclk3_clk   (enet_gtx_clk),
+      
+      .tse_mac_rgmii_in    (enet_rx_d),
+      .tse_mac_rgmii_out   (enet_tx_d),
+      .tse_mac_rx_control  (enet_rx_dv),
+      .tse_mac_tx_control  (enet_tx_en),
+      .tse_mac_tx_clk      (tx_clk_to_the_tse_mac),
+      .tse_mac_rx_clk      (enet_rx_clk),
+      .tse_mac_set_10      (1'b0),
+      .tse_mac_set_1000    (1'b1), 
+      .tse_mac_ena_10      (ena_10_from_the_tse_mac),
+      .tse_mac_eth_mode    (eth_mode_from_the_tse_mac),
+      .tse_mac_mdio_out    (mdio_out_from_the_tse_mac),
+      .tse_mac_mdio_oen    (mdio_oen_from_the_tse_mac),
+      .tse_mac_mdio_in     (enet_mdio),
+      .tse_mac_mdc         (enet_mdc),
+      
+      .memory_mem_a    (memory_mem_a),
+      .memory_mem_ba    (memory_mem_ba),
+      .memory_mem_ck    (memory_mem_ck),
+      .memory_mem_ck_n    (memory_mem_ck_n),
+      .memory_mem_cke    (memory_mem_cke),
+      .memory_mem_cs_n    (memory_mem_cs_n),
+      .memory_mem_dm    (memory_mem_dm),
+      .memory_mem_ras_n    (memory_mem_ras_n),
+      .memory_mem_cas_n    (memory_mem_cas_n),
+      .memory_mem_we_n    (memory_mem_we_n),
+      .memory_mem_reset_n    (memory_mem_reset_n),
+      .memory_mem_dq    (memory_mem_dq),
+      .memory_mem_dqs    (memory_mem_dqs),
+      .memory_mem_dqs_n    (memory_mem_dqs_n),
+      .memory_mem_odt    (memory_mem_odt),
+      .pll_0_locked_export (pll_0_locked_export),
+      
+      .entropic_ip_top_data_36_valid(ff_data_36_valid),
+      .entropic_ip_top_data_36(ff_data_36),
+      .entropic_ip_top_fpga_dip_id(device_id_dip),
+      
+      .tse_config_export(tse_config_sleeping)
+      
+      );
+   
+   
+		    
+   wire [9:0] data_l_wire;
+   wire [9:0] data_h_wire;
+   
+   reg [9:0]  data_l;
+   reg [9:0]  data_h;
+   
+   //10 bit DDR input from the DUT
+   ddio_in_10bits ddio_in(
+			  .aclr(~reset_n),
+			  .datain(ddr_in),
+			  .inclock(ddr_in_clk),
+			  .dataout_h(data_h_wire),
+			  .dataout_l(data_l_wire));
+
+   always @ (posedge ddr_in_clk)
+     begin
+	if(~reset_n)
+	  begin
+	     
+	  end
+	else
+	  begin
+	     
+	  end
+     end
+   
+
+   
+   reg 	      data_36_valid;
+   reg [35:0] data_36;
+   
+   //Construct 36 bit data
+   always @(posedge ddr_in_clk)
+     begin
+        if(~reset_n)
+          begin
+             data_36 <= 36'h000000000;
+             data_36_valid <= 1'b0;
+	     data_l <= 10'h000;
+	     data_h <= 10'h000;
+	  end
+        else
+          begin
+	     data_l <= data_l_wire;
+	     data_h <= data_h_wire;
+
+             if(data_h[9])
+               begin
+                  data_36 <= {{data_h[8:0],data_l[8:0]},18'h00000};
+                  data_36_valid <= 1'b0;
+               end
+             else
+               begin
+                  data_36 <= {{data_36[35:18]},{data_h[8:0],data_l[8:0]}};
+                  data_36_valid <= 1'b1;
+               end
+          end 
+     end
+
+   wire [35:0] ff_data_36;
+   reg 	       ff_data_36_valid;
+   wire        clk166;
+   wire        ff_rd_req;
+   wire        ff_rd_empty;
+
+   assign clk166_out = clk166;
+   assign      ff_rd_req = ~ff_rd_empty;
+   
+   //assert ff data valid signal
+   always @(posedge clk166)
+     begin
+        if(~reset_n)
+          begin
+             ff_data_36_valid <= 1'b0;
+          end
+        else
+          begin
+             if(ff_rd_req)
+               begin
+                  ff_data_36_valid <= 1'b1;
+               end
+             else
+               begin
+                  ff_data_36_valid <= 1'b0;
+               end
+          end
+     end
+   
+   fifo36 fifo36_inst(
+		      .data(data_36),
+		      .rdclk(clk166),
+		      .rdreq(ff_rd_req),
+		      .wrclk(~ddr_in_clk),
+		      .wrreq(data_36_valid),
+		      .q(ff_data_36),
+		      .rdempty(ff_rd_empty),
+		      .wrfull());
+   
+   
+
+
+   
+   
+   
+   
+   
+   
+endmodule // nios2_top

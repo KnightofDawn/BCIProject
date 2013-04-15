@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<root>
+  <event name="reserved" id="0" descr="No description" />
+  <event name="rfTfrCtrlEvent" id="1" descr="The RF Transfer Controller can generate an event via a special opcode and tag that event with an arbitrary 12-bit associated information field.  This enables logging of up to 4096 test points and error conditions.Frequency:  Assume low frequency and/or low timestamp accuracy requirements.">
+    <data dataNum="0" LSB="0" MSB="11" name="eventTag" signed="no" decimal="12" bit="12" />
+  </event>
+</root>
+

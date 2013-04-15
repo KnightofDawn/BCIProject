@@ -1,0 +1,80 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+entity TesterFpgaAndOrElement is
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      CmpInBus  : in  std_logic_vector(7 downto 0);
+      CmpOut    : out std_logic;
+
+      ConfigRegsIn   : in std_logic_vector(31 downto 0);
+      ConfigRegsOut  : out std_logic_vector(31 downto 0);
+      ConfigRegsEn   : in std_logic;
+      ConfigRegsLd   : in std_logic;
+      ConfigRegsSt   : in std_logic
+   );
+end TesterFpgaAndOrElement;
+
+architecture RTL of TesterFpgaAndOrElement is
+   -- Reg 0 - Find Data in stream
+   -- | [31]   |[30:16]|[15:14]|[13:12]|[11:10]| [9:8] | [7:6] | [5:4] | [3:2] | [1:0] |
+   -- | And/Or |  N/A  | Inp7  | Inp6  | Inp5  | Inp4  | Inp3  | Inp2  | Inp1  | Inp0  |
+   -- |        |       |Select |Select |Select |Select |Select |Select |Select |Select |
+   -- 0 - 0
+   -- 1 - 1
+   -- 2 - Input
+   type   RegisterBank_t is array (0 to 0) of std_logic_vector(31 downto 0);
+   signal RegisterBank       : RegisterBank_t;
+   signal RegisterBankStatic : RegisterBank_t;
+   
+   type MuxSel_t is array (0 to 7) of std_logic_vector(1 downto 0);
+   signal MuxSelBus : MuxSel_t;
+   signal AndOr     : std_logic;
+   signal ToGateBus : std_logic_vector(7 downto 0);
+
+begin
+   a: for i in 0 to 7 generate
+      ToGateBus(i) <= '0' when MuxSelBus(i)="00" else
+                      '1' when MuxSelBus(i)="01" else
+                      CmpInBus(i);
+   end generate;
+
+   CmpOut <= '1' when AndOr = '1' and ToGateBus  = "11111111" else
+             '1' when AndOr = '0' and ToGateBus /= "00000000" else
+             '0';
+
+   -- Config Registers 
+   process (RST, CLK)
+   begin
+      if RST = '1' then
+         RegisterBank       <= (others=>(others=>'0'));
+         RegisterBankStatic <= (others=>(others=>'0'));
+      elsif CLK'event and CLK='1' then
+         if (ConfigRegsSt = '1') then
+            RegisterBank <= RegisterBankStatic;
+         end if;
+         if (ConfigRegsLd = '1') then 
+            RegisterBankStatic <= RegisterBank;
+         end if;
+         if (ConfigRegsEn = '1') then
+            RegisterBankStatic(RegisterBankStatic'high) <= ConfigRegsIn;
+            for i in 0 to RegisterBankStatic'high-1 loop
+               RegisterBankStatic(i) <= RegisterBankStatic(i+1);
+            end loop;
+         end if;
+      end if;
+   end process;
+   ConfigRegsOut <= RegisterBankStatic(0);
+   b: for i in 0 to 7 generate
+      MuxSelBus(i) <= RegisterBank(0)(i*2+1 downto i*2);
+   end generate;
+   AndOr <= RegisterBank(0)(31);
+
+end RTL;
+
+

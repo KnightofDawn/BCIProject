@@ -1,0 +1,99 @@
+module drip_data_stream_tb();
+   
+   reg clk166;
+   reg reset;
+   reg drip_fsm_finish;
+   reg [55:0] cnt;
+   
+   reg 	      drip_ff_empty;
+   
+   wire       drip_ff_read_req;
+   reg        avl_str_ready;
+   
+   initial
+     begin 
+	clk166 = 1;
+	reset = 1;
+	drip_fsm_finish = 0;
+	cnt = 55'd0;
+	drip_ff_empty = 0;
+	avl_str_ready = 1;
+	
+	#20 reset = 0;
+
+	#36 avl_str_ready = 0;
+
+	#48 avl_str_ready = 1;
+	
+	//#3000 drip_fsm_finish = 1;
+
+	//#7000 $stop;
+	
+	
+     end
+   
+   always
+     begin
+	#3 clk166 = ~clk166;
+     end 
+
+   reg [31:0]      drip_data_out;
+   reg [3:0] 	   drip_hdr_out;
+   reg [15:0] 	   drip_ofst_out;
+   reg 		   drip_en_out;
+
+   reg [31:0] 	   counter;
+   
+   always @ (posedge clk166)
+     begin
+	if(reset == 1'b1)
+	  begin
+	     counter <= 32'd0;
+	     drip_data_out <= 0;
+	     drip_hdr_out  <= 0;
+	     drip_ofst_out <= 0;
+	     drip_en_out   <= 0;
+	  end
+	else
+	  begin
+	     counter <= counter + 32'd1;
+		 
+	     if((counter % 32'd10) == 0 && (counter<32'd100000))
+	       begin
+		  drip_data_out <= counter;
+		  drip_hdr_out  <= counter[19:16];
+		  drip_ofst_out <= counter[15:0];
+		  drip_en_out   <= 1'b1;
+	       end
+	     else
+	       begin
+		  drip_en_out   <= 1'b0;
+	       end
+	  end
+     end
+	
+   
+   drip_data_stream drip_data_stream_inst
+     (
+      .clk166(clk166),
+      .reset(reset),
+      
+      .drip_fsm_finish(drip_fsm_finish),
+      .drip_fsm_idle(),
+      
+      .drip_data_out(drip_data_out),
+      .drip_hdr_out(drip_hdr_out),
+      .drip_ofst_out(drip_ofst_out), 
+      .drip_en_out(drip_en_out), 
+      
+      //Ethernet Avalon Streaming source
+      .avl_str_sop(),
+      .avl_str_eop(),
+      .avl_str_data(),
+      .avl_str_data_valid(),
+      .avl_str_empty(),
+      .avl_str_ready(avl_str_ready),
+      .avl_str_error()
+      );
+
+endmodule

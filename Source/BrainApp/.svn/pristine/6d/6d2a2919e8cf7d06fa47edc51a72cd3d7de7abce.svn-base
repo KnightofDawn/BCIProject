@@ -1,0 +1,256 @@
+module capture_to_memory_tb();
+   
+   reg clk166;
+   reg reset;
+
+   reg [1:0] capture_throttle;
+   reg [31:0] capture_data32;
+   reg [3:0]  capture_hdr4;
+   reg [15:0] capture_ofst16;
+   reg	      capture_en;
+   
+   //ddr3 avalon memory mapped interface
+   wire       avl_ready;
+   wire       avl_write_req;
+   wire [31:0] avl_addr;
+   wire        avl_size;
+   wire        avl_be;
+   wire [127:0] avl_wdata;
+
+   assign avl_ready = 1;
+   
+   reg [127:0] 	ram[0:4095];
+      
+   //control and status
+   reg      arm;
+   reg       trigger;
+
+   //assign arm = 1;
+   //assign trigger = 0;
+   
+   initial
+     begin
+	clk166 = 0;
+	reset = 1;
+	capture_throttle = 0;
+	capture_data32 = 0;
+	capture_hdr4 = 0;
+	capture_ofst16 = 0;
+	capture_en = 0;
+	trigger = 0;
+	arm = 0;
+	
+
+	#18 reset = 0;
+
+	#200 arm = 1;
+	
+	#35000 trigger = 1;
+
+	#45000 arm = 0;
+	#45000 trigger = 0;
+	
+	#46000 arm = 1;
+
+	#47000 trigger = 1;
+	
+	#60000 $stop;
+     end
+
+   
+
+   
+   always
+     begin
+	#3 clk166 = ~clk166;
+     end
+
+
+   reg [7:0] byte_counter;
+   
+   
+   //generate capture data
+   always @(posedge clk166)
+     begin
+	if(reset)
+	  begin
+	     capture_throttle <= 0;
+	     capture_data32 <= 0;
+	     capture_hdr4 <= 0;
+	     capture_ofst16 <= 0;
+	     capture_en <= 0;
+	     byte_counter <= 0;
+	  end
+	else
+	  begin
+	     capture_throttle <= capture_throttle + 1;
+	     capture_en <= 1'b0;
+	     
+	     if(capture_throttle == 0)
+	       begin
+		  byte_counter <= byte_counter + 8'h05;
+		  
+		  capture_data32 <= {(byte_counter+8'h01),(byte_counter+8'h02),(byte_counter+8'h03),byte_counter+8'h04};
+		  capture_hdr4   <= (byte_counter);
+		  capture_ofst16 <= ((byte_counter)>>4);
+		  
+		  capture_en     <= capture_en + 1;
+	       end
+	  end
+     end
+
+
+   wire [31:0] oldest_sample_addr;
+   wire [31:0] newest_sample_addr;
+   wire        capture_done;
+   wire        ff_40_overflow_sticky;
+   
+   
+   capture_to_memory capture_to_memory_inst
+     (
+      .clk166(clk166),
+      .reset(reset),
+      
+      //capture data from filter block
+      .capture_data32(capture_data32),
+      .capture_hdr4(capture_hdr4),
+      .capture_ofst16(capture_ofst16),
+      .capture_en(capture_en),
+      
+      //ddr3 avalon memory mapped interface
+      .avl_addr(avl_addr), 
+      .avl_size(avl_size), 
+      .avl_be(avl_be), 
+      .avl_ready(avl_ready), 
+      .avl_wdata(avl_wdata),
+      .avl_write_req(avl_write_req),
+      
+      //control and status
+      .arm(arm),
+      .trigger(trigger),
+      .trigger_position(3'h2), 
+      
+      .oldest_sample_addr(oldest_sample_addr),
+      .newest_sample_addr(newest_sample_addr),
+      .capture_done(capture_done),
+      .ff_40_overflow_sticky(ff_40_overflow_sticky)
+      
+      );
+   
+
+
+   reg [7:0]   verify_counter;
+   reg [15:0]  error;
+   reg         align_err;
+   
+   reg [127:0] ram_sample;
+
+   wire [31:0] newest_sample_addr_minus_five = newest_sample_addr - 32'h00000005;
+      
+   always @(posedge clk166)
+     begin
+	if(reset)
+	  begin
+	     verify_counter <= 8'h00;
+	     error <= 16'h0000;
+	     ram_sample <= 128'd0;
+	     align_err <= 0;
+	     
+	  end
+	else
+	  begin
+
+	     error <= error;
+
+	     if(avl_write_req)
+	       begin
+		  
+		  ram[avl_addr[15:4]] <= avl_wdata;
+		  
+		  ram_sample =  ram[newest_sample_addr_minus_five[15:4]];
+		  
+		  ram_sample = ram_sample >> (8 * newest_sample_addr_minus_five[3:0]);
+
+		  if ((ram_sample[7:0]    != ram_sample[15:8] + 8'h01) || 
+		      (ram_sample[15:8]    != ram_sample[23:16] + 8'h01) ||
+		      (ram_sample[23:16] != ram_sample[31:24] + 8'h01))
+		    begin
+		       align_err <= 1;
+		    end
+		  else
+		    begin
+		       align_err <= 0;
+		    end
+    		  verify_counter <= verify_counter + 8'h10;
+		  
+		  if(avl_wdata[7:0] != verify_counter)
+		    begin
+		       error[0] <= 1'b1;		       
+		    end
+		  if(avl_wdata[15:8] != verify_counter + 8'h01)
+		    begin
+		       error[1] <= 1'b1;
+		    end
+		  if(avl_wdata[23:16] != verify_counter + 8'h02)
+		    begin
+		       error[2] <= 1'b1;
+		    end
+		  if(avl_wdata[31:24] != verify_counter + 8'h03)
+		    begin
+		       error[3] <= 1'b1;
+		    end
+		  if(avl_wdata[39:32] != verify_counter + 8'h04)
+		    begin
+		       error[4] <= 1'b1;
+		    end
+		  if(avl_wdata[47:40] != verify_counter + 8'h05)
+		    begin
+		       error[5] <= 1'b1;
+		    end
+		  if(avl_wdata[55:48] != verify_counter + 8'h06)
+		    begin
+		       error[6] <= 1'b1;
+		    end
+		  if(avl_wdata[63:56] != verify_counter + 8'h07)
+		    begin
+		       error[7] <= 1'b1;
+		    end
+		  if(avl_wdata[71:64] != verify_counter + 8'h08)
+		    begin
+		       error[8] <= 1'b1;
+		    end
+		  if(avl_wdata[79:72] != verify_counter + 8'h09)
+		    begin
+		       error[9] <= 1'b1;
+		    end
+		  if(avl_wdata[87:80] != verify_counter + 8'h0A)
+		    begin
+		       error[10] <= 1'b1;
+		    end
+		  if(avl_wdata[95:88] != verify_counter + 8'h0B)
+		    begin
+		       error[11] <= 1'b1;
+		    end
+		  if(avl_wdata[103:96] != verify_counter + 8'h0C)
+		    begin
+		       error[12] <= 1'b1;
+		    end
+		  if(avl_wdata[111:104] != verify_counter + 8'h0D)
+		    begin
+		       error[13] <= 1'b1;
+		    end
+		  if(avl_wdata[119:112] != verify_counter + 8'h0E)
+		    begin
+		       error[14] <= 1'b1;
+		    end
+		  if(avl_wdata[127:120] != verify_counter + 8'h0F)
+		    begin
+		       error[15] <= 1'b1;
+		    end
+	       end
+	  end
+     end
+
+   
+   
+endmodule // capture_to_memory_tb

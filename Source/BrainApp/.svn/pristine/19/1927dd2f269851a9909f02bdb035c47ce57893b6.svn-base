@@ -1,0 +1,70 @@
+onerror {resume}
+quietly WaveActivateNextPane {} 0
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/clk166
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/reset
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_fsm_finish
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/cnt
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_ff_empty
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/avl_str_ready
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_out
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_hdr_out
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_ofst_out
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_en_out
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/counter
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/clk166
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/reset
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_fsm_finish
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_fsm_idle
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_data_out
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_hdr_out
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_ofst_out
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_en_out
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/avl_str_sop
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/avl_str_eop
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/avl_str_data
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/avl_str_data_valid
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/avl_str_empty
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/avl_str_ready
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/avl_str_error
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_ff_data_56_in
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_ff_data_56
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_ff_empty
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_ff_read_req
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_ff_almost_empty
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_ff_full
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/pkt_gen_state
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/pkt_byte_cnt
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_data_buffer56
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_data_buffer_cnt
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/pkt_cnt
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/pkt_end_cnt
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/drip_ff_data_available
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/clock
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/data
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/rdreq
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/wrreq
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/almost_empty
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/empty
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/full
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/q
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/sub_wire0
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/sub_wire1
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/sub_wire2
+add wave -noupdate -radix hexadecimal /drip_data_stream_tb/drip_data_stream_inst/fifo56_drip_data_inst/sub_wire3
+TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {50 ps} 0}
+configure wave -namecolwidth 285
+configure wave -valuecolwidth 106
+configure wave -justifyvalue left
+configure wave -signalnamewidth 0
+configure wave -snapdistance 10
+configure wave -datasetprefix 0
+configure wave -rowmargin 4
+configure wave -childrowmargin 2
+configure wave -gridoffset 0
+configure wave -gridperiod 1
+configure wave -griddelta 40
+configure wave -timeline 0
+configure wave -timelineunits ps
+update
+WaveRestoreZoom {702369 ps} {703143 ps}

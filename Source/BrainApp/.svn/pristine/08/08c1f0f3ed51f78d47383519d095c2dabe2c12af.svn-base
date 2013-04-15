@@ -1,0 +1,15 @@
+transcript on
+if {[file exists rtl_work]} {
+	vdel -lib rtl_work -all
+}
+vlib rtl_work
+vmap work rtl_work
+
+vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory {C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.v}
+vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory {C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory_tb.v}
+
+vsim work.capture_to_memory_tb
+
+do wave.do
+
+run -all

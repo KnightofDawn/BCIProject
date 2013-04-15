@@ -1,0 +1,125 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+ 
+
+entity TesterFpgaParser is
+   port( 
+      RST       : in std_logic;
+      CLK       : in std_logic;
+   
+      Reset     : in std_logic;
+      
+      DutData   : in std_logic_vector(35 downto 0);
+      DutDataEn : in std_logic;
+
+      DataOut   : out std_logic_vector(31 downto 0);
+      HdrOut    : out std_logic_vector( 3 downto 0);
+      OffsetOut : out std_logic_vector(15 downto 0);
+      PktTypeOut: out std_logic_vector( 3 downto 0); -- updated on CsBuff Header Type 
+      DataOutEn : out std_logic
+   );
+end TesterFpgaParser;
+
+architecture RTL of TesterFpgaParser is
+---------------     Rst Cnt
+-- Event Logger      2  3
+-- TestMux           4  5
+-- CsBuff            6  7
+-- Memory Monitor    8  9
+-- DMA Data         10 11,12
+-- Periodic Monitor 13 14
+
+   signal DataIn    : std_logic_vector (31 downto 0);
+   signal HdrIn     : std_logic_vector ( 3 downto 0);
+   signal PktTypeIn : std_logic_vector ( 3 downto 0);
+   signal EventLoggerCntr, TestMuxCntr, CsBuffCntr, 
+          MemoryMonCntr, DmaDataCntr, PeriodicMonCntr : std_logic_vector(15 downto 0);
+
+begin
+   DataIn    <= DutData(31 downto  0);
+   HdrIn     <= DutData(35 downto 32);
+   PktTypeIn <= DutData(19 downto 16);
+
+   process (CLK, RST)
+   begin
+      if (RST = '1') then
+         EventLoggerCntr <= (others=>'0');
+         TestMuxCntr     <= (others=>'0');
+         CsBuffCntr      <= (others=>'0');
+         MemoryMonCntr   <= (others=>'0');
+         DmaDataCntr     <= (others=>'0');
+         PeriodicMonCntr <= (others=>'0');
+         PktTypeOut      <= (others=>'0');
+         
+      elsif (CLK'event and CLK = '1') then
+         if (Reset = '1') then
+            EventLoggerCntr <= (others=>'0');
+            TestMuxCntr     <= (others=>'0');
+            CsBuffCntr      <= (others=>'0');
+            MemoryMonCntr   <= (others=>'0');
+            DmaDataCntr     <= (others=>'0');
+            PeriodicMonCntr <= (others=>'0');
+            PktTypeOut      <= (others=>'0');
+         
+         elsif (DutDataEn = '1') then
+            if (HdrIn = std_logic_vector(to_unsigned(2,4))) then
+               EventLoggerCntr <= (others=>'0');
+               OffsetOut       <= (others=>'0');
+            elsif (HdrIn = std_logic_vector(to_unsigned(3,4))) then
+               EventLoggerCntr <= EventLoggerCntr + 1;
+               OffsetOut       <= EventLoggerCntr;
+            
+            elsif (HdrIn = std_logic_vector(to_unsigned(4,4))) then
+               TestMuxCntr <= (others=>'0');
+               OffsetOut   <= (others=>'0');
+            elsif (HdrIn = std_logic_vector(to_unsigned(5,4))) then
+               TestMuxCntr <= TestMuxCntr + 1;
+               OffsetOut   <= TestMuxCntr;
+
+            elsif (HdrIn = std_logic_vector(to_unsigned(6,4))) then
+               CsBuffCntr <= (others=>'0');
+               OffsetOut  <= (others=>'0');
+               PktTypeOut <= PktTypeIn;
+            elsif (HdrIn = std_logic_vector(to_unsigned(7,4))) then
+               CsBuffCntr <= CsBuffCntr + 1;
+               OffsetOut  <= CsBuffCntr;
+
+            elsif (HdrIn = std_logic_vector(to_unsigned(8,4))) then
+               MemoryMonCntr <= (others=>'0');
+               OffsetOut     <= (others=>'0');
+            elsif (HdrIn = std_logic_vector(to_unsigned(9,4))) then
+               MemoryMonCntr <= MemoryMonCntr + 1;
+               OffsetOut     <= MemoryMonCntr;
+
+            elsif (HdrIn = std_logic_vector(to_unsigned(10,4))) then
+               DmaDataCntr <= (others=>'0');
+               OffsetOut   <= (others=>'0');
+            elsif ((HdrIn = std_logic_vector(to_unsigned(11,4))) or 
+                   (HdrIn = std_logic_vector(to_unsigned(12,4)))) then
+               MemoryMonCntr <= DmaDataCntr + 1;
+               OffsetOut     <= DmaDataCntr;
+
+            elsif (HdrIn = std_logic_vector(to_unsigned(13,4))) then
+               PeriodicMonCntr <= (others=>'0');
+               OffsetOut   <= (others=>'0');
+            elsif (HdrIn = std_logic_vector(to_unsigned(14,4))) then
+               PeriodicMonCntr <= PeriodicMonCntr + 1;
+               OffsetOut       <= PeriodicMonCntr;
+            end if; 
+            
+            DataOut   <= DataIn;
+            HdrOut    <= HdrIn;
+            DataOutEn <= '1';
+            
+         else 
+            DataOutEn <= '0';
+            
+         end if; -- DutDataEn = '1'
+      
+      end if; -- CLK'event
+   end process;
+
+end RTL;

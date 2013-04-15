@@ -1,0 +1,165 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+
+entity TesterFpgaMemoryElement is
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      DataIn    : in std_logic_vector(31 downto 0);
+      HdrIn     : in std_logic_vector( 3 downto 0);
+      OffsetIn  : in std_logic_vector(15 downto 0);
+      PktIdIn   : in std_logic_vector( 1 downto 0);
+      PktTypeIn : in std_logic_vector( 3 downto 0);
+      DataInEn  : in std_logic;
+
+      PktIdSelIn : in  std_logic_vector( 1 downto 0);
+      DataOut    : out std_logic_vector(31 downto 0);
+
+      ConfigRegsIn   : in std_logic_vector(31 downto 0);
+      ConfigRegsOut  : out std_logic_vector(31 downto 0);
+      ConfigRegsEn   : in std_logic;
+      ConfigRegsLd   : in std_logic;
+      ConfigRegsSt   : in std_logic
+   );
+end TesterFpgaMemoryElement ;
+
+architecture RTL of TesterFpgaMemoryElement is
+   -- Reg 0 - Find Data in stream
+   -- | [31] |   [29:25]   |   [24:20]  |  [19:16]  |                    [15:0]                          |
+   -- |  N/A |   RShift    |   SignExt  |  PktType  |                Offset in Block                     |
+   -- Reg 1 - Data Mask
+   -- |                                            [31:0]                                                |
+   -- |                                             Mask                                                 |
+   -- Reg 2 - Compare Data For Pkt Id 0
+   -- |                                            [31:0]                                                |
+   -- |                                             Data                                                 |
+   -- Reg 3 - Compare Data For Pkt Id 1
+   -- |                                            [31:0]                                                |
+   -- |                                             Data                                                 |
+   -- Reg 4 - Compare Data For Pkt Id 2
+   -- |                                            [31:0]                                                |
+   -- |                                             Data                                                 |
+   -- Reg 5 - Compare Data For Pkt Id 3
+   -- |                                            [31:0]                                                |
+   -- |                                             Data                                                 |
+   -- Reg 6 - Add Data Constant
+   -- |                                            [31:0]                                                |
+   -- |                                         Add Data                                                 |
+   -- Execution order: Mask, Right-Shift, Sign-Extension
+   
+   function SignExtend( 
+      Num : std_logic_vector(31 downto 0);
+      SignExt : integer range 0 to 31
+   ) return std_logic_vector is 
+      variable RetVal : std_logic_vector(31 downto 0);
+   begin
+      RetVal(SignExt downto 0)    := Num(SignExt downto 0);
+      RetVal(31 downto SignExt+1) := (others => Num(SignExt));
+      return RetVal;
+   end function;
+   
+   function PktIdToRegNum(PktId : std_logic_vector(1 downto 0))
+      return integer is
+      variable RegNum : integer range 2 to 5;
+   begin
+      if    (PktId="00") then 
+         RegNum := 2;
+      elsif (PktId="01") then 
+         RegNum := 3;
+      elsif (PktId="10") then 
+         RegNum := 4;
+      elsif (PktId="11") then 
+         RegNum := 5;
+      end if;
+      return RegNum;
+   end function;
+   
+   type   RegisterBank_t is array (0 to 6) of std_logic_vector(31 downto 0);
+   signal RegisterBank       : RegisterBank_t;
+   signal RegisterBankStatic : RegisterBank_t;
+   
+   signal Match  : std_logic;
+   signal OffsetReg  : std_logic_vector(15 downto 0);
+   signal PktTypeReg : std_logic_vector( 3 downto 0);
+   signal SignExtReg : integer range 31 downto 0;
+   signal RShiftReg  : std_logic_vector( 4 downto 0);
+   signal MaskReg    : std_logic_vector(31 downto 0);
+   signal ConstReg   : std_logic_vector(31 downto 0);
+
+   signal FilteredDataIn : std_logic_vector(31 downto 0);
+   
+begin
+
+   -- Match
+   Match  <= '1' when (DataInEn='1') and 
+                      (HdrIn="0111") and 
+                      (OffsetIn=OffsetReg) and 
+                      (PktTypeIn=PktTypeReg) 
+                 else '0';
+                 
+   FilteredDataIn <= SignExtend(SHR((DataIn and MaskReg),RShiftReg),SignExtReg);
+   
+   -- Config Registers 
+   process (RST, CLK)
+   begin
+      if RST = '1' then
+         RegisterBank       <= (others=>(others=>'0'));
+         RegisterBankStatic <= (others=>(others=>'0'));
+      elsif CLK'event and CLK='1' then
+         if (ConfigRegsSt = '1') then
+            RegisterBank <= RegisterBankStatic;
+         elsif (Match='1') then
+            RegisterBank(PktIdToRegNum(PktIdIn)) <= FilteredDataIn;
+         end if;
+         if (ConfigRegsLd = '1') then 
+            RegisterBankStatic <= RegisterBank;
+         end if;
+         if (ConfigRegsEn = '1') then
+            RegisterBankStatic(RegisterBankStatic'high) <= ConfigRegsIn;
+            for i in 0 to RegisterBankStatic'high-1 loop
+               RegisterBankStatic(i) <= RegisterBankStatic(i+1);
+            end loop;
+         end if;
+      end if;
+   end process;
+   ConfigRegsOut   <= RegisterBankStatic(0);
+   OffsetReg       <= RegisterBank(0)(15 downto  0);
+   PktTypeReg      <= RegisterBank(0)(19 downto 16);
+   SignExtReg      <= conv_integer(RegisterBank(0)(24 downto 20));
+   RShiftReg       <= RegisterBank(0)(29 downto 25);
+   MaskReg         <= RegisterBank(1);
+   ConstReg        <= RegisterBank(6);
+   DataOut         <= RegisterBank(PktIdToRegNum(PktIdSelIn)) + ConstReg;
+   
+end RTL;
+
+--   type   RegisterBank_t is array (0 to 6) of std_logic_vector(31 downto 0);
+--   signal RegisterBank       : RegisterBank_t;
+--   signal RegisterBankStatic : RegisterBank_t;
+   -- Config Registers 
+--   process (RST, CLK)
+--   begin
+--      if RST = '1' then
+--         RegisterBank       <= (others=>(others=>'0'));
+--         RegisterBankStatic <= (others=>(others=>'0'));
+--      elsif CLK'event and CLK='1' then
+--         if (ConfigRegsSt = '1') then
+--            RegisterBank <= RegisterBankStatic;
+--         end if;
+--         if (ConfigRegsLd = '1') then 
+--            RegisterBankStatic <= RegisterBank;
+--         end if;
+--         if (ConfigRegsEn = '1') then
+--            RegisterBankStatic(RegisterBankStatic'high) <= ConfigRegsIn;
+--            for i in 0 to RegisterBankStatic'high-1 loop
+--               RegisterBankStatic(i) <= RegisterBankStatic(i+1);
+--            end loop;
+--         end if;
+--      end if;
+--   end process;
+--   ConfigRegsOut <= RegisterBankStatic(0);

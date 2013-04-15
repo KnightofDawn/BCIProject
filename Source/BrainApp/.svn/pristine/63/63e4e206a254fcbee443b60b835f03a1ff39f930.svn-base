@@ -1,0 +1,210 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 21 22:42:36 2013
+
+@author: yozturk
+"""
+from PyQt4 import QtCore, QtGui, Qt
+import os
+import sys
+from PyQt4.QtGui import *
+
+
+class ExtendedComboBox(QComboBox):
+    def __init__(self, parent=None):
+        super(ExtendedComboBox, self).__init__(parent)
+
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.setEditable(True)
+        
+        # add a filter model to filter matching items
+        self.pFilterModel = QSortFilterProxyModel(self)
+        self.pFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.pFilterModel.setSourceModel(self.model())
+
+        # add a completer, which uses the filter model
+        self.completer = QCompleter(self.pFilterModel, self)
+        # always show all (filtered) completions
+        self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        self.setCompleter(self.completer)
+
+        # connect signals
+        self.lineEdit().textEdited[unicode].connect(self.pFilterModel.setFilterFixedString)
+        self.completer.activated.connect(self.on_completer_activated)
+
+
+    # on selection of an item from the completer, select the corresponding item from combobox 
+    def on_completer_activated(self, text):
+        if text:
+            index = self.findText(text)
+            self.setCurrentIndex(index)
+
+
+    # on model change, update the models of the filter and completer as well 
+    def setModel(self, model):
+        super(ExtendedComboBox, self).setModel(model)
+        self.pFilterModel.setSourceModel(model)
+        self.completer.setModel(self.pFilterModel)
+
+
+    # on model column change, update the model column of the filter and completer as well
+    def setModelColumn(self, column):
+        self.completer.setCompletionColumn(column)
+        self.pFilterModel.setFilterKeyColumn(column)
+        super(ExtendedComboBox, self).setModelColumn(column)
+
+
+class Gate(QtGui.QGroupBox): 
+     def __init__(self,master,i):       
+        self.container = master
+        self.addGate(master,i)
+        self.GateInputs = []
+        self.OutputConnection=[]
+       
+     def addGate(self,master,i):
+        if (i < 9):
+             self.groupBox = QtGui.QGroupBox(Qt.QString("Gate %1") .arg(i))
+        else:
+             self.groupBox = QtGui.QGroupBox(Qt.QString("Final Output"))
+             
+        self.groupBox.setFixedHeight(100)
+        if i in [1,3,5,7] :
+            self.groupBox.setStyleSheet("background-color: lightGray")
+        else:
+            self.groupBox.setStyleSheet("background-color: yellow")
+
+        if (i == 9):
+            self.groupBox.setStyleSheet("background-color: cyan")
+            
+            
+        self.hbox = Qt.QGridLayout(self.groupBox)
+        self.groupBox.setLayout(self.hbox)
+        self.gateType = QtGui.QComboBox()
+        self.gateType.addItem("AND")
+        self.gateType.addItem("OR")
+        self.hbox.addWidget(self.gateType)
+        self.label = QtGui.QLabel("Inputs :")
+        self.hbox.addWidget(self.label)
+        self.gateInputs = QtGui.QLineEdit()   
+        
+        
+        #self.gateID.setStyleSheet('color: red')
+        # self.groupBox.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        #                             "border:1px solid rgb(255, 170, 255);")
+      
+        self.hbox.addWidget(self.gateInputs)
+    
+#        button = PicButton(QPixmap("andGate.png"))
+#        self.hbox.addWidget(button)
+        
+        
+       
+        
+        master.addWidget(self.groupBox)
+
+     def deleteGate(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)
+        
+
+
+class Counter(QtGui.QGroupBox): 
+     def __init__(self,master,i):       
+        self.container = master
+        self.addCounter(master,i)
+        self.CounterInputs = []
+        self.OutputConnection=[]
+       
+     def addCounter(self,master,i):
+        self.groupBox = QtGui.QGroupBox(Qt.QString("Counter %1") .arg(i))
+        self.groupBox.setFixedHeight(110)
+        self.label1 = QtGui.QLabel(self.groupBox)
+        self.label1.setGeometry(QtCore.QRect(10, 20, 71, 16))
+        self.label1.setText("InitCounter")
+        self.label2 = QtGui.QLabel(self.groupBox)
+        self.label2.setGeometry(QtCore.QRect(140, 20, 91, 16))
+        self.label2.setText("Current Counter")
+        self.initCounter = QtGui.QSpinBox(self.groupBox)
+        self.initCounter.setGeometry(QtCore.QRect(10, 40, 111, 22))
+        self.currentCounter = QtGui.QSpinBox(self.groupBox)
+        self.currentCounter.setGeometry(QtCore.QRect(140, 40, 101, 22))
+        self.label_21 = QtGui.QLabel(self.groupBox)
+        self.label_21.setGeometry(QtCore.QRect(250, 20, 81, 16))
+        self.label_21.setText("Dependent on")
+        self.cntReset = QtGui.QLineEdit(self.groupBox)
+        self.cntReset.setGeometry(QtCore.QRect(257, 81, 110, 20))
+        self.label_22 = QtGui.QLabel(self.groupBox)
+        self.label_22.setGeometry(QtCore.QRect(13, 64, 91, 16))
+        self.label_22.setText("UpCountSignals")
+        self.cntUpCount = QtGui.QLineEdit(self.groupBox)
+        self.cntUpCount.setGeometry(QtCore.QRect(10, 81, 111, 20))
+        self.cntDownCount = QtGui.QLineEdit(self.groupBox)
+        self.cntDownCount.setGeometry(QtCore.QRect(135, 81, 110, 20))
+        self.label_24 = QtGui.QLabel(self.groupBox)
+        self.label_24.setGeometry(QtCore.QRect(260, 66, 101, 10))
+        self.label_24.setText("ResetCountSignals")
+        self.cntDependOn = QtGui.QLineEdit(self.groupBox)
+        self.cntDependOn.setGeometry(QtCore.QRect(250, 40, 110, 20))
+        self.label_29 = QtGui.QLabel(self.groupBox)
+        self.label_29.setGeometry(QtCore.QRect(136, 66, 101, 16))
+        self.label_29.setText("DownCountSignals")
+        
+        self.initCounter.setValue(1)
+        master.addWidget(self.groupBox)
+
+     def deleteCounter(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)
+
+
+class Condition(QtGui.QGroupBox): 
+     def __init__(self,master,filterList,i):       
+        self.container = master
+        self.filterList =filterList     
+        self.addCondition(master,i)
+        self.OutputConnection=[]
+    
+     def addCondition(self,master,i):     
+        self.BufGroup = QtGui.QGroupBox(Qt.QString("Comparison Group  %1") .arg(i))
+        self.bufCombo1 = QtGui.QComboBox(self.BufGroup)
+        self.bufCombo1.setGeometry(QtCore.QRect(10, 16, 250, 22)) 
+        self.bufCombo1.setEditable(True)
+        
+        self.bufCombo2 = QtGui.QComboBox(self.BufGroup)
+        self.bufCombo2.setGeometry(QtCore.QRect(10, 53, 250, 23))
+        self.bufCombo2.setEditable(True)
+
+        self.bufCmp = QtGui.QComboBox(self.BufGroup)
+        self.bufCmp.setGeometry(QtCore.QRect(270, 16, 41, 81))
+        self.BufEdit = QtGui.QLineEdit(self.BufGroup)
+        self.BufEdit.setGeometry(QtCore.QRect(80, 80, 180, 21))
+        self.bufAndPlus = QtGui.QComboBox(self.BufGroup)
+        self.bufAndPlus.setGeometry(QtCore.QRect(10, 80, 61, 21))
+#        
+        for filterElement in self.filterList:
+            self.bufCombo1.addItem(filterElement[0])
+            self.bufCombo2.addItem(filterElement[0])      
+#        
+        self.bufAndPlus.addItems(['&','+'])
+        self.bufCmp.addItems(['>', '<', '!=', '=='])
+
+        self.proxy1 = Qt.QSortFilterProxyModel(self.bufCombo1)
+        self.proxy1.setSourceModel(self.bufCombo1.model())
+        self.bufCombo1.model().setParent(self.proxy1)
+        self.bufCombo1.setModel(self.proxy1)
+        self.bufCombo1.model().sort(0)
+        
+        self.proxy2 = Qt.QSortFilterProxyModel(self.bufCombo2)
+        self.proxy2.setSourceModel(self.bufCombo1.model())
+        self.bufCombo2.model().setParent(self.proxy2)
+        self.bufCombo2.setModel(self.proxy2)
+        self.bufCombo2.model().sort(0)
+        
+        
+        master.addWidget(self.BufGroup)
+       
+
+       
+   

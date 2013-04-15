@@ -1,0 +1,38 @@
+`timescale 1ns/100ps
+
+module tse_config_tb();
+   
+   reg clk166;
+   reg reset;
+
+   initial
+     begin
+	clk166 = 0;
+	reset = 1;
+
+	#18 reset = 0;
+
+	#26000 $stop;
+     end
+
+   
+   always
+     begin
+	#3 clk166 = ~clk166;
+     end
+
+   wire waitrequest = 1'b0;
+   
+   
+   tse_config tse_config_tb
+     (
+      .clk166(clk166),
+      .reset(reset), 
+      .write(),
+      .address(),
+      .writedata(),
+      .waitrequest(waitrequest)
+      );
+   
+   
+endmodule // capture_to_memory_tb
