@@ -1,0 +1,417 @@
+<system desc="based on: Hand edited and generated back to PHY_Interface.doc" dl_ldpc_regs_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 35)" fd_tables_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 20)" name="reg_htm_parse" td_tables_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 20)">
+  <block name="PhyDl" offset="0xcc150000">
+    <regfile absolute_addr="0xcc151080" desc="PhyDl Rx Csbuff Status (dynamic status register)" name="RxCsbSts" offset="0x1080">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="RxDllEntryStatus" offset="0x00">
+        <field access="rw" desc="Alias - see TxDllEntryControl register description." name="ControlEmpty" offset="0" reset="1" width="1" />
+        <field access="rw" desc="Set to '0' by hardware to indicate the entry has valid status. Writing a '1' indicates the entry is transferred to hardware for reuse." name="Empty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Alias - see RxDllEntryControl register description." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxDllControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxDllStatusLost" offset="5" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxDllStatusOverflow" offset="6" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="25" />
+      </reg>
+      <reg name="RxDllFecStatus" offset="0x04">
+        <field access="ru" desc="0: no error detected by LDPC decoder 1: error detected by LDPC decoder Set to '1' when the LDPC decoder is enabled and an uncorrectable error is detected in at least one codeword in the packet." name="LdpcDecErr" offset="0" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="1" reset="x" width="1" />
+        <field access="ru" desc="0: no error detected by R-S decoder 1: error detected by R-S decoder Set to '1' when the Reed-Solomon decoder is enabled and an uncorrectable error is detected in at least one codeword in the packet." name="RsDecErr" offset="2" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="28" />
+        <field access="ru" desc="0: one or more uncorrectable errors detected in packet 1: no uncorrectable errors detected in packet Indicates the success of the last enabled FEC unit in the processing chain. Set to '1' when no FEC unit is enabled." name="RxFecSuccess" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RxLdpcDecStatus_0" offset="0x08">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="16" />
+        <field access="ru" desc="Number of uncorrectable blocks detected in packet. Saturates at the maximum value. Set to 0 when the LDPC decoder is not enabled." name="NumErrs" offset="16" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="RxLdpcDecStatus_1" offset="0x0c">
+        <field access="ru" desc="Number of times decode aborted by the input buffer filling. This applies to both OFDM and OFDMA." name="LdpcDecNumAbortIters" offset="0" reset="x" width="8" />
+        <field access="ru" desc="Number of times decode stopped by reaching iteration limit. This applies to both OFDM and OFDMA." name="LdpcDecNumMaxIters" offset="8" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxLdpcDecStatus_2" offset="0x10">
+        <field access="ru" name="NumStopIters_4" offset="0" reset="x" width="8" />
+        <field access="ru" name="NumStopIters_5" offset="8" reset="x" width="8" />
+        <field access="ru" name="NumStopIters_6" offset="16" reset="x" width="8" />
+        <field access="ru" desc="OFDMA codeword 7 number of times decode stopped by stop iteration criteria; Not valid in OFDM mode." name="NumStopIters_7" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxLdpcDecStatus_3" offset="0x14">
+        <field access="ru" desc="For OFDMA codeword 0 or OFDM packet." name="NumStopIters_0" offset="0" reset="x" width="8" />
+        <field access="ru" name="NumStopIters_1" offset="8" reset="x" width="8" />
+        <field access="ru" name="NumStopIters_2" offset="16" reset="x" width="8" />
+        <field access="ru" name="NumStopIters_3" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxLdpcDecStatus_4" offset="0x18">
+        <field access="ru" name="DecMaxDecLayers_4" offset="0" reset="x" width="8" />
+        <field access="ru" name="DecMaxDecLayers_5" offset="8" reset="x" width="8" />
+        <field access="ru" name="DecMaxDecLayers_6" offset="16" reset="x" width="8" />
+        <field access="ru" desc="OFDMA codeword 7 maximum number of layers processed for a codeword; Not valid in OFDM mode." name="DecMaxDecLayers_7" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxLdpcDecStatus_5" offset="0x1c">
+        <field access="ru" desc="For OFDMA codeword 0 or OFDM packet." name="DecMaxDecLayers_0" offset="0" reset="x" width="8" />
+        <field access="ru" name="DecMaxDecLayers_1" offset="8" reset="x" width="8" />
+        <field access="ru" name="DecMaxDecLayers_2" offset="16" reset="x" width="8" />
+        <field access="ru" name="DecMaxDecLayers_3" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxLdpcDecStatus_6" offset="0x20">
+        <field access="ru" name="TotalDecLayers_6" offset="0" reset="x" width="16" />
+        <field access="ru" desc="OFDMA codeword 7 cumulative number of layers processed for all codeswords in pack. Not valid in OFDM mode." name="TotalDecLayers_7" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxLdpcDecStatus_7" offset="0x24">
+        <field access="ru" name="TotalDecLayers_4" offset="0" reset="x" width="16" />
+        <field access="ru" name="TotalDecLayers_5" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxLdpcDecStatus_8" offset="0x28">
+        <field access="ru" name="TotalDecLayers_2" offset="0" reset="x" width="16" />
+        <field access="ru" name="TotalDecLayers_3" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxLdpcDecStatus_9" offset="0x2c">
+        <field access="ru" desc="For OFDMA codeword 0 or OFDM packet." name="TotalDecLayers_0" offset="0" reset="x" width="16" />
+        <field access="ru" name="TotalDecLayers_1" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxRsDecStatus" offset="0x30">
+        <field access="ru" desc="Number of bytes corrected in packet. Set to 0 when the R-S decoder is not enabled." name="NumCorrections" offset="0" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="5" />
+        <field access="ru" desc="Number of uncorrectable blocks detected in packet. Set to 0 when the R-S decoder is not enabled." name="NumErrs" offset="16" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxDllStatus" offset="0x34">
+        <field access="ru" desc="Short block if insufficient data to complete last block." name="ByteDeinterleaverShortBlock" offset="0" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="1" reset="x" width="31" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc150100" desc="PhyDl Tx Ldpc (Encode) Parity Matrix Table Registers" name="TxLdpcEnc" offset="0x100">
+      <reg name="ConfigControl" offset="0x0">
+        <field access="rw" desc="0: 4608 rate 19/24 ... 1: 576 rate 3/4 ... Specifies the generator matrix accessed by writes and reads to TxLdpcEncConfigData." name="CodeSel" offset="24" reset="x" width="1" />
+        <field access="rw" desc="When '0' and set to '1' the internal configuration address counters are set to (0,0). The next write or read to TxLdpcEncConfigData accesses address (0,0)." name="SetStartAddr" offset="28" reset="x" width="1" />
+      </reg>
+      <reg name="ConfigData" offset="0x4">
+        <field access="rw" desc="Accesses to this register write or read the generator matrix of the code selected by CodeSel. The 4608 code uses a 38x960 submatrix and the 576 code uses a 36x144 submatrix. Sequential accesses to this register access the selected submatrix in row-major order with the internal address counters incremented after each access. See XXX for details of the format." name="Data" offset="0" reset="x" width="32" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc150500" desc="PhyDl Rx Ldpc (Decode) Parity Matrix Table Registers" name="RxLdpcDec" offset="0x500">
+      <reg name="ConfigControl" offset="0x0">
+        <field access="rw" desc="0: 4608 rate 19/24 ... 1: 576 rate 3/4 ... Specifies the generator matrix accessed by writes and reads to TxLdpcEncConfigData." name="CodeSel" offset="24" reset="x" width="2" />
+        <field access="rw" desc="When '0' and set to '1' the internal configuration address counters are set to (0,0). The next write or read to TxLdpcEncConfigData accesses address (0,0)." name="SetStartAddr" offset="28" reset="x" width="1" />
+      </reg>
+      <reg name="ConfigData" offset="0x4">
+        <field access="rw" desc="Accesses to this register write or read the generator matrix of the code selected by CodeSel. The 4608 code uses a 38x960 submatrix and the 576 code uses a 36x144 submatrix. Sequential accesses to this register access the selected submatrix in row-major order with the internal address counters incremented after each access. See XXX for details of the format." name="Data" offset="0" reset="x" width="32" />
+      </reg>
+    </regfile>
+    <regfile desc="PhyDl Tx Csr (static control register)" name="TxCsr" offset="0x0000">
+      <reg name="PhyVersionNum" offset="0x000">
+        <field access="ru" desc="Revision number of module." name="Revision" offset="0" reset="0" width="8" />
+        <field access="ru" desc="Version number of module." name="Version" offset="8" reset="0" width="8" />
+        <field access="ru" desc="Indicates module type. PHY = TBS." name="ModuleID" offset="16" reset="0" width="16" />
+      </reg>
+      <reg name="PhyTxDllCtrl" offset="0x004">
+        <field access="rw" desc="0: Tx DLL reset 1: Tx DLL enabled." name="Enable" offset="0" reset="0" width="1" />
+        <field access="rw" desc="0: &quot;circular queue&quot; mode 1: &quot;register&quot; mode ... Normal operation uses &quot;circular queue&quot; mode. Repetitive and continuous operation use &quot;register&quot; mode." name="DynCtrlMode" offset="1" reset="x" width="1" />
+        <field access="rw" desc="0: normal operation ... 1: loopback Tx DLL to Rx DLL ... Note this bit controls both Tx and Rx." name="LoopbackToRx" offset="2" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="29" />
+      </reg>
+      <reg name="TxDataPattGen" offset="0x008">
+        <field access="rw" desc="When the PN23 pattern is selected InitialPatternState[22:0] is the initial (seed) value of the PN-23 LFSR. Note InitialPatternState[0] is the first bit shifted out of the LFSR; this is consistent with the bit order of the Byte Scrambler LFSR seed but bit-reversed compared to the definition of this parameter in the PHY Systems spec. When the RAMP pattern is selected InitialPatternState[7:0] is the starting value of the ramp. When the TWO-BYTE pattern is selected InitialPatternState[7:0] followed by InitialPatternState[15:8] are the repeating pattern." name="InitialPatternState" offset="0" reset="x" width="23" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="1" />
+        <field access="rw" desc="Starts the pattern generator when '1' in continuous or fixed packet modes. Stops the pattern generator when '0' in continuous or fixed packet modes. When stopping in continuous mode the pattern generator ends the packet and stops after generating NumBytes bytes. When stopping in fixed-packet mode the pattern generator stops after the end of the current packet. Not used in replace mode." name="PattStartStop" offset="24" reset="x" width="1" />
+        <field access="rw" name="RESERVED" offset="25" reset="x" width="2" />
+        <field access="rw" desc="When '0' and set to '1' the internal PattResetPacketStartOnce bit is set to '1'. The internal PattResetPacketStartOnce bit is identical in function to the PattResetPacketStart bit, except it is cleared to '0' following a generated packet and hence only applies to a single packet." name="SetPattResetPacketStartOnce" offset="27" reset="x" width="1" />
+        <field access="rw" desc="Selects the operating mode of the pattern generator. 0: replace mode 1: continuous mode 2: fixed packet mode." name="Mode" offset="28" reset="0" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxErrInsert" offset="0x00c">
+        <field access="rw" desc="Initial value of the PN-31 LFSR." name="PnSeed" offset="0" reset="x" width="31" />
+        <field access="ru" name="RESERVED" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="TxDllStatusPlaceholder">
+        <field access="ru" name="Placeholder" offset="0" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="1" reset="x" width="31" />
+      </reg>
+      <reg name="DllStatusCntrl_0">
+        <field access="ru" desc="dll fifo status bit 0 - TX FIFO empty ... bit 1 - RX FIFO empty  ...bit 2 - TX FIFO full  ...bit 3 - RX FIFO full" name="PhyFifoStatus" offset="0" reset="0" width="4" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="28" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc150800" desc="PhyDl Tx Csbuff (dynamic control register)" name="TxCsbCtl" offset="0x0800">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="TxDllEntryControl" offset="0x00">
+        <field access="rw" desc="Writing a '0' transfers this entry to hardware for processing. Writing a '1' transfers this entry to software for reuse." name="Empty" offset="0" reset="1" width="1" />
+        <field access="ru" desc="State of corresponding status entry - see TxDllEntryStatus register description." name="StatusEmpty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Indicates this entry has been processed (but status not necessarily available). 0: not processed 1: processed." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="29" />
+      </reg>
+      <reg name="TxDllControl" offset="0x04">
+        <field access="rw" desc="The packet length modulo 4. Used in 'normal' input mode to determine how many bytes of the last 32-bit input word from the DMA are to be processed. Not used in 'bypass' input mode. ... 0: 4 bytes ... 1: 1 byte ... 2: 2 bytes ... 3: 3 bytes." name="PktLenMod4" offset="0" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="2" reset="x" width="26" />
+        <field access="rw" desc="0: normal input (8b) 1: bypass input (32b) Controls how input data from the DMA is processed by the Tx pipeline. In 'normal' input mode 8 bits are processed at a time. In 'bypass' input mode 32 bits are processed at a time." name="InputMode" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxDataPattGen" offset="0x08">
+        <field access="rw" desc="In replace mode the number of input bytes to pass through without modification before replacing subsequent input bytes with pattern bytes. In fixed packet mode the number of pattern bytes to generate per packet (must be greater than 0). In continuous mode the number of pattern bytes to generate before ending the packet once stop is asserted (must be greater than 0)." name="NumBytes" offset="0" reset="x" width="16" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="8" />
+        <field access="rw" desc="0: PN23 ... 1: RESERVED ... 2: RAMP ... 3: TWO-BYTE ... The 'PN23' pattern is the output from a PN-23 (x23 + x5 + 1) LFSR which is compatible with external BER Test equipment. The LFSR is set to the value of InitialPatternState[22:0] at the start of a packet as specified by ResetPacketStartOnce and ResetPacketStart. The 'PN23 Serial' pattern is the least-significant 8 bits of the PN-23 LFSR (see above) that is advanced one position per 8 bits of output. The LFSR is set to the value of InitialPatternState[22:0] at the start of a packet as specified by ResetPacketStartOnce and ResetPacketStart. The 'RAMP' pattern is the value of an 8-bit counter that increments by 1 for each 8 bits of output, wrapping back to 0 after 255. The counter is set to the value of InitialPatternState[7:0] at the start of a packet as specified by ResetPacketStartOnce and ResetPacketStart. The 'TWO-BYTE' pattern is InitialPatternState[7:0] followed by InitialPatternState[15:8], repeated as required, starting with the former at the start of each packet." name="PattSelect" offset="24" reset="x" width="2" />
+        <field access="rw" desc="0: Pattern state continues at packet start ... 1: Pattern state initialized at packet start Only used when the PN23, or RAMP patterns are selected. ... When '1' the pattern generator state is initialized at the start of the packet - see InitialPatternState for details. Must be '1' when PattSelect differs from the previous packet (i.e. the pattern is changed) for the state of the pattern generator to be defined." name="PattResetPacketStart" offset="26" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: Pattern generator bypassed 1: Pattern generator enabled. The enable is used in replace mode, continuous and fixed-packet modes." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxRsEnc_0" offset="0x0c">
+        <field access="rw" desc="The total number of Reed-Solomon blocks to encode. The first NumBlks-1 blocks are encoded using the InitialK and InitialT parameters. One last block is encoded using the FinalK and FinalT parameters. Must be greater than 0. When 1 the single block is encoded using the final parameters." name="NumBlks" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="8" />
+        <field access="rw" desc="Reed-Solomon encoder T parameter for the last block. Supported values are 3,4,5,6,8." name="FinalT" offset="16" reset="x" width="6" />
+        <field access="rw" desc="Reed-Solomon encoder T parameter for the first NumBlks-1 blocks. Supported values are 3,4,5,6,8." name="InitialT" offset="22" reset="x" width="6" />
+        <field access="rw" desc="0: R-S encoder bypassed 1: R-S encoder enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxRsEnc_1" offset="0x10">
+        <field access="rw" desc="Reed-Solomon encoder K parameter for the last block. Must be greater than 1 and such that the overall codeword length (N=K+2T) is less than 256." name="FinalK" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="8" />
+        <field access="rw" desc="Reed-Solomon encoder K parameter for the first NumBlks-1 blocks. Must be greater than 1 and such that the overall codeword length (N=K+2T) is less than 256." name="InitialK" offset="16" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="TxByteInterleaver" offset="0x14">
+        <field access="rw" desc="The number of rows to interleave. Must be greater than 1 (due to implementation limitation). The number of columns times the number of rows must be greater than 6 (due to implementation limitation) and 160 or less." name="NumRows" offset="0" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="1" />
+        <field access="rw" desc="The number of columns to interleave. Must be greater than 1 (due to implementation limitation). The number of columns times the number of rows must be greater than 6 (due to implementation limitation) and 160 or less." name="NumCols" offset="8" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="13" />
+        <field access="rw" desc="0: Interleaver bypassed 1: Interleaver enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxLdpcEnc_0" offset="0x18">
+        <field access="rw" desc="The number of blocks to encode using the InitialK and InitialCodeSel parameters. Any remaining blocks are encoded using the FinalK and FinalCodeSel parameters. A value of 0 encodes all blocks with the 'final' parameters." name="NumInitialBlks" offset="0" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="6" />
+        <field access="rw" desc="0: 4608 rate 19/24 1: 576 rate 3/4 Code for remaining blocks after first NumInitialBlks blocks." name="FinalCodeSel" offset="16" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="20" reset="x" width="2" />
+        <field access="rw" desc="0: 4608 rate 19/24 1: 576 rate 3/4 Code for the first NumInitialBlks blocks." name="InitialCodeSel" offset="22" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="2" />
+        <field access="rw" desc="0: LDPC encoder bypassed 1: LDPC encoder enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxLdpcEnc_1" offset="0x1c">
+        <field access="rw" desc="Number of data bits per LDPC codeword for remaining blocks after first NumInitialBlks blocks. The selected LDPC code is shortened as required to this data length. Must be greater than 0 and less than or equal to the native K of the selected code. Restricted to multiple of 8 for OFDMA." name="FinalK" offset="0" reset="x" width="13" />
+        <field access="ru" name="RESERVED" offset="13" reset="x" width="3" />
+        <field access="rw" desc="Number of data bits per LDPC codeword for the first NumInitialBlks blocks. The selected LDPC code is shortened as required to this data length. Must be greater than 0 and less than or equal to the native K of the selected code. Restricted to multiple of 8 for OFDMA." name="InitialK" offset="16" reset="x" width="13" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxOfdmPadder" offset="0x20">
+        <field access="rw" desc="The total number of bytes output by the padder. The OFDM padder will append zero bytes or drop extra bytes to ensure the output is this length. Must be greater than 0." name="NumBytes" offset="0" reset="x" width="16" />
+        <field access="rw" desc="1: The OFDM padder uses 0xFF to do byte padding. 0: OFDM padder uses 0x00." name="PadOne" offset="16" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="12" />
+        <field access="rw" desc="0: OFDM padder bypassed 1: OFDM padder enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxByteScrambler" offset="0x24">
+        <field access="rw" desc="The initial value of the PN-23 LFSR." name="Seed" offset="0" reset="x" width="23" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="5" />
+        <field access="rw" desc="0: Byte Scrambler bypassed 1: Byte scrambler enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxErrInsert" offset="0x28">
+        <field access="rw" desc="In 'random' mode bits[3:0] specify the shift count 'N' that controls the probability of error. In 'periodic' mode bits[9:0] specify the period in bytes." name="NOrPeriod" offset="0" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="15" />
+        <field access="rw" desc="0: random bit errors 1: periodic bit errors." name="Mode" offset="25" reset="x" width="1" />
+        <field access="rw" desc="0: PN-31 LFSR continues at packet start 1: PN-31 LFSR set to PnSeed at packet start Only used in 'random' bit errors mode. Must be '1' for the first packet transmitted in 'random' mode for the state of the LFSR to be defined - in particular this applies following a packet transmitted in 'periodic' mode." name="PnResetPacketStart" offset="26" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: Error inserter bypassed 1: Error inserter enabled When not enabled the PN-31 LFSR state is held." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc150880" desc="PhyDl Tx Csbuff Status (dynamic status register)" name="TxCsbSts" offset="0x0880">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="TxDllEntryStatus" offset="0x00">
+        <field access="rw" desc="Alias - see TxDllEntryControl register description." name="ControlEmpty" offset="0" reset="1" width="1" />
+        <field access="rw" desc="Set to '0' by hardware to indicate the entry has valid status. Writing a '1' indicates the entry is transferred to hardware for reuse." name="Empty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Alias - see TxDllEntryControl register description." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" desc="How does this happen?." name="ControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="Lost" offset="5" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="Overflow" offset="6" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="25" />
+      </reg>
+      <reg name="TxDllStatus" offset="0x04">
+        <field access="ru" desc="Set to '1' when the RS encoder is enabled and there are insufficient input data to complete the specified number of blocks." name="RsEncShortPkt" offset="0" reset="x" width="1" />
+        <field access="ru" desc="Set to '1' when the RS encoder is enabled and there are more input data than the specified number of blocks." name="RsEncLongPkt" offset="1" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="2" reset="x" width="1" />
+        <field access="ru" desc="Set to '1' when the Byte Interleaver is enabled and there are insufficient data to complete the last block." name="ByteInterleaverShortBlock" offset="3" reset="x" width="1" />
+        <field access="ru" desc="Set to '1' when the LDPC encoder is enabled and there are insufficient input data to complete the last block." name="LdpcEncShortBlock" offset="4" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="5" reset="x" width="27" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc150400" desc="PhyDl Rx Csr (static control register)" name="RxCsr" offset="0x0400">
+      <reg name="PhyRxDllCtrl" offset="0x004">
+        <field access="rw" desc="0: Rx DLL reset 1: Rx DLL enabled." name="Enable" offset="0" reset="0" width="1" />
+        <field access="rw" desc="0: &quot;circular queue&quot; mode 1: &quot;register&quot; mode ... Normal operation uses &quot;circular queue&quot; mode. Repetitive and continuous operation use &quot;register&quot; mode." name="DynCtrlMode" offset="1" reset="x" width="1" />
+        <field access="rw" desc="0: normal operation 1: loopback Rx DLL to Tx DLL Note this bit controls both Tx and Rx and the loopback is from the perspective of an external transmitter." name="LoopbackToTx" offset="2" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="29" />
+      </reg>
+      <reg name="RxLdpcDec" offset="0x008">
+        <field access="rw" desc="0: 1.0 ... 1: 0.875 ... 2: 0.8125 ... 3: 0.75 ... 4: 0.6875 ... 5. 0.625 ... Selects the prescale factor used when CodeSel is 0 (4608 rate 19/24 code). (CodeSel is either RxLdpcDec.InitialCodeSel or RxLdpcDec.FinalCodeSel, whichever is active)." name="CodeSel0PrescaleSel" offset="0" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="rw" desc="0: 1.0 ... 1: 0.875 ... 2: 0.8125 ... 3: 0.75 ... 4: 0.6875 ... 5. 0.625 ... Selects the prescale factor used when CodeSel is 1 (576 rate 3/4 (OFDMA) code). (CodeSel is either RxLdpcDec.InitialCodeSel or RxLdpcDec.FinalCodeSel, whichever is active)." name="CodeSel1PrescaleSel" offset="4" reset="x" width="3" />
+        <field access="rw" desc="0: Abort decode on input buffer full ... 1: Decode ignores input buffer full ... When '1' the decoder won't abort decoding the current block set when the input buffer is full - it only stops decoding when either the early stop condition is met (and EarlyStopEnable is '1') or the corresponding MaxIters iteration limit is reached. This is intended for use in loopback testing of the LDPC decoder where flow control ensures no data is lost. When '0' the decoder aborts decoding the current block set when the input buffer is full to avoid data loss. Must be '0' for normal operation." name="InBuffFullAbortDisable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="25" />
+      </reg>
+      <reg name="RxDataPattCheck_0" offset="0x00c">
+        <field access="rw" desc="When the PN23 or PN23 Serial patterns are selected InitialPatternState[22:0] is the initial (seed) value of the PN-23 LFSR. Note InitialPatternState[0] is the first bit shifted out of the LFSR; this is consistent with the bit order of the Byte Scrambler LFSR seed but bit-reversed compared to the definition of this parameter in the PHY Systems spec. When the RAMP pattern is selected InitialPatternState[7:0] is the starting value of the ramp. When the TWO-BYTE pattern is selected InitialPatternState[7:0] followed by InitialPatternState[15:8] are the repeating pattern." name="InitialPatternState" offset="0" reset="x" width="23" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="4" />
+        <field access="rw" desc="When '0' and set to '1' the internal PattResetPacketStartOnce bit is set to '1'. The internal PattResetPacketStartOnce bit is identical in function to the PattResetPacketStart bit, except it is cleared to '0' following a checked packet and hence only applies to a single packet." name="SetPattResetPacketStartOnce" offset="27" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxDataPattCheck_1" offset="0x010">
+        <field access="rw" desc="Number of checked received packets since the last refresh (or reset) after which the status registers should be refreshed. See Refresh bit above." name="RefreshNumPkts" offset="0" reset="x" width="16" />
+        <field access="rw" desc="When '0' and set to '1' a refresh of the status registers will be performed when at least RefreshNumPkts have been received following the last refresh. If RefreshNumPkts is 0 the status registers will be refreshed immediately. If a cumulative count MSB becomes '1' before RefreshNumPkts have been received the refresh is performed at that point instead." name="Refresh" offset="16" reset="0" width="1" />
+        <field access="rw" desc="When '0' and set to '1' the StatusRefreshed bit is cleared to '0'." name="ClearStatusRefreshed" offset="17" reset="0" width="1" />
+        <field access="ru" desc="Set to '1' after the status registers have been refreshed. Refreshing the status registers copies the cumulative count values to the status registers and then clears the cumulative counts. The status registers are refreshed in response to setting the Refresh bit (see below) or when the MSB of any cumulative count becomes '1'. This bit should be cleared via the ClearStatusRefreshed bit to be able to determine when the next refresh occurs." name="StatusRefreshed" offset="18" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="19" reset="x" width="1" />
+        <field access="rw" desc="0: 1/2 ... 1: 1/4 ... 2: 1/8 ... 3: 1/16 ... The BER which if exceeded classifies the packet as an outlier. Outlier packets do not update the cumulative counts (except for the NumOutlierPackets count). When the PN23 pattern is selected outlier packets cause the pattern generator to attempt re-synchronization on the next packet checked (unless either PattResetPacketStartOnce or PattResetPacketStart is '1' for the next checked packet)." name="OutlierThreshold" offset="20" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="10" />
+      </reg>
+      <reg name="RxDLLEventThresh0" offset="0x014">
+        <field access="rw" desc="Event is generated if RS decoder number of corrected bytes is greater than or equal to this field." name="rsCorrByteLargeThresh" offset="0" reset="x" width="4" />
+        <field access="rw" desc="Event is generated if number of LDPC decLayerCnt exceeds this threshold for long codes." name="ldpcItnLargeLongThresh" offset="4" reset="x" width="8" />
+        <field access="rw" desc="Event is generated if number of LDPC decLayerCnt exceeds this threshold for short codes." name="ldpcItnLargeShortThresh" offset="12" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="20" reset="x" width="12" />
+      </reg>
+      <reg name="RxPattCheckStatus_0" offset="0x18">
+        <field access="ru" desc="Cumulative number of packets checked that were outlier packets at the last status refresh. See the Refresh bit description for further details." name="NumOutlierPackets" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxPattCheckStatus_1" offset="0x1c">
+        <field access="ru" desc="Cumulative number of packets checked that were not outlier packets at the last status refresh. See the Refresh bit description for further details." name="NumPackets" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxPattCheckStatus_2" offset="0x20">
+        <field access="ru" desc="Cumulative number of packet errors (packets with at least one bit error) at the last status refresh. See the Refresh bit description for further details." name="NumPacketErrs" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxPattCheckStatus_3" offset="0x24">
+        <field access="ru" desc="Cumulative number of bytes checked at the last status refresh. See the Refresh bit description for further details." name="NumBytes" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxPattCheckStatus_4" offset="0x28">
+        <field access="ru" desc="Cumulative number of byte errors (bytes with at least one bit error) at the last status refresh. See the Refresh bit description for further details." name="NumByteErrs" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxPattCheckStatus_5" offset="0x2c">
+        <field access="ru" desc="Cumulative number of bit errors at the last status refresh. See the Refresh bit description for further details." name="NumBitErrs" offset="0" reset="x" width="32" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc151000" desc="PhyDl Rx Csbuff (dynamic control register)" name="RxCsbCtl" offset="0x1000">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="RxDllEntryControl" offset="0x00">
+        <field access="rw" desc="Writing a '0' transfers this entry to hardware for processing. Writing a '1' transfers this entry to software for reuse." name="Empty" offset="0" reset="1" width="1" />
+        <field access="ru" desc="State of corresponding status entry - see TxEntryNStatus register description." name="StatusEmpty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Indicates this entry has been processed (but status not necessarily available). 0: not processed 1: processed." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="29" />
+      </reg>
+      <reg name="RxDllInputControl" offset="0x04">
+        <field access="rw" desc="Setting this field to 1 enable DLL Rx events logging." name="EventEnable" offset="0" reset="x" width="1" />
+        <field access="rw" desc="This field is sent along with events to the logger. Software use this tag to line up PHY events and DMA engine events." name="EventPktID" offset="1" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="5" reset="x" width="23" />
+        <field access="rw" desc="0: 10 LLR (Normal) ... 1: 32-bit bypass." name="InputFormat" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxByteUnscrambler_0" offset="0x08">
+        <field access="rw" desc="The base initial value of the PN-23 LFSRs. The initial value of each context's LFSR is the bitwise XOR of this value and the value in the SeedMod array selected by the context ID repeated 5 3/4 times." name="Seed" offset="0" reset="x" width="23" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="5" />
+        <field access="rw" desc="0: Byte unscrambler bypassed ... 1: Byte unscrambler enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxByteUnscrambler_1" offset="0x0c">
+        <field access="rw" desc="Value is repeated 5 3/4 times to yield a 23-bit value that is bitwise XORed with Seed. The result is the associated context's initial LFSR seed." name="SeedMod_0" offset="0" reset="x" width="4" />
+        <field access="rw" name="SeedMod_1" offset="4" reset="x" width="4" />
+        <field access="rw" name="SeedMod_2" offset="8" reset="x" width="4" />
+        <field access="rw" name="SeedMod_3" offset="12" reset="x" width="4" />
+        <field access="rw" name="SeedMod_4" offset="16" reset="x" width="4" />
+        <field access="rw" name="SeedMod_5" offset="20" reset="x" width="4" />
+        <field access="rw" name="SeedMod_6" offset="24" reset="x" width="4" />
+        <field access="rw" name="SeedMod_7" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxByteUnscrambler_2" offset="0x10">
+        <field access="rw" name="SeedMod_8" offset="0" reset="x" width="4" />
+        <field access="rw" name="SeedMod_9" offset="4" reset="x" width="4" />
+        <field access="rw" name="SeedMod_10" offset="8" reset="x" width="4" />
+        <field access="rw" name="SeedMod_11" offset="12" reset="x" width="4" />
+        <field access="rw" name="SeedMod_12" offset="16" reset="x" width="4" />
+        <field access="rw" name="SeedMod_13" offset="20" reset="x" width="4" />
+        <field access="rw" name="SeedMod_14" offset="24" reset="x" width="4" />
+        <field access="rw" name="SeedMod_15" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxLdpcDec_0" offset="0x14">
+        <field access="rw" desc="The number of LDPC block sets plus one to decode using the InitialK and InitialCodeSel parameters. One final block set is decoded using the FinalK and FinalCodeSel parameters. Must be greater than 0." name="NumSets" offset="0" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="6" />
+        <field access="rw" desc="0: 4608 rate 19/24 ... 1: 576 rate 3/4 (OFDMA) ... 15: NULL rate 1/1 ... Code for the last block set." name="FinalCodeSel" offset="16" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="20" reset="x" width="2" />
+        <field access="rw" desc="0: 4608 rate 19/24 ... 1: 576 rate 3/4 ... 15: NULL rate 1/1 ... Code for the first NumSets-1 block sets." name="InitialCodeSel" offset="22" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="2" />
+        <field access="rw" desc="0: LDPC decoder 32-bit bypass ... 1: LDPC decoder enabled ... 2: LDPC decoder LLR bypass ... The decoder drains before bypassing either input LLRs or input 32-bit data; sufficient delay at the receiver input is required to ensure bypass data is not lost." name="Enable" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxLdpcDec_1" offset="0x18">
+        <field access="rw" desc="Number of data bits per LDPC codeword for the last set. The selected LDPC code is shortened as required to this data length. Must be greater than 0 and less than or equal to the native K of the selected code (or 4608 for the NULL code). Restricted to multiple of 8 for OFDMA." name="FinalK" offset="0" reset="x" width="13" />
+        <field access="ru" name="RESERVED" offset="13" reset="x" width="3" />
+        <field access="rw" desc="Number of data bits per LDPC codeword for the first NumSets-1 sets. The selected LDPC code is shortened as required to this data length. Must be greater than 0 and less than or equal to the native K of the selected code (or 4608 for the NULL code). Restricted to multiple of 8 for OFDMA." name="InitialK" offset="16" reset="x" width="13" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxLdpcDec_2" offset="0x1c">
+        <field access="rw" desc="Maximum number of iterations allowed to decode a block set. After reaching this limit the decoder stops and outputs the current result whether it successfully decoded or not. Applies to block sets decoded after end-of-packet is received." name="MaxItersPktEnd" offset="0" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="4" />
+        <field access="rw" desc="Maximum number of iterations allowed to decode a block set. After reaching this limit the decoder stops and outputs the current result whether it successfully decoded or not. Applies to block sets decoded before end-of-packet is received." name="MaxIters" offset="8" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="16" />
+        <field access="rw" desc="0: disable early stop condition ... 1: enable early stop condition ... When enabled the decoder will stop iterating when all codewords in the block set have met the early stop condition. When disabled the decoder will iterate until reaching the MaxIters/MaxItersPktEnd limit or the input buffer space is exhausted, whichever occurs first." name="EarlyStopEnable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxLdpcDec_3" offset="0x20">
+        <field access="rw" desc="Number of blocks (codewords) per set for the associated context. Must be in the range 0..15. When the 4608 (non-OFDMA) code is selected there must be 1 block for context 0 and 0 blocks for the remaining contexts. When the 576 (OFDMA) code is selected the sum of all entries (the number of blocks per set) must be 8 or less. When the NULL code is selected the sum of all entries (the number of blocks per set) must be 16 or less, and the total number of bytes in the set less than 4608." name="ContextNumBlks_0" offset="0" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_1" offset="4" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_2" offset="8" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_3" offset="12" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_4" offset="16" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_5" offset="20" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_6" offset="24" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_7" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxLdpcDec_4" offset="0x24">
+        <field access="rw" name="ContextNumBlks_8" offset="0" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_9" offset="4" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_10" offset="8" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_11" offset="12" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_12" offset="16" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_13" offset="20" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_14" offset="24" reset="x" width="4" />
+        <field access="rw" name="ContextNumBlks_15" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxByteDeinterleaver" offset="0x28">
+        <field access="rw" desc="The number of rows to deinterleave. Must be greater than 1 (due to implementation limitation). The number of columns times the number of rows must be greater than 6 (due to implementation limitation) and 160 or less." name="NumRows" offset="0" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="1" />
+        <field access="rw" desc="The number of columns to deinterleave. Must be greater than 1 (due to implementation limitation). The number of columns times the number of rows must be greater than 6 (due to implementation limitation) and 160 or less." name="NumCols" offset="8" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="13" />
+        <field access="rw" desc="0: Deinterleaver bypassed 1: Deinterleaver enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxRsDec_0" offset="0x2c">
+        <field access="rw" desc="The total number of Reed-Solomon blocks to decode. The first NumBlks-1 blocks are decoded using the InitialK and InitialT parameters. One last block is decoded using the FinalK and FinalT parameters. Any further input is discarded. Must be greater than 0. When 1 the single block is decoded using the final parameters." name="NumBlks" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="8" />
+        <field access="rw" desc="Reed-Solomon decoder T parameter for the last block. Supported values are 3,4,5,6,8." name="FinalT" offset="16" reset="x" width="6" />
+        <field access="rw" desc="Reed-Solomon decoder T parameter for the first NumBlks-1 blocks. Supported values are 3,4,5,6,8." name="InitialT" offset="22" reset="x" width="6" />
+        <field access="rw" desc="0: R-S decoder bypassed 1: R-S decoder enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxRsDec_1" offset="0x30">
+        <field access="rw" desc="Reed-Solomon decoder K parameter for the last block. Must be greater than 1 and such that the overall codeword length (N=K+2T) is less than 256." name="FinalK" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="8" />
+        <field access="rw" desc="Reed-Solomon decoder K parameter for the first NumBlks-1 blocks. Must be greater than 1 and such that the overall codeword length (N=K+2T) is less than 256." name="InitialK" offset="16" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxDataPattCheck" offset="0x34">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="20" />
+        <field access="rw" desc="OFDMA context to check and update the cumulative statistics with. Must be set to 0 for non-OFDMA packets." name="ContextID" offset="20" reset="x" width="4" />
+        <field access="rw" desc="0: PN23 ... 1: PN23 Serial ... 2: RAMP ... 3: TWO-BYTE ... See TxPattGen.PattSelect for pattern descriptions." name="PattSelect" offset="24" reset="x" width="2" />
+        <field access="rw" desc="0: Pattern state continues at packet start ... 1: Pattern state initialized at packet start Only used when the PN23, PN23 Serial or RAMP patterns are selected. ... When '1' the pattern generator state is initialized at the start of the packet - see InitialPatternState for details. Must be '1' when PattSelect differs from the previous packet (i.e. the pattern is changed) for the state of the pattern generator to be defined. For the PN23 pattern this bit being '1' at the start of a packet also forces the pattern generator to the 'synchronized' state, inhibiting pattern re-synchronization for that packet." name="PattResetPacketStart" offset="26" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: Pattern checker disabled ... 1: Pattern checker enabled ... When enabled the received packet is checked and the cumulative statistics updated as appropriate. When disabled no checking is performed and the cumulative statistics are unchanged." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxDllOutputControl" offset="0x38">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="28" />
+        <field access="rw" desc="0: normal operation ... 1: 32-bit bypass ... 2: discard output data DLL receive section output mode. ... In 'normal' mode 8 bits are output at a time to the DMA; this must be selected when the DLL receive section is processing normal packet data. In '32-bit-bypass' mode 32 bits are output at a time to the DMA; this must be selected when the DLL receive section is bypassing 32-bit probe results or packet data samples. In 'discard-output-data' mode the output data is discarded without passing to the DMA." name="Mode" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+    </regfile>
+  </block>
+</system>

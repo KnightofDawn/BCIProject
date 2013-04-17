@@ -1,0 +1,3439 @@
+# -*- coding: utf-8 -*-
+# Import sys, os modules in Python.
+# These are needed to run the GUI and 
+# also to handle directory and other os related functions
+import sys, os,  csv
+from ctypes import *
+from winpcapy import *
+import string
+import socket as sk
+import platform
+import copy
+from xml.etree import ElementTree
+from time import sleep
+from collections import defaultdict
+import threading
+import subprocess
+import time
+import random
+import json
+import pickle
+
+# Import the modules QtCore (for low level Qt functions)
+# QtGui (for visual/GUI related Qt functions)
+from PyQt4 import QtCore, QtGui, Qt
+from PyQt4.QtNetwork import *
+from PyQt4.QtCore import pyqtSignal 
+
+
+
+from matplotlib.widgets import MultiCursor, SpanSelector
+import matplotlib.animation as animation
+
+from matplotlib.gridspec import GridSpec
+
+import matplotlib.pyplot as plt
+import pylab
+from pylab import *
+
+# Import the matplotlib module
+import matplotlib as mplib
+# Import the FigureCanvas object from matplotlib, this is the canvas on which the figure is drawn in the GUI.
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+# Import the navigation toolbar -- shown on the figure in the GUI. (having options such as zoom, save etc.)
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+# Import Figure -- actual figure object containing the matplotlib figure in the GUI
+from matplotlib.figure import Figure
+# FuncFormatter is the function to do a custom formatting of the figure axis. 
+from matplotlib.ticker import FuncFormatter
+# SpanSelector is the function for selecting a portion of the plot graphically using the mouse.
+from matplotlib.widgets import SpanSelector
+
+# InternalShell is the python shell used in the GUI.
+from spyderlib.widgets.internalshell import InternalShell
+# NamespaceBrowser and VariableExplorer are used to create the variable explorer table using in the GUI.
+from spyderlib.widgets.externalshell.namespacebrowser import NamespaceBrowser
+from spyderlib.plugins.variableexplorer import VariableExplorer
+
+import numpy as np
+import numpy.lib.recfunctions as nprf
+from numpy.random import randint
+
+
+
+
+
+# FFT functions from SciPy
+from scipy.signal import fftconvolve
+from scipy.fftpack import fftshift, fft
+
+# The GUI MainWindow object from the python code generated using the .ui file
+
+# conf.py contains various configurations such as testmux parameter structures, result filenames etc...
+import conf
+from tdPortComponent import *
+from filterClasses import *
+from networkClasses import *
+from ParalleltriggerComponents import *
+from circularQueue import *
+from UtilityClasses import *
+from quicksave import *   
+# testdebuglib is a custom module/library of signal processing functions.
+# Currently includes preamble type detection and correlation functions.
+import testdebuglib as tdlib
+from  mplwidget import * 
+
+if platform.python_version()[0] == "3":
+    raw_input=input
+
+import sys
+from  testEx  import Ui_MainWindow
+from PyQt4 import QtGui, Qt, QtCore
+
+
+class UserInterface(QtGui.QMainWindow):
+    received = QtCore.pyqtSignal(int)   #Signal defined to communicate when a new packet is processed
+    processed = QtCore.pyqtSignal(int)
+ #  plotUpdate = QtCore.pyqtSignal(int)
+ 
+    def __init__(self, parent=None):
+        """ Initialize the GUI application. 
+        Connect Signals and Slots within the GUI.
+        Create the Python Console and Variable Explorer.
+        Initialize variables needed by the application.
+        """
+        # Initialize the QWidget with the parent (in this case no parent)
+        QtGui.QWidget.__init__(self, parent)
+        # Center the GUI on the screen
+        # Create a Ui_MainWindow object representing the GUI
+        self.ui = Ui_MainWindow()
+
+        # Call the setuUi function of the main window object.
+        self.ui.setupUi(self)
+        self.initVariables()
+        
+        self.scrolllayout = QtGui.QVBoxLayout()
+        self.scrollwidget = QtGui.QWidget()
+        self.scrollwidget.setLayout(self.scrolllayout)         
+        self.myScrollArea = QtGui.QScrollArea()
+        self.scrollwidget.setMinimumSize(1800,1800)
+         
+        self.myScrollArea.setWidgetResizable(True)
+        self.myScrollArea.setEnabled(True)
+        self.myScrollArea.setWidget(self.scrollwidget)
+        
+         
+
+        self.layout = QtGui.QHBoxLayout(self.centralWidget())
+        self.layout.addWidget(self.myScrollArea)
+        
+        
+        self.manTabWidget = QtGui.QTabWidget()
+        self.tabWidget1  = QtGui.QWidget()        
+        self.FPGAStatus  = QtGui.QWidget()        
+        self.RTFilterTab  = QtGui.QWidget()        
+        self.CaptureFilterTab  = QtGui.QWidget()        
+        self.CsBufTriggers  = QtGui.QWidget()        
+        self.TriggerTab  = QtGui.QWidget()        
+        self.CaptureDataDisplay  = QtGui.QWidget()        
+        self.RTDataDisplay  = QtGui.QWidget()  
+        self.tabWidget9  = QtGui.QWidget()  
+        self.tdPortTab  = QtGui.QWidget()  
+        self.statusTab  = QtGui.QWidget()  
+                
+        self.tabLayout1= QtGui.QHBoxLayout(self.tabWidget1)
+        self.tabLayout2= QtGui.QHBoxLayout(self.FPGAStatus)
+        self.tabLayout3= QtGui.QHBoxLayout(self.RTFilterTab)
+        self.tabLayout4= QtGui.QHBoxLayout(self.CaptureFilterTab)
+        self.tabLayout5= QtGui.QHBoxLayout(self.CsBufTriggers)
+        self.tabLayout6= QtGui.QHBoxLayout(self.TriggerTab)
+        self.tabLayout7= QtGui.QHBoxLayout(self.CaptureDataDisplay)
+        self.tabLayout8= QtGui.QHBoxLayout(self.RTDataDisplay)
+        self.tabLayout9= QtGui.QHBoxLayout(self.tabWidget9)
+        self.tabLayout10= QtGui.QHBoxLayout(self.tdPortTab)
+        self.tabLayout11= QtGui.QHBoxLayout(self.statusTab)
+        
+        self.manTabWidget.addTab(self.tabWidget1,"FPGA Connect")                     
+        self.manTabWidget.addTab(self.FPGAStatus,"FPGA Configuration")       
+        self.manTabWidget.addTab(self.RTFilterTab,"RT Filters")       
+        self.manTabWidget.addTab(self.CaptureFilterTab,"Capture Filters")       
+        self.manTabWidget.addTab(self.CsBufTriggers,"CsBuff Triggers")       
+        self.manTabWidget.addTab(self.TriggerTab,"TestMux Triggers")       
+        self.manTabWidget.addTab(self.RTDataDisplay,"RT Data Display")           
+        self.manTabWidget.addTab(self.CaptureDataDisplay,"Capture Data Display")           
+        self.manTabWidget.addTab(self.tabWidget9,"Capture Buffer View")       
+        self.manTabWidget.addTab(self.tdPortTab,"Configure TDPort")       
+        self.manTabWidget.addTab(self.statusTab,"Status Page")       
+
+        self.manTabWidget.setUsesScrollButtons(True)
+        self.scrolllayout.addWidget( self.manTabWidget)
+        self.setLayout(self.layout)   
+        
+# Setup Tabs        
+        self.setupFPGAConnectTab()
+        self.setupFPGAConfigurationTab()
+        self.setupRTFilterTab()        
+        self.setupCaptureFilterTab()
+        self.setupCsBuffTriggerTab()
+        self.setupTestMuxTriggerTab()
+        self.setupTDPortTab()
+        self.setupStatusMonitor()
+        self.setupRTDataDisplay()
+        self.setupCaptureDisplay()
+        
+        
+        self.RTFilterVBox = Qt.QGridLayout(self.RTFilterGroup)        
+        self.RTFilterVBox.setAlignment(QtCore.Qt.AlignTop)
+        self.captureFilterVBox = Qt.QGridLayout(self.captureFilterFrame)
+        self.captureFilterVBox.setAlignment(QtCore.Qt.AlignTop)         
+        self.triggerVBox = Qt.QGridLayout(self.triggerGroup)
+        self.triggerVBox.setAlignment(QtCore.Qt.AlignTop)
+        self.tdPortVBox = Qt.QGridLayout(self.tdPortGroup)
+        self.tdPortVBox.setAlignment(QtCore.Qt.AlignTop)
+ 
+ 
+ 
+        self.RTPlot = self.RTDataDisplay;
+        self.CapturePlot = self.CaptureDataDisplay;
+  
+ 
+ 
+ #****************** Signals Connected to Slots **********************************************
+
+       
+        self.manTabWidget.currentChanged.connect(self.manTabHandler)       
+       
+        self.buttonConnect.clicked.connect(self.connectDUTAccepted)
+        self.buttonDiscover.clicked.connect(self.discoverFPGA)
+        self.buttonChooseDirectory.clicked.connect(self.chooseDirectory)
+    
+        
+        self.HOSTComboInterface.currentIndexChanged.connect(self.NetworkInterfaceChanged)
+        self.buttontdPortRead.clicked.connect(self.readTDPortState)        
+        self.buttontdPortAdd.clicked.connect(self.addTDPortState)        
+        self.buttontdPortDel.clicked.connect(self.deleteTDPortState)        
+        self.buttontdPortSend.clicked.connect(self.updateTDPortState)   
+        self.buttontdPortSave.clicked.connect(self.saveTDPortState)
+        self.buttontdPortLoad.clicked.connect(self.loadTDPortState)
+        self.buttontdPortRestoreAll.clicked.connect(self.sendTDPortRestoreAll)   
+        
+
+        self.bottonCaptureAddFilter.clicked.connect(self.addCaptureFilter)
+        self.bottonRTAddFilter.clicked.connect(self.addRTFilter)
+        self.buttonCaptureReadReg.clicked.connect(self.readCaptureFilters)
+        self.pushCaptureSendFilters.clicked.connect(self.sendCaptureFilters)
+        self.pushRTSendFilters.clicked.connect(self.sendRTFilters)
+        self.buttonRTReadReg.clicked.connect(self.readRTFilters)
+        self.bottonCaptureDelFilter.clicked.connect(self.deleteCaptureFilter)
+        self.bottonRTDelFilter.clicked.connect(self.deleteRTFilter)
+        self.buttonTriggerDelete.clicked.connect(self.deleteTrigger)
+        self.bottonCaptureCopyFilter.clicked.connect(self.copyCaptureToRT)
+        self.bottonRTCopyFilter.clicked.connect(self.copyRTtoCapture)
+        self.buttonAddTriggerLine.clicked.connect(self.addTriggerLine)
+        #Trigger Slide Events
+        self.triggerSlider.sliderPressed.connect(self.sliderMoved)
+        self.triggerSlider.sliderReleased.connect(self.sliderMoved)
+        self.triggerSlider.valueChanged.connect(self.sliderMoved)        
+        self.buttonFSMRead.clicked.connect(self.readFSMRegisters)
+        self.buttonFSMSend.clicked.connect(self.writeFSMRegisters)        
+        #self.buttonBufferRead.clicked.connect(self.readMemoryDump)
+        self.FPGAComboMAC.setDuplicatesEnabled(False)
+        self.RTDisplayAddVariable.clicked.connect(self.RTDisplayAddPlot)
+        self.CaptureDisplayAddVariable.clicked.connect(self.CaptureAddPlot)
+        self.buttonTriggerSend.clicked.connect(self.sendTriggers)
+        self.buttonTriggerRead.clicked.connect(self.readTriggers)
+        self.runStopButton.clicked.connect(self.setisRunning)
+        self.extTrigEnabButton.clicked.connect(self.setExtTriggerEnable)
+        self.extTrigPolarityButton.clicked.connect(self.setExtTrigPolarity)
+        self.selfGenDataButton.clicked.connect(self.setSelfGenData)
+        self.sliderValue.currentIndexChanged.connect(self.setSliderValue)
+        self.buttonSendParallelTriggers.clicked.connect(self.sendParallelTriggers)
+        self.buttonClearParallelTriggers.clicked.connect(self.clearParallelTriggers)
+        self.buttonAddParallelTriggerLines.clicked.connect(self.addParallelTriggerLine)
+        self.buttonDeleteParallelTriggerLines.clicked.connect(self.delParallelTriggerLine)
+        self.buttonReadParallelTriggers.clicked.connect(self.readParallelTriggers)
+       
+#************************************************************************************************************************************************
+        self.queueLock = threading.Lock()
+        
+        self.createDictionaries() # Create Dictionaries Used
+
+    
+#        self.plotUpdate.connect(self.updatePlot)
+        #TIMER TO UPDATE THE PLOTS
+        self.timer = Qt.QTimer()
+        self.timer.timeout.connect(self.on_timer)            
+        update_freq = 10
+        if update_freq > 0:
+            self.timer.start(1000.0 / update_freq)     
+##     
+#     
+#        #TIMER TO SEND A  DISCOVERY PACKET OUT FOR CONNECTIVITY TESTING
+        self.discoveryTimer = Qt.QTimer()
+        self.discoveryTimer.timeout.connect(self.on_discoveryTimer)            
+#              
+#        
+        self.check_freq = 0.1
+        if self.check_freq > 0:
+            self.discoveryTimer.start(1000.0 / self.check_freq)     
+#        
+        
+        
+        self.manTabWidget.setCurrentIndex(0) 
+        self.connectDUT()
+
+        msg = "NumPy, SciPy, Matplotlib have been imported"
+        cmds = ['from numpy import *', 'from scipy import *', 'from matplotlib.pyplot import *']
+        self.console = cons = InternalShell(self, namespace=globals(), message=msg, commands=cmds, multithreaded=False)
+        self.console.setMinimumWidth(200)
+        font = QtGui.QFont("Consolas")
+        font.setPointSize(14)
+        msg = "NumPy, SciPy, Matplotlib have been imported"
+        cmds = ['from numpy import *', 'from scipy import *', 'from matplotlib.pyplot import *']
+ 
+        # Create a variable explorer object
+        self.vexplorer = VariableExplorer(self)
+        # Connect the python shell to the variable explorer
+        self.nsb = self.vexplorer.add_shellwidget(cons)
+       # # Set visual properties
+        cons.set_font(font)
+        cons.set_codecompletion_auto(True)
+        cons.set_calltips(True)
+        cons.setup_calltips(size=300, font=font)
+        cons.setup_completion(size=(200, 150), font=font)
+
+        self.console_dock = QtGui.QDockWidget("Python Console", self)
+        self.console_dock.setWidget(cons)
+        
+        # Add the variable explorer to the main gui
+        self.vexplorer_dock = QtGui.QDockWidget("Variable Explorer", self)
+        self.vexplorer_dock.setWidget(self.vexplorer)
+        
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.vexplorer_dock)
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.console_dock)
+             
+        self.ui.menuView.addAction(self.vexplorer_dock.toggleViewAction())
+        self.ui.menuView.addAction(self.console_dock.toggleViewAction())
+
+      #  self.vexplorer_dock.hide()
+      #  self.console_dock.hide()
+        
+        self.addStatusWidget()  
+        self.addLeftMenu()
+     
+        self.setUpParallelTriggers()    # Will create the parallel triggers      
+        self.setisRunning()             # test if unit is running 
+        self.setExtTriggerEnable()
+        self.setExtTrigPolarity()
+        self.setSelfGenData()
+        self.refresh_vexplorer_table()
+
+           
+#*************************************************************************************************        
+    def manTabHandler(self,index):
+        if (index == 0) :
+            self.deviceConfigured = True
+        if (index == 1):
+            print ("FSM Register Read/Write")
+        if (index == 2):
+            if (self.rtFilterHeaders == False):
+                ex = filterHeaders(self.RTFilterVBox)
+                ex.EnableAll.clicked.connect(lambda: self.EnableAll(self.RTFilters))
+                ex.SelectAll.clicked.connect(lambda: self.SelectAll(self.RTFilters))                
+                self.rtFilterHeaders = True          
+                ex = filterItem(self.RTFilterVBox,self.baseList,self.numRTFilters+1)
+                ex.dataVar.currentIndexChanged.connect(lambda: self.dataIndexChanged(ex,1))
+                ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex,1))
+                ex.OffsetVar.currentIndexChanged.connect(lambda: self.offsetIndexChanged(ex,1))
+                ex.rangeVar.currentIndexChanged.connect(lambda: self.bitRangeIndexChanged(ex,1))  
+                ex.enableButton.clicked.connect(lambda: self.enableItem(ex))
+                ex.dataVar.setCurrentIndex(0)            
+                self.RTFilters.append(ex)        
+                self.numRTFilters = len(self.RTFilters)
+        if (index == 3):
+            if (self.captureFilterHeaders == False):
+                ex = filterHeaders(self.captureFilterVBox)
+                ex.EnableAll.clicked.connect(lambda: self.EnableAll(self.CaptureFilters))
+                ex.SelectAll.clicked.connect(lambda: self.SelectAll(self.CaptureFilters))                
+
+                self.captureFilterHeaders = True
+                ex = filterItem(self.captureFilterVBox,self.baseList,self.numCaptureFilters+1)
+                ex.dataVar.currentIndexChanged.connect(lambda: self.dataIndexChanged(ex,1))
+                ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex,1))
+                ex.OffsetVar.currentIndexChanged.connect(lambda: self.offsetIndexChanged(ex,1))    
+                ex.rangeVar.currentIndexChanged.connect(lambda: self.bitRangeIndexChanged(ex,1))    
+                ex.enableButton.clicked.connect(lambda: self.enableItem(ex))
+                ex.dataVar.setCurrentIndex(0)                        
+                self.CaptureFilters.append(ex)  
+                self.numCaptureFilters = len(self.CaptureFilters)
+        if (index == 4):
+            print ("Parallel Triggers ")
+        if (index == 5):
+             if (self.trigHeaders == False):
+                ex = triggerHeaders(self.triggerVBox)
+                ex.SelectAll.clicked.connect(lambda: self.SelectAll(self.Triggers))                
+                self.trigHeaders = True
+        if (index == 6):
+            print ("RT  Data Display")
+            if (len(self.RTPlotVariables) < 1):
+                self.RTDisplayAddPlot()
+
+                
+            for combo in self.RTPlotVariables:
+                combo.clear()                
+                for item in self.RTFilters:
+                    key = str(item.dataVar.currentText()+'_'+item.baseVar.currentText())+'_'+ str(item.OffsetVar.currentText())+'_'+ str(item.rangeVar.currentText())
+                    combo.addItem(key)
+                    
+            
+        if (index == 7):
+            print ("Capture   Data Display")
+            if (len(self.CapturePlotVariables) < 1):
+                self.CaptureAddPlot()
+        if (index == 8):
+            print ("Capture Buffer View")
+        if (index==9):
+            if (self.tdPortHeaders == False):
+                ex = tdPortHeaders(self.tdPortVBox)
+                self.tdPortHeaders = True
+
+                inputFile = open("tdPortData.txt")
+                self.tdPortLineCount = 0
+                while 1:           
+                    line = inputFile.readline()
+                    if not line:
+                        break
+                    dstMac = line.strip()
+                    tdPortLine = dstMac.split(" ") 
+                    #print (tdPortLine)
+                    self.tdPortData[tdPortLine[0]] = [tdPortLine[1], tdPortLine[1]]
+                    self.tdPortLineCount = self.tdPortLineCount + 1
+               
+                
+                inputFile.close();          
+                
+                tdPortValueLayout = QtGui.QVBoxLayout(self.tdPortValuesGroup)                
+                self.tdTable = myTableView(self.tdPortData, self.tdPortLineCount, 3)
+                tdPortValueLayout.addWidget(self.tdTable)       
+
+
+    def EnableAll(self,filterList):
+        for item in filterList:
+              self.enableItem(item)
+
+            
+
+    def SelectAll(self,ItemList):
+        for item in ItemList:
+            item.checkBox.setChecked(not(item.checkBox.isChecked()))
+            
+            
+    def saveSession(self):
+        sessionFileName = QtGui.QFileDialog.getSaveFileName(
+                self, 'Save File', '', '*.session')
+        if not sessionFileName.isEmpty():
+            sessionFile = open(sessionFileName,'wb')
+            pickle.dump(self.numRTFilters,sessionFile)
+            pickle.dump(self.numCaptureFilters,sessionFile)
+            pickle.dump(self.numTriggers,sessionFile)
+            numParallelTriggers = len(self.TriggerConditions) 
+            pickle.dump(numParallelTriggers,sessionFile)
+            
+            for item in self.RTFilters:
+                pickle.dump(item.convertToList(), sessionFile)
+
+            for item in self.CaptureFilters:
+                pickle.dump(item.convertToList(), sessionFile)
+                
+            for item in self.Triggers:
+                pickle.dump(item.convertToList(), sessionFile)
+
+            for item in self.TriggerConditions:
+                pickle.dump(item.convertToList(), sessionFile)
+                
+            for item in self.TriggerGatesOne:
+                pickle.dump(item.convertToList(), sessionFile)
+
+            for item in self.TriggerGatesTwo:
+                pickle.dump(item.convertToList(), sessionFile)
+
+            for item in self.TriggerGatesThree:
+                pickle.dump(item.convertToList(), sessionFile)
+
+            for item in self.TriggerGatesFour:
+                pickle.dump(item.convertToList(), sessionFile)
+
+            for item in self.TriggerCounters:
+                pickle.dump(item.convertToList(), sessionFile)
+
+            sessionFile.close()
+
+    def loadSession(self):
+        sessionFileName = QtGui.QFileDialog.getOpenFileName(
+                self, 'Open File', '', '*.session')
+        if not sessionFileName.isEmpty():
+            sessionFile = open(sessionFileName,'rb')
+            #print(sessionFileName)
+            self.numRTFilters = pickle.load(sessionFile)
+            self.numCaptureFilters = pickle.load(sessionFile)
+            self.numTriggers = pickle.load(sessionFile)
+            numParallelTriggers = pickle.load(sessionFile)
+
+            for i in range(0,self.numRTFilters):
+                self.RTFilterList = pickle.load(sessionFile)
+                #print(self.RTFilterList)
+            for i in range(0,self.numCaptureFilters):
+                self.CaptureFilterList = pickle.load(sessionFile)
+                #print(self.CaptureFilterList)
+            for i in range(0,self.numTriggers):
+                self.TriggerList = pickle.load(sessionFile)
+                #print(self.TriggerList)
+            for i in range(0,numParallelTriggers):
+                self.conditionList = pickle.load(sessionFile)
+                #print(self.conditionList)                
+            for i in range(0,numParallelTriggers):
+                self.gate1List = pickle.load(sessionFile)
+                print(self.gate1List)
+            for i in range(0,numParallelTriggers):
+                self.gate2List = pickle.load(sessionFile)
+                print(self.gate1List)
+            for i in range(0,numParallelTriggers):
+                self.gate3List = pickle.load(sessionFile)
+                print(self.gate3List)
+            for i in range(0,numParallelTriggers):
+                self.gate4List = pickle.load(sessionFile)
+                print(self.gate4List)
+            for i in range(0,numParallelTriggers):
+                self.counterList = pickle.load(sessionFile)
+                print(self.counterList)
+            
+    def on_timer(self):
+        """ Executed periodically when the monitor update timer
+            is fired.
+        """
+       
+        self.updatePlot()    
+     
+    
+    def on_discoveryTimer(self):
+        self.connectivityTimer = Qt.QTimer()
+        self.connectivityTimer.setSingleShot(True)        
+        self.connectivityTimer.timeout.connect(self.on_connectivityTimer)    
+        self.isPingReceived = False
+        self.connectivityTimer.start(1000)
+
+        if (self.listening):
+            if (self.FPGAComboMAC.currentText() != ""):
+                self.readFSMRegisters()
+            else:
+                self.discoverFPGA()
+            
+
+        
+     
+
+
+    def on_connectivityTimer(self):
+        i=1
+#        if (self.isPingReceived == False): 
+#            self.isConnected = False
+#            self.isArmed = False
+#            self.isTriggered = False
+#            self.isCaptured = False
+#            self.updateStatus()
+            #print("No Connection")
+
+        
+    def addStatusWidget(self):
+        self.statusWindow = QtGui.QDockWidget("FPGA STATUS",self)
+        statusGroupBox = QtGui.QGroupBox(self.statusWindow)           
+        statgrp1 = QtGui.QGroupBox(statusGroupBox)        
+        statgrp2 = QtGui.QGroupBox(statusGroupBox)                      
+        statvbox = QtGui.QVBoxLayout(statusGroupBox)
+        statgrp1layout =  QtGui.QVBoxLayout(statgrp1)    
+        statgrp2layout =  QtGui.QVBoxLayout(statgrp2)      
+        statvbox.addWidget(statgrp1)
+        statvbox.addWidget(statgrp2)    
+        self.buttonARM = QtGui.QPushButton("ARM",self)
+        self.labelFPGA = QtGui.QLabel("FPGA Version: 10.1.1",self)
+        self.labelFPGA.setStyleSheet('font:bold 14px')
+#       
+        self.labelConnected = QtGui.QLabel("NOT CONNECTED",self)   
+        self.labelConnected.setStyleSheet('font:bold 14px;color:red')
+#       
+#       
+#      
+        statgrp1layout.addWidget(self.labelFPGA)
+        statgrp1layout.addWidget(self.labelConnected)        
+        statgrp1layout.addWidget(self.buttonARM) 
+        
+        self.statusLabel = QtGui.QLabel("DISARMED")
+        self.statusLabel.setStyleSheet("font:bold 18px;color: red")     
+        statgrp2layout.addWidget(self.statusLabel)
+#        
+#        
+        statusGroupBox.setLayout(statvbox)     
+        self.statusWindow.setWidget(statusGroupBox) 
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea,self.statusWindow)              
+        self.statusWindow.setFixedWidth(200)
+        self.statusWindow.setFixedHeight(200)
+#                
+        self.buttonARM.clicked.connect(self.armFPGA)
+        self.buttonARM.setDisabled(True)
+        self.ui.menuView.addAction(self.statusWindow.toggleViewAction())
+ 
+    def armFPGA(self):
+        if (self.isArmed):
+            self.buttonARM.setText("ARM")
+            self.buttonARM.setStyleSheet('color:red')
+            self.isArmed = False
+            self.isRunning = 0
+        else:
+            self.isArmed = True
+            self.isRunning = 1
+            self.buttonARM.setText("DISARM")
+            self.buttonARM.setStyleSheet('color:blue')
+        
+#        self.writeFSMRegisters()          
+#        self.updateStatus()
+
+
+       
+    def addLeftMenu(self):
+        ''' The Docakble Menu on the Left side
+            To add to ythe menu, simply add to LeftMenuList  following the examples below
+        '''
+        self.leftMenuWindow = QtGui.QDockWidget("Operations",self)
+        self.LeftMenuGroupBox = QtGui.QGroupBox(self.leftMenuWindow)     
+        self.LeftMenuLayout = QtGui.QVBoxLayout(self.LeftMenuGroupBox)
+        self.LeftMenuGroupBox.setLayout(self.LeftMenuLayout)
+        self.leftMenuList = QtGui.QListWidget()
+        self.LeftMenuLayout.addWidget(self.leftMenuList)
+        self.leftMenuWindow.setWidget(self.LeftMenuGroupBox) 
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea,self.leftMenuWindow)  
+      
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("FPGA Connect"))
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("FPGA Status"))                
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("RT Filter"))
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("Capture Filter"))
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("CsBuff Triggers"))     
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("TestMux Triggers"))
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("RT Data Display"))
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("Capture Data Display"))
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("Capture Buffer View"))   
+        self.leftMenuList.addItem(QtGui.QListWidgetItem("Configure TdPort"))   
+                 
+        self.ui.menuView.addAction(self.leftMenuWindow.toggleViewAction())
+         
+        
+        ''' Connect ItemClicked Signal from Left menu 
+        '''
+        self.leftMenuList.itemClicked.connect(self.LeftMenuItemChanged)       
+   
+    def LeftMenuItemChanged(self):
+        #print("Left Menu Item Change")
+        index = self.leftMenuList.currentRow()
+        #print(index)
+        self.manTabWidget.setCurrentIndex(index)   
+        
+        
+    def  initVariables(self):
+        self.selectedComponents = []
+        self.Triggers=[]
+        self.RTFilters=[]
+        self.CaptureFilters=[]
+        self.tdPortList = []
+        self.filterList = []
+        self.baseList = []
+        self.rangeList=[]
+        self.topList=[]    
+        self.packetQueue = []
+        self.TriggerLines = []
+        
+        self.TriggerConditions = []
+        self.TriggerGatesOne =[]
+        self.TriggerGatesTwo=[]
+        self.TriggerGatesThree =[]
+        self.TriggerGatesFour =[]
+        self.TriggerCounters = []      
+
+        
+        self.numTriggers = 0
+        self.numRTFilters = 0
+        self.numCaptureFilters = 0
+        self.numtdPortItems = 0
+        self.totalTriggers = 16
+        self.totalRTFilters = 16
+        self.totalCaptureFilters = 16
+        self.queueLength = 0
+        self.numConditions = 0
+        self.numGates = 0
+        
+        self.isRunning = 0
+        self.isExtTriggerEnabled = 0
+        self.isExtTriggerHigh = 0
+        self.selfGenerating = 0
+        
+        self.packetsProcessed = 0
+        self.FPGAVersion = "10.1.1"
+        self.isConnected = False
+        self.isArmed = False
+        self.isTriggered = False
+        self.isCaptured = False
+        self.RTOff = 0
+        
+    
+        self.filterDictionary = {}
+        self.baseDictionary = {}
+        self.topDictionary = defaultdict(list)
+        self.offsetDictonary = {}
+        self.streamToBaseDictionary = {}
+        self.basetoStreamDictionary = {}
+        self.tdPortData = {}
+        self.tdPortLineCount = 0
+        
+        self.rtFilterHeaders = False
+        self.trigHeaders = False
+        self.tdPortHeaders = False
+        self.captureFilterHeaders = False
+        self.deviceConfigured=False
+        self.isConfigured = False
+        self.selectedGate = 0
+        self.lineConnectors = {}
+
+        self.adapterHandle = pcap_t
+        self.listening = False
+        self.RTPlotVariables = []
+        self.CapturePlotVariables = []
+        self.RTPlotData = []
+    
+        self.plotData = RingBuffer(1000)
+        self.plotData1 = RingBuffer(1000)
+                
+        self.isPingReceived = False
+        #End initVariables      
+        
+#####################################################################################
+    def createDictionaries(self):
+                # READ CSBuff Files abnd Create the Dictionaries
+        with open('Phy_regspec_fusion.xml', 'rt') as f:
+            tree = ElementTree.parse(f)
+
+        for bnode in tree.iter('block'):            #block node
+            bname = bnode.attrib.get('name')
+            boffset = bnode.get('offset')           
+            for rfile in bnode.iter('regfile'):     #register file
+                rname = rfile.attrib.get('name')
+                if (str(rname).find("Csr") > -1 and str(bname).find("Dbg") == -1) :
+                     continue
+                self.topDictionary[bname].append(rname)
+                baseName = bname+'_'+rname
+                if (rfile.attrib.get ('absolute_addr')):
+                    boffset = rfile.attrib.get ('absolute_addr')                  
+                #print(baseName+"______"+boffset)
+                self.baseDictionary[baseName] = [boffset, "7",[]]
+                for node in rfile.iter('reg'):                  #registers 
+                    name = node.attrib.get('name')
+                    baseItem=self.baseDictionary.get(baseName)                    
+                    offt = node.attrib.get('offset')
+                    #offt.replace('0x','')
+                    #ofsetval = int(offt1)
+                    a = Qt.QString(str(offt))
+                    #a.replace('0x','')
+                    offt = str(a)
+                    val1 = a.toInt(16)
+                    b = val1[0] /4      
+                    offt1 = "{:>}" .format(str(b)) 
+                   
+                    #print(ofsetval)
+                    name = name +'  ('+offt1+')'
+                    baseItem[2].append(name)  
+                    offsetName = baseName+'_'+name
+                    self.offsetDictonary[offsetName]=[offt,[]]
+                    #offt.replace('0x','')
+                    for n in node.iter('field'):                #fields
+                        n1  = n.attrib.get('name')
+                        fieldItem = self.offsetDictonary.get(offsetName)
+                        fieldItem[1].append(n1)
+                        offset = n.attrib.get('offset')
+                        width = n.attrib.get('width')
+                        offset1 = int(offset)+int(width)-1
+                        offset2 = str(Qt.QString("%1:%2") .arg(offset1)   .arg(offset))
+                        offset2 = "{:>}".format(offset2)                        
+                        filtername = bname+'_'+rname+'_'+name+'_'+n1
+                        #print (filtername)
+                        #if (n1 !="RESERVED"):
+                                     
+                        dataVar = bname              
+                        baseVar = rname    
+                        variable = 0
+                        if (dataVar[-2:] == "Dl"):
+                            variable = variable | 0x30;
+                        if (dataVar[-2:] == "Fd"):
+                            variable = variable | 0x31;
+                        if (dataVar[-2:] == "Td"):
+                            variable = variable | 0x32;
+                        if (dataVar[-4:] == "Rfic"):
+                            variable = variable | 0x33;
+                                        
+                        if (baseVar[:2] == "Rx"):
+                            variable = variable | 0x44
+                        if (baseVar[:2] == "Tx"):    
+                            variable = variable | 0x40
+                                                
+                        if (baseVar[-3:] == "Ctl"):
+                            variable = variable | 0x88
+                        if (baseVar[-3:] == "Sts"):
+                            variable = variable | 0x80    
+                            
+                            
+                            
+                        filterListElement=[filtername,boffset,"7",offt,offset2,variable]                                                
+                        self.filterList.append(filterListElement)                               
+                        self.filterDictionary[filtername]=filterListElement
+                            #print ("{0} {1}" .format(n1,offset2))                            
+       
+
+
+
+#   READ XML DOCUMENTS AND CREATE THE FILTERS
+         
+        self.topDictionary["eventLogger"].append("eventLogger")                    
+        self.baseDictionary["eventLogger_eventLogger"] = ["FFFFFFFF", "3",[]]              
+        with open('eventLogger.xml', 'rt') as eventfile:
+            print (eventfile)            
+            eventtree = ElementTree.parse(eventfile)
+        for eventnode in eventtree.iter('event'):
+            eventname = eventnode.attrib.get('name')
+            eventID = eventnode.get('id')           
+            baseItem=self.baseDictionary.get("eventLogger_eventLogger")
+                       
+            offt = str(eventID)
+            eventname = eventname +'  ('+offt+')'            
+            baseItem[2].append(eventname)  
+            offsetName = "eventLogger"+'_'+"eventLogger"+'_'+eventname    
+            self.offsetDictonary[offsetName]=[offt,[]]  
+            for rfile in eventnode.iter('data'):                
+                rname = rfile.attrib.get('name')
+                fieldItem = self.offsetDictonary.get(offsetName)
+                fieldItem[1].append(rname)
+                bitMax = rfile.attrib.get('MSB')
+                bitMin = rfile.attrib.get('LSB')
+                offset2 = str(Qt.QString("%1:%2") .arg(bitMax)   .arg(bitMin))
+                offset2 = "{:>}".format(offset2)                       
+
+                filtername =offsetName +'_'+rname
+                #insert 0 into list for packect type                 
+                filterListElement=[filtername,"FFFFFFFF","3",offt,offset2,0]                                                
+                self.filterList.append(filterListElement)                               
+                self.filterDictionary[filtername]=filterListElement     
+        
+        
+        self.CsBuffDictionary = self.filterDictionary
+        self.CsBuffFilterList = self.filterList
+        self.CsBuffList=self.filterDictionary.keys()
+        
+     
+       
+        self.topDictionary["TestMux"].append("TestMux")      
+        self.baseDictionary["TestMux_TestMux"] = ["FFFFFFFF", "5",[]]
+        with open('testMux.xml', 'rt') as eventfile:
+            eventtree = ElementTree.parse(eventfile)
+        for eventnode in eventtree.iter('mode'):       
+            eventname = eventnode.attrib.get('name')       
+            eventID = eventnode.get('id') 
+            baseItem=self.baseDictionary.get("TestMux_TestMux")
+            eventname = eventname +'  ('+  eventID+')'          
+            baseItem[2].append(eventname)  
+            offsetName = "TestMux"+'_'+"TestMux"+'_'+eventname                
+            offt = str(eventID)
+            self.offsetDictonary[offsetName]=[offt,[]]  
+            for rfile in eventnode.iter('primary'):
+                rname = rfile.attrib.get('name')
+                for bfile in rfile.iter('data'):
+                    bname = bfile.attrib.get('name')
+                    fieldItem = self.offsetDictonary.get(offsetName)
+                    bname = rname[0:1] + '_'+ bname
+                    fieldItem[1].append(bname)
+                    bitMax = bfile.attrib.get('MSB')
+                    bitMin = bfile.attrib.get('LSB')
+                    offset2 = str(Qt.QString("%1:%2") .arg(bitMax)   .arg(bitMin))
+                    offset2 = "{:>}".format(offset2)  
+                    filtername = offsetName+'_'+bname
+                    #insert 0 into list for packect type                     
+                    filterListElement=[filtername,"0xFFFFFFFF","5",offt,offset2,0]                                                
+                    self.filterList.append(filterListElement)                               
+                    self.filterDictionary[filtername]=filterListElement  
+                    
+                    
+            for rfile in eventnode.iter('secondary'):
+                rname = rfile.attrib.get('name')
+                for bfile in rfile.iter('data'):
+                    bname = bfile.attrib.get('name')
+                    bname = rname[0:1] + '_'+ bname
+                    fieldItem = self.offsetDictonary.get(offsetName)
+                    fieldItem[1].append(bname)
+                    bitMax = bfile.attrib.get('MSB')
+                    bitMin = bfile.attrib.get('LSB')
+                    offset2 = str(Qt.QString("%1:%2") .arg(bitMax)   .arg(bitMin))
+                    offset2 = "{:>}".format(offset2)  
+                    filtername = offsetName+'_'+rname+'_'+bname
+                    #insert 0 into list for packect type 
+                    filterListElement=[filtername,"0xFFFFFFFF","5",offt,offset2,0]                                                
+                    self.filterList.append(filterListElement)                               
+                    self.filterDictionary[filtername]=filterListElement 
+       
+       
+       
+       
+        self.topDictionary["AllCsBuff"].append("All") 
+        self.baseDictionary["AllCsBuff_All"] = ["0xFFFFFFFF", "0x7",["All"]] 
+        self.offsetDictonary["AllCsBuff_All_All"]=["0xFFFF",["All"]]    
+        filterListElement=["AllCsBuff_All_All_All","0xFFFFFFFF","7","0xffff","31:0",0]                                     
+        self.filterList.append(filterListElement)                               
+        self.filterDictionary["AllCsBuff_All_All_All"]=filterListElement   
+               
+        self.baseList=self.topDictionary.keys()        
+#******************************************************************************************************************
+#####################################################################################
+    def setSliderValue(self):
+        value = self.sliderValue.currentIndex()
+        self.triggerSlider.setValue(value)
+        
+    def setisRunning(self):
+        if (self.runStopButton.text() ==  "STOP"):
+            self.runStopButton.setText("RUN")
+            self.runStopButton.setStyleSheet("font:bold 18px;background-color: green") 
+            self.isRunning = 1
+        else:
+            self.runStopButton.setText("STOP")
+            self.runStopButton.setStyleSheet("font:bold 18px;background-color: red") 
+            self.isRunning = 0
+            
+            
+    def setExtTriggerEnable(self):
+        if (self.extTrigEnabButton.text() == "ENABLE EXTERNAL TRIGGER"):
+            self.extTrigEnabButton.setText("DISABLE EXTERNAL TRIGGER")     
+            self.extTrigEnabButton.setStyleSheet("font:bold 18px;background-color: red") 
+            self.isExtTriggerEnabled = 0
+        else:
+            self.isExtTriggerEnabled = 1
+            self.extTrigEnabButton.setText("ENABLE EXTERNAL TRIGGER")
+            self.extTrigEnabButton.setStyleSheet("font:bold 18px;background-color: green") 
+         
+  
+    def setExtTrigPolarity(self):
+        if (self.extTrigPolarityButton.text() == "SET EXTERNAL TRIGGER POLARITY LOW"):
+            self.isExtTriggerHigh = 1
+            self.extTrigPolarityButton.setText("SET EXTERNAL TRIGGER POLARITY HIGH")
+            self.extTrigPolarityButton.setStyleSheet("font:bold 18px;background-color: green") 
+        else:
+            self.isExtTriggerHigh = 0
+            self.extTrigPolarityButton.setText("SET EXTERNAL TRIGGER POLARITY LOW")
+            self.extTrigPolarityButton.setStyleSheet("font:bold 18px;background-color: red") 
+            
+    def setSelfGenData(self):
+        if (self.selfGenDataButton.text() =="USE SELF-GEN TEST DATA"):
+            self.selfGenerating = 0
+            self.selfGenDataButton.setText("USE DATA FROM DUT")
+            self.selfGenDataButton.setStyleSheet("font:bold 18px;background-color: green") 
+        else:
+            self.selfGenerating = 1
+            self.selfGenDataButton.setText("USE SELF-GEN TEST DATA")
+            self.selfGenDataButton.setStyleSheet("font:bold 18px;background-color: red") 
+
+    def RTDisplayAddPlot(self):
+#         if (len(self.RTPlotVariables) >4 ):
+#             vertical = len(self.RTPlotVariables) * 300
+#             self.scrollwidget.setMinimumSize(1800,vertical) 
+#             self.RTDisplayWidget.setGeometry(QtCore.QRect(260, 0, 1041, vertical))
+         plotData = RingBuffer(1000)
+         self.RTPlotData.append(plotData)
+         combo1 = ExtendedComboBox(self.RTDisplayContGroup)
+         self.RTDisplayContLayout.addWidget(combo1)
+         #self.RTDisplayLayout.setAlignment(QtCore.Qt.AlignTop)
+         combo1.addItem("Please Select")
+
+#         for filterElement in self.filterList:
+#             combo1.addItem(filterElement[0])
+
+
+         for item in self.RTFilters:
+            key = str(item.dataVar.currentText()+'_'+item.baseVar.currentText())+'_'+ str(item.OffsetVar.currentText())+'_'+ str(item.rangeVar.currentText())
+            combo1.addItem(key)
+            
+         self.RTPlotVariables.append(combo1)
+      
+      
+         qfigWidget = QtGui.QWidget(self.RTDisplayqscrollContents)      
+         #fig = Figure((3, 3), dpi=100)
+         fig = plt.figure(figsize=(3,3)) 
+         canvas = FigureCanvas(fig)
+         canvas.setParent(qfigWidget)
+         toolbar = NavigationToolbar(canvas, qfigWidget)
+         axes = fig.add_subplot(111)
+         axes.plot([1,2,3,4])
+         axes.hold(False)
+        
+          # place plot components in a layout
+         plotLayout = QtGui.QVBoxLayout()
+         plotLayout.addWidget(canvas)
+         plotLayout.addWidget(toolbar)
+         qfigWidget.setLayout(plotLayout)
+    
+          # prevent the canvas to shrink beyond a point
+          # original size looks like a good minimum size
+         canvas.setMinimumSize(canvas.size())        
+         self.RTDisplayqscrollLayout.addWidget(qfigWidget)
+         
+         #fig.canvas.mpl_connect('figure_enter_event', self.enter_figure)
+         #fig.canvas.mpl_connect('figure_leave_event', self.leave_figure)
+         #fig.canvas.mpl_connect('axes_enter_event', self.enter_axes)
+         #fig.canvas.mpl_connect('axes_leave_event', self.leave_axes)
+         #fig.canvas.mpl_connect('button_press_event', self.mouse_pressed)
+         #fig.canvas.mpl_connect('button_release_event', self.mouse_released)
+         #fig.canvas.mpl_connect('motion_notify_event', self.mouse_motion)
+         #fig.canvas.mpl_connect('pick_event', self.pickEvent)
+         #fig.canvas.mpl_connect('resize_event', self.canvasResized)
+         #fig.canvas.mpl_connect('scroll_event', self.mouseScrolled)
+         
+
+
+         self.RTFigures.append(fig)
+         
+         
+         combo1.activated.connect(lambda: self.CsBuffPlotData(self.RTPlotVariables.index(combo1),[])) 
+    
+    def enter_axes(self,event):
+        print 'enter_axes', event.inaxes
+        event.inaxes.patch.set_facecolor('yellow')
+        event.canvas.draw()
+
+    def leave_axes(self,event):
+        print 'leave_axes', event.inaxes
+        event.inaxes.patch.set_facecolor('white')
+        event.canvas.draw()
+    
+    def enter_figure(self,event):
+        print 'enter_figure', event.canvas.figure
+        event.canvas.figure.patch.set_facecolor('red')
+        event.canvas.draw()
+    
+    def leave_figure(self,event):
+        event.canvas.figure.patch.set_facecolor('grey')
+        event.canvas.draw()
+        
+    def mouse_pressed(self,event):
+        print 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
+            event.button, event.x, event.y, event.xdata, event.ydata)    
+            
+    def mouse_released(self,event):
+        print 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
+            event.button, event.x, event.y, event.xdata, event.ydata) 
+
+    def mouse_motion(self,event):
+        print "mouse motion" 
+
+    def pickEvent(self,event):
+        print 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
+            event.button, event.x, event.y, event.xdata, event.ydata) 
+
+    def canvasResized(self,event):        
+        print "canvas resized"
+        event.canvas.draw() 
+
+    def mouseScrolled(self,event):
+        print "mouse scrolled" 
+
+
+    def CaptureAddPlot(self): 
+         combo1 = ExtendedComboBox(self.RTDisplayContGroup)
+         self.CaptureDisplayContLayout.addWidget(combo1)
+         combo1.addItem("Please Select")
+
+         for filterElement in self.filterList:
+             combo1.addItem(filterElement[0])        
+        
+         self.numCaptureFigures = self.numCaptureFigures + 1
+         self.CapturePlotVariables.append(combo1)
+         combo1.activated.connect(lambda: self.AttachCaptureData(combo1))      
+         self.CaptureDisplayWidget.addSubPlot(self.numCaptureFigures,self.CapturePlotVariables)
+         
+         
+    def AttachCaptureData(self,combo):
+        index = self.CapturePlotVariables.index(combo)
+        title = combo.currentText()
+        self.CaptureDisplayWidget.assignTitle(index,title)
+        
+        
+        
+        
+    def CsBuffPlotData(self,index,data):
+#        t = arange(0.0, 100, 0.1)
+#        base=cos(2*pi*t)
+#       #index = self.RTPlotVariables.index(combo)
+#        #for index in range(len(self.RTPlotVariables)):
+#        index = 0
+#        x = len(base)
+#        base.resize(len(base)+1)
+#        base[x] = 10
+#        base = base * np.random.rand()
+         if (len(data) > 0 ):
+             figure =  self.RTFigures[index] 
+             axes = figure.add_subplot(111)
+             axes.plot(self.plotData)
+             axes.set_title(str(self.RTPlotVariables[index].currentText()))
+             figure.canvas.draw()
+             
+                 
+
+        #self.RTPlot.plotData(index,base)
+        
+            
+    def CapturePlotData(self,data):
+    
+        self.CapturePlot.plotData(0,data)
+            
+ 
+    def addStatusWidget(self):
+        self.statusWindow = QtGui.QDockWidget("FPGA STATUS",self)
+        statusGroupBox = QtGui.QGroupBox(self.statusWindow)           
+        statgrp1 = QtGui.QGroupBox(statusGroupBox)        
+        statgrp2 = QtGui.QGroupBox(statusGroupBox)                      
+        statvbox = QtGui.QVBoxLayout(statusGroupBox)
+        statgrp1layout =  QtGui.QVBoxLayout(statgrp1)    
+        statgrp2layout =  QtGui.QVBoxLayout(statgrp2)      
+        statvbox.addWidget(statgrp1)
+        statvbox.addWidget(statgrp2)    
+        self.buttonARM = QtGui.QPushButton("ARM",self)
+        self.labelFPGA = QtGui.QLabel("FPGA Version: 10.1.1",self)
+        self.labelFPGA.setStyleSheet('font:bold 14px')
+       
+        self.labelConnected = QtGui.QLabel("NOT CONNECTED",self)   
+        self.labelConnected.setStyleSheet('font:bold 14px;color:red')
+       
+       
+      
+        statgrp1layout.addWidget(self.labelFPGA)
+        statgrp1layout.addWidget(self.labelConnected)        
+        statgrp1layout.addWidget(self.buttonARM) 
+        
+        self.statusLabel = QtGui.QLabel("DISARMED")
+        self.statusLabel.setStyleSheet("font:bold 18px;color: red")     
+        statgrp2layout.addWidget(self.statusLabel)
+        
+        
+        statusGroupBox.setLayout(statvbox)     
+        self.statusWindow.setWidget(statusGroupBox) 
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea,self.statusWindow)              
+        self.statusWindow.setFixedWidth(200)
+        self.statusWindow.setFixedHeight(200)
+                
+        self.buttonARM.clicked.connect(self.armFPGA)
+        self.buttonARM.setDisabled(True)
+        self.ui.menuView.addAction(self.statusWindow.toggleViewAction())
+        
+            
+        
+        
+   
+
+    def sliderMoved(self):
+        value = self.triggerSlider.value()
+        self.sliderValue.setCurrentIndex(value)
+      
+            
+
+    def readTDPortState(self):
+        for item in self.tdPortList:
+            baseAddress = item.baseAddres.text() 
+            baseAddress = str(baseAddress).lstrip("0x")
+            data = self.tdPortData.get(baseAddress)
+            
+            mask = 0
+            bitPos = str(item.bitRange.text()).split(':')
+            bitStart = int(bitPos[1])
+            bitEnd = int(bitPos[0]) 
+                        
+            mask = 1 << bitStart; 
+                    
+            for i in range(bitStart,bitEnd+1):
+                 mask = mask | (1 << i)
+
+            
+            
+            print (data)
+            newValue = int(data[1],16)
+            newValue = newValue & mask
+            newValue = newValue >> bitStart            
+            
+            item.value.setText(Qt.QString("%1") .arg(newValue))       
+        
+        
+        
+    def addTDPortState(self):
+        ex = tdPortItem(self.tdPortVBox,self.baseList,self.numtdPortItems+1)
+        ex.dataVar.activated.connect(lambda: self.dataIndexChanged(ex,3))
+        ex.baseVar.activated.connect(lambda: self.baseIndexChanged(ex,3))
+        ex.OffsetVar.activated.connect(lambda: self.offsetIndexChanged(ex,3))    
+        ex.rangeVar.activated.connect(lambda: self.bitRangeIndexChanged(ex,3))           
+        ex.enableButton.clicked.connect(lambda: self.enableItem(ex))
+        ex.sendButton.clicked.connect(lambda: self.sendTDCommand(ex))
+        ex.restoreButton.clicked.connect(lambda: self.restoreTDCommand(ex))
+        ex.dataVar.setCurrentIndex(0)    
+        self.tdPortList.append(ex)  
+        self.numtdPortItems = len(self.tdPortList)
+
+        
+    def restoreTDCommand(self,item):
+        baseAddress = item.baseAddres.text() 
+        data = self.tdPortData.get(str(baseAddress))
+        data[1] = data[0]
+        self.tdPortData[str(baseAddress)] = data     
+        self.tdTable.setmydata(self.tdPortData)
+        
+    def sendTDCommand(self,item):
+        baseAddress = item.baseAddres.text() 
+        mask = 0
+        bitPos = str(item.bitRange.text()).split(':')
+        bitStart = int(bitPos[1])
+        bitEnd = int(bitPos[0]) 
+                    
+        mask = 1 << bitStart; 
+                
+        for i in range(bitStart,bitEnd+1):
+             mask = mask | (1 << i)
+        baseAddress = str(baseAddress).lstrip("0x")
+        data = self.tdPortData.get(baseAddress)
+        valueStr = item.value.text()        
+        
+     
+        value =  int(str(valueStr),16)
+        
+        value = value << bitStart
+        value = value & mask 
+        
+  
+        newValue = int(data[1],16)
+        newValue = newValue & ~mask
+        
+      
+        newValue = value | newValue
+        
+   
+        
+        data[1] = "{0:08x}" .format(newValue)
+        self.tdPortData[str(baseAddress)] = data   
+       
+        self.tdTable.setmydata(self.tdPortData)
+        
+        
+        
+    def deleteTDPortState(self):
+        for item in self.tdPortList:
+            if (item.checkBox.isChecked()):
+                item.deletetdPort(self.tdPortVBox)
+                self.tdPortList.remove(item)
+                self.tdPortVBox.update()
+        self.numtdPortItems = len(self.tdPortList)
+    
+
+    def updateTDPortState(self):
+       for item in self.tdPortList:
+           self.sendTDCommand(item)
+
+
+    def saveTDPortState(self):
+        path = QtGui.QFileDialog.getSaveFileName(
+                self, 'Save File', '', 'CSV(*.csv)')
+        if not path.isEmpty():
+            with open(unicode(path), 'wb') as stream:
+                writer = csv.writer(stream)
+                for row in range(self.tdTable.rowCount()):
+                    rowdata = []
+                    for column in range(self.tdTable.columnCount()):
+                        item = self.tdTable.item(row, column)
+                        print (item)
+                        if item is not None:
+                            rowdata.append(
+                                unicode(item.text()).encode('utf8'))
+                        else:
+                            rowdata.append('')
+                    writer.writerow(rowdata)
+
+
+    def loadTDPortState(self):
+        path = QtGui.QFileDialog.getOpenFileName(
+                self, 'Open File', '', 'CSV(*.csv)')
+        if not path.isEmpty():
+            with open(unicode(path), 'rb') as stream:
+                self.tdTable.setRowCount(0)
+                self.tdTable.setColumnCount(0)
+                for rowdata in csv.reader(stream):
+                    row = self.tdTable.rowCount()
+                    self.tdTable.insertRow(row)
+                    self.tdTable.setColumnCount(len(rowdata))
+                    for column, data in enumerate(rowdata):
+                        item = QtGui.QTableWidgetItem(data.decode('utf8'))
+                        self.tdTable.setItem(row, column, item)
+
+
+    def sendTDPortRestoreAll(self):
+        for item in self.tdPortList:        
+            baseAddress = item.baseAddres.text() 
+            data = self.tdPortData.get(str(baseAddress))
+            data[1] = data[0]
+            self.tdPortData[str(baseAddress)] = data     
+        self.tdTable.setmydata(self.tdPortData)
+        
+        
+
+    def printPacket(self,header,pkt_data):
+        LINE_LEN = 16
+        print ("%ld:%ld (%ld)\n" % (header.contents.ts.tv_sec,header.contents.ts.tv_usec, header.contents.len))
+        ##  Print the packet
+        for i in range(1,header.contents.len + 1):
+            print ("{0:02x} "  .format(pkt_data[i-1])),
+            if (i % LINE_LEN) == 0:
+                print ("\n")
+        #print ("\n\n")
+    
+    def deleteRTFilter(self):
+        removedone = False
+        while removedone == False:
+            removedone = True
+            for item in self.RTFilters:            
+                if (item.checkBox.isChecked()):
+                    removedone = False
+                    self.RTFilters.remove(item)
+                    item.deleteFilter(self.RTFilterVBox)                            
+            self.numRTFilters = len(self.RTFilters)
+            self.RTFilterVBox.update()
+            
+    
+    def copyRTtoCapture(self):
+        for item in self.RTFilters:
+            
+            if (item.checkBox.isChecked()):
+                doesExist = self.isFilterExist(item,self.CaptureFilters)
+                if (doesExist is 0  ): 
+                    ex = filterItem(self.captureFilterVBox,self.baseList,self.numCaptureFilters+1) 
+                    ex.dataVar.currentIndexChanged.connect(lambda: self.dataIndexChanged(ex,1))
+                    ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex,1))
+                    ex.OffsetVar.currentIndexChanged.connect(lambda: self.offsetIndexChanged(ex,1))    
+                    ex.rangeVar.currentIndexChanged.connect(lambda: self.bitRangeIndexChanged(ex,1))      
+                    ex.enableButton.clicked.connect(lambda: self.enableItem(ex))
+                    ex.copyFilter(item)
+                    ex.dataVar.setCurrentIndex(item.dataVar.currentIndex())                    
+                    self.numCaptureFilters = len(self.CaptureFilters)
+                    self.CaptureFilters.append(ex)
+                   
+   
+                #
+                # Add filter to RT 
+    
+    def copyCaptureToRT(self):
+        for item in self.CaptureFilters:
+            if (item.checkBox.isChecked()):
+                doesExist = self.isFilterExist(item,self.RTFilters)
+                if (doesExist == 0  ):                           
+                    ex = filterItem(self.RTFilterVBox,self.baseList,self.numRTFilters+1)
+                    ex.dataVar.currentIndexChanged.connect(lambda: self.dataIndexChanged(ex,1))
+                    ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex,1))
+                    ex.OffsetVar.currentIndexChanged.connect(lambda: self.offsetIndexChanged(ex,1))    
+                    ex.rangeVar.currentIndexChanged.connect(lambda: self.bitRangeIndexChanged(ex,1))      
+                    ex.enableButton.clicked.connect(lambda: self.enableItem(ex))
+                    ex.copyFilter(item)
+                    ex.dataVar.setCurrentIndex(item.dataVar.currentIndex())                    
+                    self.numRTFilters = len(self.RTFilters)
+                    self.RTFilters.append(ex)
+                    ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex))
+               
+                
+                #
+                # Add filter to RT 
+
+    def isFilterExist(self, item, filterList):
+        returnValue = 0
+        for refFilter in filterList:
+            returnValue = refFilter.compareFilter(item)
+            if (returnValue == 1):
+                 QtGui.QMessageBox.about(self, "Filter Message","Filter  exists                            ")
+                 break
+            
+        return(returnValue)
+
+    def deleteCaptureFilter(self):
+        removedone = False
+        while removedone == False:
+            removedone = True
+            for item in self.CaptureFilters:
+                if (item.checkBox.isChecked()):
+                    removedone = False
+                    item.deleteFilter(self.captureFilterVBox)
+                    self.CaptureFilters.remove(item)
+                    self.captureFilterVBox.update()
+                    print(len(self.CaptureFilters))
+            self.numCaptureFilters = len(self.CaptureFilters)             
+
+    def deleteTrigger(self):
+        removedone = False
+        while removedone == False:
+            removedone = True
+            for  item in self.Triggers:                    
+                if (item.checkBox.isChecked()):
+                    removedone = False
+                    item.deleteTrigger(self.triggerVBox)
+                    self.Triggers.remove(item)
+                    self.triggerVBox.update()
+                    print(len(self.Triggers))
+                   
+        
+        self.bottonRTDelFilter.clicked.connect(self.deleteRTFilter)
+        self.buttonTriggerDelete.clicked.connect(self.deleteTrigger)            
+  
+
+    def addCaptureFilter(self):
+        if (self.numCaptureFilters < self.totalCaptureFilters):
+            ex = filterItem(self.captureFilterVBox,self.baseList,self.numCaptureFilters+1)
+            ex.dataVar.currentIndexChanged.connect(lambda: self.dataIndexChanged(ex,1))
+            ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex,1))
+            ex.OffsetVar.currentIndexChanged.connect(lambda: self.offsetIndexChanged(ex,1))    
+            ex.rangeVar.currentIndexChanged.connect(lambda: self.bitRangeIndexChanged(ex,1))    
+            #ex.baseAddres.textEdited.connect(lambda: self.AddressEdited(ex))
+            #ex.baseAddres.textChanged.connect(lambda: self.AddressEdited(ex))
+                        
+            ex.enableButton.clicked.connect(lambda: self.enableItem(ex))
+            ex.dataVar.setCurrentIndex(0)                        
+            self.CaptureFilters.append(ex)  
+            self.numCaptureFilters = len(self.CaptureFilters)
+
+    def AddressEdited(filter):
+       filter.dataVar.setCurrentText("Please Select")
+
+    def enableItem(self,item):
+        if (item.isEnabled): 
+            item.isEnabled = False
+            item.setStyleEnabled(False)
+            item.enableButton.setChecked(False)
+        else:
+            item.isEnabled = True
+            item.setStyleEnabled(True)
+            item.enableButton.setChecked(True)
+        
+    def addRTFilter(self):
+        if (self.numRTFilters < self.totalRTFilters):       
+            ex = filterItem(self.RTFilterVBox,self.baseList,self.numRTFilters+1)
+            ex.dataVar.currentIndexChanged.connect(lambda: self.dataIndexChanged(ex,1))
+            ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex,1))
+            ex.OffsetVar.currentIndexChanged.connect(lambda: self.offsetIndexChanged(ex,1))
+            ex.rangeVar.currentIndexChanged.connect(lambda: self.bitRangeIndexChanged(ex,1))  
+            ex.enableButton.clicked.connect(lambda: self.enableItem(ex))
+            ex.dataVar.setCurrentIndex(0)            
+            self.RTFilters.append(ex)        
+            self.numRTFilters = len(self.RTFilters)
+        
+        
+
+    def dataIndexChanged(self,item,isFilter):
+        key = str(item.dataVar.currentText())
+        if key in  self.topDictionary.keys():
+            BaseItems = self.topDictionary.get(key)
+            #print (topItem)
+            #filter.baseAddres.setText(topItem[0])
+            #filter.streamIDMin.setText(topItem[1])
+            #filter.streamIDMax.setText(topItem[2])
+            #BaseItems = topItem[0]
+            item.baseVar.clear()
+            for base in BaseItems:
+                item.baseVar.addItem(base)
+          
+            item.baseVar.setCurrentIndex(0)
+        else: 
+            filter.OffsetVar.clear() 
+ 
+    def baseIndexChanged(self,item,isFilter):
+        key = str(item.dataVar.currentText()+'_'+item.baseVar.currentText())
+        print("key :",key)
+        #print (self.baseDictionary.get(key))   
+        if key in  self.baseDictionary.keys():
+            baseItem = self.baseDictionary.get(key)
+            #print (baseItem)
+            if (isFilter == 1):                
+                item.baseAddres.setText(baseItem[0])                                
+                item.streamIDMin.setText(str(hex(int(baseItem[1],16)-1)))
+                item.streamIDMax.setText(str(hex(int(baseItem[1],16))))
+            if (isFilter == 3):    
+                item.baseAddres.setText(baseItem[0])
+                item.baseAddressValue = baseItem[0]
+                item.bitRange.setText("31:0")                                            
+            Offsets = baseItem[2]
+            item.OffsetVar.clear()
+            for offset in Offsets:
+                item.OffsetVar.addItem(offset)
+            
+            item.OffsetVar.setCurrentIndex(0)
+        else: 
+            item.OffsetVar.clear()
+
+                        
+    def  offsetIndexChanged(self,item,isFilter):
+        key = str(item.dataVar.currentText()+'_'+item.baseVar.currentText())+'_'+ str(item.OffsetVar.currentText())
+        if key in self.offsetDictonary.keys():
+            offsetItem = self.offsetDictonary.get(key)
+            if (isFilter == 1):
+                item.offsetMin.setText(offsetItem[0])
+                item.offsetMax.setText(offsetItem[0])
+            bitVars = offsetItem[1]
+             
+            print(offsetItem) 
+           
+            if (isFilter == 3 ): 
+                baseValue = int(str(item.baseAddressValue),16)
+                baseValue = baseValue + int(str(offsetItem[0]),16)
+                bValue = "{0:08x}" .format(baseValue)
+                item.baseAddres.setText(Qt.QString("%1") .arg(bValue))                
+                item.bitRange.setText("31:0")
+            item.rangeVar.clear()
+            for bitVariable in bitVars:
+                item.rangeVar.addItem(bitVariable)
+                
+            item.rangeVar.setCurrentIndex(0)
+   
+    def bitRangeIndexChanged(self,item,isFilter):        
+        key = str(item.dataVar.currentText()+'_'+item.baseVar.currentText())+'_'+ str(item.OffsetVar.currentText())+'_'+ str(item.rangeVar.currentText())
+        print(key)
+        if key in self.filterDictionary.keys():
+            rangeItem = self.filterDictionary.get(key)
+            if (isFilter == 1):
+                  item.bitRange.setText(rangeItem[4])
+            if (isFilter == 3):
+                  item.bitRange.setText(rangeItem[4])
+                  print(rangeItem)
+    
+    def addTriggerLine(self):
+        self.numTriggers = self.numTriggers + 1
+        ex = triggerItem(self.triggerVBox,self.baseList,self.numTriggers)     
+        ex.dataVar.currentIndexChanged.connect(lambda: self.dataIndexChanged(ex,2))
+        ex.dataVar.activated.connect(lambda: self.dataIndexChanged(ex,2))                
+        ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex,2))
+        ex.OffsetVar.currentIndexChanged.connect(lambda: self.offsetIndexChanged(ex,2))
+        ex.rangeVar.currentIndexChanged.connect(lambda: self.bitRangeIndexChanged(ex,2))           
+        
+        ex.combo3.activated.connect(lambda: self.triggerCombo3Changed(ex))           
+        ex.combo4.activated.connect(lambda: self.triggerCombo4Changed(ex))           
+        
+        self.triggerVBox.update()
+        
+        ex.lineEdit1.setText(Qt.QString("%1") .arg(self.numTriggers))
+        self.Triggers.append(ex)  
+                
+                
+    def triggerCombo3Changed(self,ex):
+        if (ex.combo3.currentIndex() == 1):
+            ex.lineEdit4.hide()
+            self.triggerVBox.update()
+        else:
+            ex.lineEdit4.show()
+            self.triggerVBox.update()
+           
+           
+    def triggerCombo4Changed(self,ex):
+        if (ex.combo4.currentIndex() == 1):
+            ex.lineEdit5.hide()
+            self.triggerVBox.update()
+            print("Reverse the Condition")
+        else:
+            ex.lineEdit5.show()
+            self.triggerVBox.update()
+            
+            
+    def readParallelTriggers(self):
+        cmdCode = 0x51
+        data = [0]*64;
+        data[0] = cmdCode   
+        dst = str(self.FPGAComboMAC.currentText())
+        self.sendPacket(self,data,64,dst)
+    
+    def readTriggers(self):
+        cmdCode = 0x50
+        data = [0]*64;
+        data[0] = cmdCode   
+        dst = str(self.FPGAComboMAC.currentText())
+        self.sendPacket(self,data,64,dst)
+            
+    def readCaptureFilters(self):
+
+        while (self.numCaptureFilters < self.totalCaptureFilters):        
+             self.addCaptureFilter()
+             ex = self.CaptureFilters[self.numCaptureFilters-1]                    
+             self.enableItem(ex)
+        cmdCode = 0x60
+        data = [0]*64;
+        data[0] = cmdCode   
+        dst = str(self.FPGAComboMAC.currentText())
+        self.sendPacket(self,data,64,dst)
+    
+        
+    def readRTFilters(self):
+        while (self.numRTFilters < self.totalRTFilters):   
+             self.addRTFilter()
+             ex = self.RTFilters[self.numRTFilters-1]
+             self.enableItem(ex)
+#            ex = filterItem(self.RTFilterVBox,self.baseList,self.numRTFilters+1)
+#            ex.dataVar.currentIndexChanged.connect(lambda: self.dataIndexChanged(ex,1))
+#            ex.baseVar.currentIndexChanged.connect(lambda: self.baseIndexChanged(ex,1))
+#            ex.OffsetVar.currentIndexChanged.connect(lambda: self.offsetIndexChanged(ex,1))    
+#            ex.rangeVar.currentIndexChanged.connect(lambda: self.bitRangeIndexChanged(ex,1))    
+#            ex.enableButton.clicked.connect(lambda: self.enableItem(ex))        
+#            ex.dataVar.setCurrentIndex(1)  
+#            self.enableItem(ex)                       
+#            self.RTFilters.append(ex)  
+#            self.numRTFilters = len(self.RTFilters)
+        cmdCode = 0x61
+        data = [0]*64;
+        data[0] = cmdCode        
+        dst = str(self.FPGAComboMAC.currentText())
+        self.sendPacket(self,data,64,dst)
+
+    def sendCaptureFilters(self):
+        print ("Capture Filters to be send")   
+        data = [0xFF]*256;
+        cmdID = 0x20        
+        data[0]= cmdID;
+        data[1] = 0 # Padding
+        index = 2
+        for item in self.CaptureFilters:
+            if (item.enableButton.isChecked()):
+                decimation= "{0:02x}" .format(int(str(item.decimation.text()),16))
+                print(decimation)
+                headerMax = "{0:02x}" .format(int(str(item.streamIDMax.text()),16))
+                print (headerMax)
+                headerMin = "{0:02x}" .format(int(str(item.streamIDMin.text()),16))
+                print (headerMin)
+                offsetMax = "{0:04x}" .format(int(str(item.offsetMax.text()),16)/4)
+                print (offsetMax)
+                offsetMin = "{0:04x}" .format(int(str(item.offsetMin.text()),16)/4)
+                print (offsetMin)  
+                variable = 0; 
+                dataVar =str(item.dataVar.currentText())                
+                baseVar = str(item.baseVar.currentText())            
+                if (dataVar[-2:] == "Dl"):
+                    variable = variable | 0x30;
+                if (dataVar[-2:] == "Fd"):
+                    variable = variable | 0x31;
+                if (dataVar[-2:] == "Td"):
+                    variable = variable | 0x32;
+                if (dataVar[-4:] == "Rfic"):
+                    variable = variable | 0x33;
+                
+                if (baseVar[:2] == "Rx"):
+                    variable = variable | 0x44
+                if (baseVar[:2] == "Tx"):    
+                    variable = variable | 0x40
+                
+                if (baseVar[-3:] == "Ctl"):
+                    variable = variable | 0x88
+                if (baseVar[-3:] == "Sts"):
+                    variable = variable | 0x80
+                data[index] =variable   
+                #data[index] = 0x0
+                data[index+1] =int(decimation,16) 
+                data[index+2] = variable                
+                #data[index+2] =int(headerMax,16) 
+                #data[index+3] =int(headerMin,16)
+                data[index+3] = int (headerMax,16) << 4
+                data[index+3] = data[index+3] | int(headerMin,16) 
+                data[index+4] =int(offsetMax[0:2],16)  
+                data[index+5] =int(offsetMax[2:4],16)  
+                data[index+6] =int(offsetMin[0:2],16) 
+                data[index+7] =int(offsetMin[2:4],16)       
+                index = index + 8
+        print(" ".join('%02x' % i for i in data))
+        dst = str(self.FPGAComboMAC.currentText())
+        pktSize = self.totalCaptureFilters*8
+        self.sendPacket(self,data,pktSize,dst)
+       
+    def  setUpParallelTriggers(self):
+        
+        self.gateGroup1VBox = Qt.QVBoxLayout(self.gateGroup1)
+        self.gateGroup2VBox = Qt.QVBoxLayout(self.gateGroup2)
+        self.gateGroup3VBox = Qt.QVBoxLayout(self.gateGroup3)
+        self.gateGroup4VBox = Qt.QVBoxLayout(self.outputGroup)           
+        self.counterGroupVBox = Qt.QVBoxLayout(self.counterGroup)   
+        self.condVBox = Qt.QVBoxLayout(self.conditionGroup)
+
+        self.gateGroup1VBox.setAlignment(QtCore.Qt.AlignTop)
+        self.gateGroup2VBox.setAlignment(QtCore.Qt.AlignTop)
+        self.gateGroup3VBox.setAlignment(QtCore.Qt.AlignTop)
+    #    self.gateGroup4VBox.setAlignment(QtCore.Qt.AlignTop)
+        self.counterGroupVBox.setAlignment(QtCore.Qt.AlignTop)
+        self.condVBox.setAlignment(QtCore.Qt.AlignTop)
+        
+        for i in range(0,1):
+            gate=Gate(self.gateGroup1VBox,i)
+            self.TriggerGatesOne.append(gate)
+#            
+        for i in range(0,1):
+           gate=Gate(self.gateGroup2VBox,i)
+           self.TriggerGatesTwo.append(gate)
+#
+#
+        for i in range(0,1):
+           gate=Gate(self.gateGroup3VBox,i)
+           self.TriggerGatesThree.append(gate)
+#    
+#    
+        gate=Gate(self.gateGroup4VBox,9)
+        self.TriggerGatesFour.append(gate)
+#
+#
+        for i in range(0,1):
+            counter=Counter(self.counterGroupVBox,i)           
+            self.TriggerCounters.append(counter)
+
+        for i in range(0,1):
+            condition=Condition(self.condVBox,self.filterList,i)           
+            self.TriggerConditions.append(condition)
+        
+        self.parallelTriggerCount = 1
+        
+    def addParallelTriggerLine(self):
+        i=self.parallelTriggerCount
+        if (i < 8):        
+            gate=Gate(self.gateGroup1VBox,i)
+            #gate.setAlignment(QtCore.AlignTop)
+            self.TriggerGatesOne.append(gate)
+        
+            gate1=Gate(self.gateGroup2VBox,i)
+            self.TriggerGatesTwo.append(gate1)
+            
+            gate2=Gate(self.gateGroup3VBox,i)
+            self.TriggerGatesThree.append(gate2)
+            
+            counter=Counter(self.counterGroupVBox,i)           
+            self.TriggerCounters.append(counter)       
+        
+            condition=Condition(self.condVBox,self.filterList,i)           
+            self.TriggerConditions.append(condition)
+        
+        self.parallelTriggerCount = self.parallelTriggerCount + 1
+        
+        
+    def delParallelTriggerLine(self):
+        for item in self.TriggerConditions:
+            if item.BufGroup.isChecked():
+                index = self.TriggerConditions.index(item) 
+                print(index)
+                self.TriggerConditions.remove(item)
+                item.deleteCondition(self.condVBox)                
+                self.condVBox.update()
+
+                item1 = self.TriggerGatesOne[index]
+                item1.deleteGate(self.gateGroup1VBox)
+                del(self.TriggerGatesOne[index])
+                self.gateGroup1VBox.update()
+
+                item2 = self.TriggerGatesTwo[index]
+                item2.deleteGate(self.gateGroup2VBox)
+                del(self.TriggerGatesTwo[index])
+                self.gateGroup2VBox.update()
+
+
+                item3 = self.TriggerGatesThree[index]
+                item3.deleteGate(self.gateGroup3VBox)
+                del(self.TriggerGatesThree[index])
+                self.gateGroup3VBox.update()
+
+                item4 = self.TriggerCounters[index]
+                item4.deleteCounter(self.counterGroupVBox)
+                del(self.TriggerCounters[index])
+                self.counterGroupVBox.update()
+
+        self.parallelTriggerCount = len(self.TriggerConditions)
+                
+
+                #Delete Parallel Trigger Lines will be implemented later                
+                        
+    def clearParallelTriggers(self):
+        for condition in self.TriggerConditions:
+            for combo in (condition.bufCombo1, condition.bufCombo2):
+                combo.setCurrentIndex(0)
+            condition.BufEdit.text()
+          
+        for gate in self.TriggerGatesOne:
+            gate.gateType.setCurrentIndex(0)
+            gate.gateInputs.setText("")
+
+
+        for gate in self.TriggerGatesTwo:
+            gate.gateType.setCurrentIndex(0)
+            gate.gateInputs.setText("")
+        
+           
+        for gate in self.TriggerGatesThree:
+            gate.gateType.setCurrentIndex(0)
+            gate.gateInputs.setText("")
+           
+        for counter in self.TriggerCounters:
+            counter.cntUpCount.setText("")
+            counter.cntReset.setText("")
+            counter.cntDownCount.setText("")
+            counter.cntDependOn.setText("")
+            counter.initCounter.setValue(1)
+            
+        for gate in self.TriggerGatesFour:
+            gate.gateType.setCurrentIndex(0)
+            gate.gateinputs.setText("")
+ 
+        
+        
+    def sendParallelTriggers(self): 
+        data = [0xFF]*(161*4+2);
+        cmdID = 0x11        
+        data[0]= cmdID;
+        data[1] = 0 # Padding
+        index = 2
+              
+        for condition in self.TriggerConditions:
+            for combo in (condition.bufCombo1, condition.bufCombo2):
+                comboText = combo.currentText()
+                mask = 0
+                defineBitField = 0xFFFFFFFF 
+                #TODO  check for constant and process 
+                if (str(comboText)[0:3] == "Phy"):                
+                    filterElement = self.filterDictionary.get(str(comboText))
+                    bitPos = filterElement[4].split(':')
+                    defineBitField = int(bitPos[1]) << 25;                
+                    defineBitField = defineBitField | int(bitPos[0]) << 20                
+                    defineBitField = defineBitField | int(filterElement[5]) << 16
+                    defineBitField = defineBitField | int(filterElement[3],16) # offset field
+                
+                
+ 
+                    bitStart = int(bitPos[1])
+                    bitEnd = int(bitPos[0]) 
+                    
+                    mask = 1 << bitStart; 
+                
+                    for i in range(bitStart,bitEnd):
+                        mask = mask | (1 << i)
+                    
+                    packetType0CmpData = 0
+                    packetType1CmpData = 0
+                    packetType2CmpData = 0
+                    packetType3CmpData = 0
+                                
+                else:          
+                    pktcmpData =  "{0:08x}" .format(int(str(comboText),16))
+                    packetType0CmpData = int(str(comboText),16)
+                    packetType1CmpData = int(str(comboText),16)
+                    packetType2CmpData = int(str(comboText),16)
+                    packetType3CmpData = int(str(comboText),16)
+                    
+            
+                constField = condition.BufEdit.text()
+                if (constField != ""):                
+                    Constant = "{0:08x}" .format(int(str(constField),16))
+                    addConstant = int(Constant,16)
+                else:
+                    addConstant = 0
+                
+                if (condition.bufAndPlus.currentText() == "&"):
+                        mask = mask & addConstant
+                        addConstant = 0
+                
+                data[index:index+4] = self.IntToArray(defineBitField)
+                data[index+4:index+8] = self.IntToArray(mask)
+                data[index+8:index+12] = self.IntToArray(packetType0CmpData)
+                data[index+12:index+16] = self.IntToArray(packetType1CmpData)
+                data[index+16:index+20] = self.IntToArray(packetType2CmpData)
+                data[index+20:index+24] = self.IntToArray(packetType3CmpData)
+                data[index+24:index+28] = self.IntToArray(addConstant)
+                index = index + 28
+            
+                    
+        #Compare block 
+        for condition in self.TriggerConditions:                
+           compIndex = condition.bufCmp.currentIndex()           
+           compareBlock = 1 << compIndex
+            #  TODO add 2's complement to the variable
+            
+           data[index:index+4] = self.IntToArray(compareBlock)
+           index = index + 4
+          
+        gateOneList = [0,0,0,0,0,0,0,0]           
+        for gate in self.TriggerGatesOne:
+            if (gate.gateType.currentText() == "AND"):            
+                GateValue = 0x80005555
+            else:
+                GateValue = 0
+
+            accVal = 3            
+            
+            GateInput = str(gate.gateInputs.text()).split(',')
+            for gatein in GateInput:        
+               if gatein in ['0','1','2','3','4','5','6','7']:
+                   shiftpos = int(gatein) * 2
+                   GateValue = GateValue | accVal << (shiftpos)
+                   print(int(gatein))
+                   gateOneList[int(gatein)] = 1
+                   print('not empty')
+            data[index:index+4] = self.IntToArray(GateValue)
+            index = index + 4
+
+
+        print(gateOneList)
+           
+        gateTwoList=[0,0,0,0,0,0,0,0]
+        for gate in self.TriggerGatesTwo:
+            gate.gateInputs.setStyleSheet('color:black')
+            if (gate.gateType.currentText() == "AND"):            
+                GateValue = 0x80005555
+            else:
+                GateValue = 0
+
+            accVal = 3            
+            
+            GateInput = str(gate.gateInputs.text()).split(',')
+            for gatein in GateInput:        
+               if gatein in ['0','1','2','3','4','5','6','7']:
+                   if gateOneList[int(gatein)] != 1:
+                       gate.gateInputs.setStyleSheet('color:red')
+                       return
+                   else:
+                       gate.gateInputs.setStyleSheet('color:black')                       
+                   shiftpos = int(gatein) * 2
+                   GateValue = GateValue | accVal << (shiftpos)
+                   gateTwoList[int(gatein)] = 1
+            data[index:index+4] = self.IntToArray(GateValue)
+            index = index + 4
+        
+           
+        gateThreeList=[0,0,0,0,0,0,0,0]         
+        for gate in self.TriggerGatesThree:
+            if (gate.gateType.currentText() == "AND"):            
+                GateValue = 0x80005555
+            else:
+                GateValue = 0
+
+            accVal = 3            
+            
+                       
+            GateInput = str(gate.gateInputs.text()).split(',')
+            for gatein in GateInput:        
+               if gatein in ['0','1','2','3','4','5','6','7']:
+                  if gateTwoList[int(gatein)] != 1:
+                       gate.gateInputs.setStyleSheet('color:red')
+                       return
+                  else:
+                       gate.gateInputs.setStyleSheet('color:black')
+                  shiftpos = int(gatein) * 2
+                  GateValue = GateValue | accVal << (shiftpos)  
+                  gateThreeList[int(gatein)] = 1
+            data[index:index+4] = self.IntToArray(GateValue)
+            index = index + 4
+
+            
+           
+        for counter in self.TriggerCounters:
+            counterValue = 0
+            
+            initialValue = int(str(counter.initCounter.text()))
+            counterValue = counterValue | initialValue << 16
+           
+            CounterUP = str(counter.cntUpCount.text()).split(',')
+            accVal = 1
+            for countin in CounterUP:        
+                if countin in ['0','1','2','3','4','5','6','7']:
+                    shiftpos = int(countin) * 2
+                    counterValue = counterValue | accVal << (shiftpos)
+                    if gateThreeList[int(countin)] != 1:
+                       counter.cntUpCount.setStyleSheet('color:red')
+                       return
+                    else:
+                       counter.cntUpCount.setStyleSheet('color:black')                        
+
+
+            CounterReset = str(counter.cntReset.text()).split(',')
+            accVal = 3
+            for countin in CounterReset:        
+                if countin in ['0','1','2','3','4','5','6','7']:
+                    if gateThreeList[int(countin)] != 1:
+                       counter.cntReset.setStyleSheet('color:red')
+                       return
+                    else:
+                       counter.cntReset.setStyleSheet('color:black')                        
+                    shiftpos = int(countin) * 2
+                    counterValue = counterValue | accVal << (shiftpos)
+
+
+            CounterDown = str(counter.cntDownCount.text()).split(',')
+            accVal = 2
+            for countin in CounterDown:        
+                if countin in ['0','1','2','3','4','5','6','7']:
+                    if gateThreeList[int(countin)] != 1:
+                       counter.cntDownCount.setStyleSheet('color:red')
+                       return
+                    else:
+                       counter.cntDownCount.setStyleSheet('color:black')                        
+                    shiftpos = int(countin) * 2
+                    counterValue = counterValue | accVal << (shiftpos)
+                   
+            data[index:index+4] = self.IntToArray(counterValue)
+            index = index + 4
+           
+
+            counterDependValue = 0
+            CounterDepend = str(counter.cntDependOn.text()).split(',')
+            accVal = 1
+            for countin in CounterDepend:        
+                if countin in ['0','1','2','3','4','5','6','7']:
+                    shiftpos = int(countin)
+                    counterDependValue = counterDependValue | accVal << (shiftpos)
+                   
+            data[index:index+4] = self.IntToArray(counterDependValue)
+            index = index + 4
+            
+        for gate in self.TriggerGatesFour:
+            if (gate.gateType.currentText() == "AND"):            
+                GateValue = 0x80005555
+            else:
+                GateValue = 0
+
+            accVal = 3            
+            
+            
+            GateInput = str(gate.gateInputs.text()).split(',')
+            for gatein in GateInput:        
+               if gatein in ['0','1','2','3','4','5','6','7']:
+                   shiftpos = int(gatein) * 2
+                   GateValue = GateValue | accVal << (shiftpos)  
+            data[index:index+4] = self.IntToArray(GateValue)
+            index = index + 4
+       
+        print(" ".join('%02x' % i for i in data))
+        dst = str(self.FPGAComboMAC.currentText())
+        pktSize = len(self.Triggers)*20+2
+        self.sendPacket(self,data,pktSize,dst)
+
+    def sendTriggers(self): 
+        data = [0xFF]*512;
+        cmdID = 0x10        
+        data[0]= cmdID;
+        data[1] = 0 # Padding
+        index = 2
+       
+        TriggerOffset = 0
+        TriggerbitRange = "31:0"
+        for item in self.Triggers:
+            key = str(item.dataVar.currentText()+'_'+item.baseVar.currentText())+'_'+ str(item.OffsetVar.currentText())
+            if key in self.offsetDictonary.keys():
+                offsetItem = self.offsetDictonary.get(key)
+                TriggerOffset = "{0:04x}" .format(int(str(offsetItem[0]),16))
+            else:
+                TriggerOffset = "{0:04x}" .format(int(str(item.OffsetVar.currentText()),16))
+                
+            key = str(item.dataVar.currentText()+'_'+item.baseVar.currentText())+'_'+ str(item.OffsetVar.currentText())+'_'+ str(item.rangeVar.currentText())
+            if key in self.filterDictionary.keys():
+                rangeItem = self.filterDictionary.get(key)
+                TriggerbitRange=rangeItem[4]      
+            else:
+                TriggerbitRange = str(item.rangeVar.currentText())
+            
+            print(TriggerOffset, TriggerbitRange)
+          
+            dataVar =str(item.dataVar.currentText())      
+            baseVar = str(item.baseVar.currentText())            
+            variable = 0
+            if (dataVar[-2:] == "Dl"):
+                variable = variable | 0x00;
+            if (dataVar[-2:] == "Fd"):
+                variable = variable | 0x01;
+            if (dataVar[-2:] == "Td"):
+                variable = variable | 0x02;
+            if (dataVar[-4:] == "Rfic"):
+                variable = variable | 0x03;
+            
+            if (baseVar[:2] == "Rx"):
+                variable = variable | 0x04
+            if (baseVar[:2] == "Tx"):    
+                variable = variable | 0x00
+            
+            if (baseVar[-3:] == "Ctl"):
+                variable = variable | 0x08
+            if (baseVar[-3:] == "Sts"):
+                variable = variable | 0x00
+            headerType = 0x07
+            
+            if (dataVar[0:4] == "Test"):
+                headerType = 0x05
+                TriggerOffset = "FFFF"
+            if (dataVar[0:5] == "event"):
+                headerType = 0x03
+
+            data[index] = headerType
+            data[index+1] = variable 
+            data[index+2] = int(TriggerOffset[0:2],16)
+            data[index+3] = int(TriggerOffset[2:4],16)
+            
+            TrigBits = TriggerbitRange.split(':')
+            bitStart = int(TrigBits[1])
+            bitEnd = int(TrigBits[0])
+            
+            mask = 1 << bitStart; 
+                
+            for i in range(bitStart,bitEnd+1):
+                mask = mask | (1 << i)
+     
+            data[index+4:index+8] = self.IntToArray(mask)
+            value = int(str(item.lineEdit2.text()),16)
+            value = value << bitStart
+            dataValue = "{0:08x}" .format(value)
+            data[index+8] = int(dataValue[0:2],16)  
+            data[index+9] = int(dataValue[2:4],16)  
+            data[index+10] = int(dataValue[4:6],16)  
+            data[index+11] = int(dataValue[6:8],16)  
+            
+            initCounter = "{0:04x}" .format(int(str(item.lineEdit3.text()),16))
+            data[index+12] = int(initCounter[0:2],16)  
+            data[index+13] = int(initCounter[2:4],16)  
+            
+            data[index+14] = int(initCounter[0:2],16)   # Current value of the  counter  
+            data[index+15] = int(initCounter[2:4],16) 
+            
+            variable = 0
+            if (item.combo3.currentIndex() == 1):
+                variable = variable | 0x8000 
+            if (item.combo2.currentIndex() == 0):
+                variable = variable | 0x4000
+            if (item.combo2.currentIndex() == 1):
+                variable = variable | 0x2000
+            if (item.combo2.currentIndex() == 2):
+                variable = variable | 0x1000
+            if (item.combo2.currentIndex() == 3):
+                variable = variable | 0x0800
+            
+            if (item.loadCounter.isChecked()):
+                variable = variable | 0x0400
+            
+#            if ( check two's complement ) :
+#                variable = variable | 0x02
+            variable = variable | 0x0200  # Assuming signed value                
+            # Get sign bit location and set it 
+            
+            temp = TriggerbitRange.split(':')
+            signLoc = int(temp[0])
+            signLoc = signLoc << 5
+            
+            variable = variable | signLoc
+            
+            variable = "{0:04x}" .format(variable)
+            data[index+16] = int(variable[0:2],16)
+            data[index+17] = int(variable[2:4],16)                                    
+            
+            # Get Negative next block
+            negNext= "{0:02x}" .format(int(str(item.lineEdit4.text()),16))
+            data[index+18] = int(negNext,16)
+            
+            posNext = "{0:02x}" .format(int(str(item.lineEdit5.text()),16))
+            data[index+19] = int(posNext,16)
+            # Get Positive Bext Block
+            index = index + 20
+            print(data)
+        print(" ".join('%02x' % i for i in data))
+        dst = str(self.FPGAComboMAC.currentText())
+        #pktSize = len(self.Triggers)*20+2
+        pktSize = self.totalTriggers*20+2
+        self.sendPacket(self,data,pktSize,dst)
+
+    def readMemoryDump(self):
+        print ("Request Memory Dump")
+        data = [0x00]*64;
+        cmdID = 0x30        
+        data[0]= cmdID;
+        data[1] = 0 # Padding
+        index = 2
+        memStart = "{0:08x}" .format(int(str(self.memoryStart.text()),16))
+        memNumWords = "{0:08x}" .format(int(str(self.memoryNumWords.text()),16))            
+        data[index] = int(memStart[0:2],16)
+        data[index+1] = int(memStart[2:4],16)
+        data[index+2] = int(memStart[4:6],16)
+        data[index+3] = int(memStart[6:8],16)
+        index = index +4        
+        data[index] = int(memNumWords[0:2],16)
+        data[index+1] = int(memNumWords[2:4],16)
+        data[index+2] = int(memNumWords[4:6],16)
+        data[index+3] = int(memNumWords[6:8],16)
+        #print (data)
+        dst = str(self.FPGAComboMAC.currentText())
+        pktSize = 64
+        self.sendPacket(self,data,pktSize,dst)
+        
+      
+        
+
+        
+    def sendRTFilters(self):
+        print("RT Filters to be Send")
+        data = [0xFF]*256;
+        cmdID = 0x21        
+        data[0]= cmdID;
+        data[1] = 0 # Padding
+        index = 2
+        for item in self.RTFilters:  
+            if (item.enableButton.isChecked()):
+                decimation= "{0:02x}" .format(int(str(item.decimation.text()),16))
+                headerMax = "{0:02x}" .format(int(str(item.streamIDMax.text()),16))
+                headerMin = "{0:02x}" .format(int(str(item.streamIDMin.text()),16))
+                offsetMax = "{0:04x}" .format(int(str(item.offsetMax.text()),16)/4)
+                offsetMin = "{0:04x}" .format(int(str(item.offsetMin.text()),16)/4)
+                variable = 0; 
+                dataVar =str(item.dataVar.currentText())                
+                baseVar = str(item.baseVar.currentText())            
+                if (dataVar[-2:] == "Dl"):
+                    variable = variable | 0x30;
+                if (dataVar[-2:] == "Fd"):
+                    variable = variable | 0x31;
+                if (dataVar[-2:] == "Td"):
+                    variable = variable | 0x32;
+                if (dataVar[-4:] == "Rfic"):
+                    variable = variable | 0x33;
+                
+                if (baseVar[:2] == "Rx"):
+                    variable = variable | 0x44
+                if (baseVar[:2] == "Tx"):    
+                    variable = variable | 0x40
+                
+                if (baseVar[-3:] == "Ctl"):
+                    variable = variable | 0x88
+                if (baseVar[-3:] == "Sts"):
+                    variable = variable | 0x80
+                data[index] = 0x0
+                data[index+1] =int(decimation,16) 
+                data[index+2] = variable                
+                #data[index+2] =int(headerMax,16) 
+                #data[index+3] =int(headerMin,16)
+                data[index+3] = int (headerMax,16) << 4
+                data[index+3] = data[index+3] | int(headerMin,16) 
+                data[index+4] =int(offsetMax[0:2],16)  
+                data[index+5] =int(offsetMax[2:4],16)  
+                data[index+6] =int(offsetMin[0:2],16) 
+                data[index+7] =int(offsetMin[2:4],16)         
+                index = index + 8        
+        print(" ".join('%02x' % i for i in data))
+        dst = str(self.FPGAComboMAC.currentText())
+        pktSize = self.totalRTFilters*8
+        self.sendPacket(self,data,pktSize,dst)
+            
+            
+    def readFSMRegisters(self):
+        cmdCode = 0x40
+        data = [0]*64;
+        data[0] = cmdCode        
+        dstMac = str(self.FPGAComboMAC.currentText())
+        self.sendPacket(self,data,64,dstMac)
+        
+    def writeFSMRegisters(self):
+        print("FSM Registers Written")
+        cmdCode = 0x00
+        data = [0]*64;
+        data[0] = cmdCode 
+        trigPos = self.triggerSlider.value()
+
+        if (self.runStopButton.text() == "RUN"):
+            self.isRunning = 1
+        else:
+            self.isRunning = 0
+         
+        if (self.selfGenDataButton.text() =="USE SELF-GEN TEST DATA"):
+            self.selfGenerating = 1
+        else:
+            self.selfGenerating = 0            
+         
+        if (self.extTrigEnabStatus.text() == "EXTERNAL TRIGGER ENABLED"):
+            self.isExtTriggerEnabled = 1
+        else:
+            self.isExtTriggerEnabled = 0
+            
+        if (self.extTrigPolarityStatus.text() == "EXTERNAL TRIGGER POLARITY HIGH"):
+            self.isExtTriggerHigh = 1
+        else:
+            self.isExtTriggerHigh = 0
+      
+        data[6] = self.isRunning << 7 | trigPos << 4
+        data[8] = self.selfGenerating << 4 |  self.isExtTriggerEnabled << 3 |  self.isExtTriggerHigh << 2       
+        
+        dstMac = str(self.FPGAComboMAC.currentText())
+        self.sendPacket(self,data,64,dstMac)  
+        self.readFSMRegisters()
+    
+    def iptos(in_):
+        return "%d.%d.%d.%d" % (in_.s_b1,in_.s_b2 , in_.s_b3, in_.s_b4)
+
+    def ifprint(self,d):
+        addres=POINTER(pcap_addr_t)
+#        print("%s\n" % d.name)
+        self.comboBox.addItem(d.name)
+        if d.addresses:
+            addres=d.addresses.contents
+        else:
+            addres=False
+#        while addres:
+#            if addres.addr.contents.sa_family == sk.AF_INET:
+#                mysockaddr_in=sockaddr_in
+#                if (addres.addr):
+#                    aTmp=cast(addres.addr,POINTER(mysockaddr_in))                     
+#                    print ("\tAddress: %s\n" % self.iptos(aTmp.contents.sin_addr.S_un.S_un_b))                   
+#            if (addres.next):
+#                addres=addres.next.contents
+#            else:
+#                addres=False
+        print ("\n")
+        
+
+    
+    def startListening(self):
+        """ Launch a thread to listen on this interface """ 
+        if not self.listening:
+            self.listening = True
+            threading.Thread(target=self._listen, name="Listener thread, adapter {}".format(self.interface.description)).start()
+            threading.Thread(target=self._packetProcessor, name="Processor thread, {}".format(str(self))).start()
+            self.received.connect(self.updateStatusWindow)
+            self.processed.connect(self.updateProcessed)
+            #self.plotUpdate.connect(self.updatePlot)
+        else:
+            "Already listening on adapter {}".format(self.interface.description)
+            return(-1)
+            
+    
+    
+    def _listen(self):
+        """ Start the network capture on the specified interface. """
+        PHAND = CFUNCTYPE(None,POINTER(c_ubyte),
+        POINTER(pcap_pkthdr),POINTER(c_ubyte))
+        print(">> Listening on {}".format(self.interface.description))
+#        pcap_loop(self.listeneradapterHandle, -1, PHAND(self.packet_handler), None)
+        pcap_loop(self.listeneradapterHandle, -1, PHAND(self._packetHandler), None) 
+        pcap_close(self.listeneradapterHandle)
+        
+        
+        
+
+    def _packetHandler(self, param, header, pkt_data):
+
+        """ Parse an intercepted network packet and add to queue. """
+        cmdID = self.data_to_num(pkt_data,14,1)
+        with self.queueLock:
+            self.queueLength += 1
+            if (cmdID == 0xC0): 
+               self.packetQueue.append(RawPacket(param, header, pkt_data, time.time()))
+                
+            else:
+                self.packetQueue.insert(0,RawPacket(param, header, pkt_data, time.time()))
+
+
+
+    def _packetProcessor(self):
+        #received = QtCore.SIGNAL(int)
+        while True:
+           
+            # exit thread if no longer needed
+          #print (self.queueLength)
+           if self.queueLength == 0:
+
+                if self.listening: continue
+
+                else: break
+
+            # grab a packet off of the packet queue
+
+           
+           with self.queueLock:
+
+                packet = self.packetQueue.pop(0) 
+               
+
+                self.queueLength -= 1
+
+                # process the packet
+           pkt_data = packet.pkt_data
+           header = packet.header
+
+
+           ether_type = self.data_to_num(pkt_data, 12, 2)
+           cmdID = self.data_to_num(pkt_data,14,1)
+           #print (cmdID)
+           source_mac = ":".join([str(hex(self.data_to_num(pkt_data, i, 1))) .replace('0x', '') for i in range(6, 12)])
+           #print(">> Received packet type {} from {}".format(hex(ether_type), source_mac))
+           #print(">> Packet size {} capture Size {}".format(header.contents.caplen, header.contents.len))
+   
+           pktLength = header.contents.len
+           if (cmdID == 0x80): 
+               self.isPingReceived = True
+               if (self.isConfigured == False): 
+                   self.processDiscoverResponse(pkt_data,pktLength)
+               else:
+                   self.processTriggerFSMResponse(pkt_data,pktLength)
+           elif (cmdID == 0x90):
+               self.processTriggerRegResponse(pkt_data,pktLength)
+           elif (cmdID == 0xA0):
+               self.processCaptureFilterRegResponse(pkt_data,pktLength)
+           elif (cmdID == 0xA1):
+               self.processRTFilterRegResponse(pkt_data,pktLength)
+           elif (cmdID == 0xB0):
+               self.processCaptureBufferContent(pkt_data,pktLength)
+           elif (cmdID == 0xC0):
+               self.processRTData(pkt_data,pktLength)
+           elif (cmdID == 0x91):
+               self.processParallelTriggerReadResponse(pkt_data,pktLength)
+
+           else: 
+              print "Unknown Response from FPGA "
+            
+           self.received.emit(self.packetsProcessed)  
+           
+           sleep(0.000001)
+       
+           
+    def updateStatusWindow(self):
+         
+           self.queuedPackets.setText(Qt.QString("%1") .arg(self.queueLength))
+           
+
+    def updateProcessed(self):  
+        
+           #self.RTOff.setText(Qt.QString("%1") .arg(self.RTOff))
+           self.seqNumber.setText(Qt.QString("%1") .arg(self.seqNum))                     
+           self.packetsProcessed  = self.packetsProcessed  + 1
+           self.processedPackets.setText(Qt.QString("%1") .arg(self.packetsProcessed))    
+          
+           
+    def updatePlot(self):
+        if (self.isArmed):
+            numPlots = len(self.RTPlotData)
+            i = 0
+            for item in self.RTPlotData:
+                plotData = np.array(item.get())
+                self.CsBuffPlotData(i,plotData)
+                i = i + 1
+           
+    def processTriggerFSMResponse(self,pkt_data,pktlen):
+        #print "Processing Trigger FSM Response"
+        seqNum = int(pkt_data[15])
+
+        self.fpgaVersion.setText(Qt.QString("%1") .arg(self.data_to_num(pkt_data,16,1)))
+        self.FPGAVersion = self.data_to_num(pkt_data,16,1)
+        self.numTrigger.setText(Qt.QString("%1") .arg(self.data_to_num(pkt_data,17,1)))
+        self.numCaptureFilter.setText(Qt.QString("%1") .arg(self.data_to_num(pkt_data,18,1)))
+        self.numRTFilter.setText(Qt.QString("%1") .arg(self.data_to_num(pkt_data,19,1)))
+        self.totalTriggers = self.data_to_num(pkt_data,17,1)
+        self.totalRTFilters = self.data_to_num(pkt_data,19,1)
+        self.totalCaptureFilters = self.data_to_num(pkt_data,18,1)
+       
+        runStop = pkt_data[20] >> 7;
+        if (runStop == 1):
+            self.isRunning = 1
+            self.runStopStatus.setText("RUNNING")
+            self.runStopStatus.setStyleSheet("font:bold 12px;background-color: green") 
+        else:
+            self.isRunning = 0
+            self.runStopStatus.setText("STOPPED")
+            self.runStopStatus.setStyleSheet("font:bold 12px;background-color: red") 
+            
+        trigPos = (pkt_data[20] >> 4) & 0x07
+       
+        self.triggerSlider.setValue(trigPos)
+        self.sliderValue.setCurrentIndex(trigPos)
+        
+        fifoOver = (pkt_data[20] & 0x0F) << 12 | pkt_data[21] << 3 | pkt_data[22] >> 5
+        self.fifoOverflow.setText(Qt.QString("%1") .arg(fifoOver))
+        
+       
+        exTrigEn = (pkt_data[22] >> 3) & 0x01
+        
+        if (exTrigEn == 1):
+            self.isExtTriggerEnabled = 1
+            self.extTrigEnabStatus.setText("EXTERNAL TRIGGER ENABLED")
+            self.extTrigEnabStatus.setStyleSheet("font:bold 12px;background-color: green") 
+        else:
+            self.isExtTriggerEnabled = 0
+            self.extTrigEnabStatus.setText("EXTERNAL TRIGGER DISABLED")
+            self.extTrigEnabStatus.setStyleSheet("font:bold 12px;background-color: red") 
+         
+        exTrigPol = (pkt_data[22] >> 2) & 0x01           
+        if (exTrigPol == 1):
+            self.isExtTriggerHigh = 1
+            self.extTrigPolarityStatus.setText("EXTERNAL TRIGGER POLARITY HIGH")
+            self.extTrigPolarityStatus.setStyleSheet("font:bold 12px;background-color: green") 
+        else:
+            self.isExtTriggerHigh = 0
+            self.extTrigPolarityStatus.setText("EXTERNAL TRIGGER POLARITY LOW")
+            self.extTrigPolarityStatus.setStyleSheet("font:bold 12px;background-color: red") 
+            
+        selfGen = (pkt_data[22] >> 4 ) & 0x01          
+        if (selfGen == 1):
+            self.selfGenerating = 1
+            self.selfGenDataStatus.setText("USING SELF GENERATED TEST DATA")
+            self.selfGenDataStatus.setStyleSheet("font:bold 12px;background-color: red") 
+        else:
+            self.selfGenerating = 0
+            self.selfGenDataStatus.setText("USING DATA FROM DUT")
+            self.selfGenDataStatus.setStyleSheet("font:bold 12px;background-color: green") 
+
+
+       
+        status = pkt_data[22] & 0x03;
+        
+        self.trigStatButton.setStyleSheet("font:bold 14px")    
+        if (status == 0):
+            self.trigStatButton.setText("IDLE")
+            self.isArmed = False
+            self.trigStatButton.setStyleSheet("font:bold 18px;background-color: red")                                     
+        elif (status == 1): 
+            self.trigStatButton.setText("ARMED")
+            self.isArmed = True
+            self.trigStatButton.setStyleSheet("font:bold 18px;background-color: cyan")    
+     
+        elif (status == 2):
+            self.trigStatButton.setText("TRIGGED")
+            self.trigStatButton.setStyleSheet("font:bold 14px")                                           
+            self.trigStatButton.setStyleSheet("font:bold 18px;background-color: green")    
+
+            self.isTriggered=True
+        else:
+            self.trigStatButton.setText("CAPTURED")
+            self.trigStatButton.setStyleSheet("font:bold 18px;background-color: yellow")    
+            self.isCaptured=True
+                  
+        self.currentTriggerBlock.setText(Qt.QString("%1") .arg(pkt_data[23]))
+        self.isConnected = True
+        self.updateStatus()
+        
+                
+    def processTriggerRegResponse(pkt_data,pktlen):
+        #print "Processing Trigger Register Response"
+        seqNum = int(pkt_data[15])
+   
+
+
+
+
+
+     
+    def processParallelTriggerRegResponse(self,pkt_data,pktLength):
+        seqNum = int(pkt_data[15])
+        
+
+
+    def processCaptureFilterRegResponse(self,pkt_data,pktlen):
+        #print "Processing Capture Filter Register Response"
+        seqNum = int(pkt_data[15])
+        padding = int(pkt_data[15])
+        index = 16  
+       
+        for i in range(0,len(self.CaptureFilters),1):
+            index = index + 1
+            ex = self.CaptureFilters[i]
+            decimation= self.data_to_num(pkt_data,index,1)
+            index = index + 1
+            pkt_type = self.data_to_num(pkt_data,index,1)
+            index = index + 1 
+            temp  = self.data_to_num(pkt_data,index,1)
+            headerMax = temp  >> 4
+            headerMin = temp & 0x0F
+            index = index + 1
+            offsetMax = self.data_to_num(pkt_data,index,2)
+            index = index + 2
+            offsetMin = self.data_to_num(pkt_data,index,2)
+            index = index + 2
+            ex.decimation.setText(Qt.QString("%1") .arg(decimation))
+            ex.baseAddres.setText(Qt.QString("%1") .arg(0x0))
+            ex.streamIDMin.setText(Qt.QString("%1") .arg(hex(headerMin))) 
+            ex.streamIDMax.setText(Qt.QString("%1") .arg(hex(headerMax))) 
+            if (offsetMin <  0xffff ):                
+                ex.offsetMin.setText(Qt.QString("%1") .arg(hex(offsetMin*4)))
+            else: 
+                ex.offsetMin.setText(Qt.QString("%1") .arg(hex(offsetMin)))            
+            if (offsetMax <  0xffff ):            
+                ex.offsetMax.setText(Qt.QString("%1") .arg(hex(offsetMax*4))) 
+            else:
+                ex.offsetMax.setText(Qt.QString("%1") .arg(hex(offsetMax)))  
+            ex.bitRange.setText(Qt.QString("%1") .arg(0x0))
+            self.captureFilterVBox.update()
+            self.numCaptureFilters = len(self.CaptureFilters)            
+            
+            
+    def processRTFilterRegResponse(self,pkt_data,pktlen):
+        #print "Processing RT Filter Register Response"
+        seqNum = int(pkt_data[15])
+        padding = int(pkt_data[15])
+        index = 16  
+       
+
+        for i in range(0,len(self.RTFilters),1):
+            index = index + 1
+            ex = self.RTFilters[i]
+            decimation= self.data_to_num(pkt_data,index,1)
+            index = index + 1
+            pkt_type = self.data_to_num(pkt_data,index,1)
+            index = index + 1 
+            temp  = self.data_to_num(pkt_data,index,1)
+            headerMax = temp  >> 4
+            headerMin = temp & 0x0F
+            index = index + 1
+            offsetMax = self.data_to_num(pkt_data,index,2)
+            index = index + 2
+            offsetMin = self.data_to_num(pkt_data,index,2)
+            index = index + 2
+            ex.decimation.setText(Qt.QString("%1") .arg(decimation))
+            ex.baseAddres.setText(Qt.QString("%1") .arg(hex(0x0)))
+            ex.streamIDMin.setText(Qt.QString("%1") .arg(hex(headerMin))) 
+            ex.streamIDMax.setText(Qt.QString("%1") .arg(hex(headerMax))) 
+            if (offsetMin <  0xffff ):                
+                ex.offsetMin.setText(Qt.QString("%1") .arg(hex(offsetMin*4)))
+            else: 
+                ex.offsetMin.setText(Qt.QString("%1") .arg(hex(offsetMin)))            
+            if (offsetMax <  0xffff ):            
+                ex.offsetMax.setText(Qt.QString("%1") .arg(hex(offsetMax*4))) 
+            else:
+                ex.offsetMax.setText(Qt.QString("%1") .arg(hex(offsetMax))) 
+
+            ex.bitRange.setText(Qt.QString("%1") .arg(hex(0x0)))
+        
+                 
+
+            
+    def processCaptureBufferContent(self,pkt_data,pktlen): 
+        file = open ("CaptureFile",'a')
+        #print "Processing RT Filter Content Response"
+        index = 15
+        memoryAddress = self.data_to_num(pkt_data,index+15,4)
+        readLength =  self.data_to_num(pkt_data,index+19,2)
+        EventLoggerData = []
+        TestMuxData = []
+        CsBuffData = []
+        MemoryMonData = []
+        DMAData = []
+        PeriodicMonData = []
+        
+        options = { 3: EventLoggerData,
+                    5: TestMuxData,
+                    7: CsBuffData,
+                    9:MemoryMonData,
+                    11: DMAData,
+                    12: DMAData,
+                    14: PeriodicMonData,
+                }
+        for index in range(21,pktlen,5):
+            strType = self.data_to_num(pkt_data,index,1)
+            value   = self.data_to_num(pkt_data,index+1,4)
+            #options[strType].append(value)   # Append value to the string
+            file.write(strTpe,value)
+            
+        file.close()
+                          
+         #TODO 
+                # Create a multidimentional List and add value to one of the lists 
+                # based on strTye
+                    
+    def processRTData(self,pkt_data,pktlen):
+        #print "Processing RT Filter Data"
+        self.seqNum = int(pkt_data[15])
+        self.processed.emit(self.packetsProcessed)
+        for index in range(16,pktlen,7):
+            RTType = pkt_data[index] & 0x0F
+
+            if (RTType == 6):                
+                RTOffset = pkt_data[index+1]  << 8 | pkt_data[index+2]
+                self.RTOff = RTType
+                RTData = self.data_to_num(pkt_data,index+3,4)   
+                self.CsBuffPktType =  (RTData >> 16) & 0x0F 
+                #self.plotData.clear()
+           
+            if (RTType == 7):
+                for item in self.RTPlotVariables:
+                    index = self.RTPlotVariables.index(item)
+                    key = item.currentText()
+                    if (self.filterDictionary.has_key(str(key))):
+                        rangeItem = self.filterDictionary.get(str(key))                  
+                        bitRange = rangeItem[4]
+                        offset = int(rangeItem[3],16) 
+                        pkType = int(rangeItem[5])
+                        pkType = self.CsBuffPktType
+                        if (pkType == self.CsBuffPktType):                        
+                            RTOffset = pkt_data[index+1]  << 8 | pkt_data[index+2]
+                            if (RTOffset == offset):
+                                #Get the bot range and store in the list
+                                RTData = self.data_to_num(pkt_data,index+3,4)   
+                                bitPos = bitRange.split(':')
+                                bitStart = int(bitPos[1])
+                                bitEnd = int(bitPos[0]) 
+            
+                                value = RTData >> bitStart            
+                                
+                                mask = 1 << bitStart; 
+                    
+                                for i in range(0,bitEnd+1):
+                                            mask = mask | (1 << i)
+                                value = value & mask
+                                self.RTPlotData[index].append(value)
+                                self.processed.emit(value)
+                        
+       # self.plotUpdate.emit(index) 
+        #self.plainTextEdit.appendPlainText("emitted")
+        #self.updateRTData(RTType, RTData, RTOffset)
+                
+            
+    def updateRTData(self,RTType, RTData, RTOffset):
+        print ("Update RT Data")
+            # RTType (TDB:1, RBD:1, Armed:1, Triggered:1, Hdr:4)
+            #TODO  Update the data
+          
+            
+    def processDiscoverResponse(self,pkt_data,pktlen):
+        #print "Processing Discover Response"
+        #print(self.isConnected)
+        FPGA_mac = ":" .join([str(hex(self.data_to_num(pkt_data, i, 1))) .replace("0x","0") for i in range(6, 12)])
+        self.FPGAComboMAC.setDuplicatesEnabled(False)
+        #self.FPGAComboDUT.setDuplicatesEnabled(False)
+        self.FPGAComboMAC.addItem(FPGA_mac)
+        #self.FPGAComboDUT.addItem(FPGA_mac)
+        self.isConnected = True
+        self.isConfigured = True
+        sleep(1)
+        self.readFSMRegisters()
+        #self.updateStatus()
+
+        
+        
+    def discoverFPGA(self):
+        cmdCode = 0x40
+        data = [0]*64;
+        data[0] = cmdCode        
+        
+        inputFile = open("DUTS.txt")
+        while 1:           
+            line = inputFile.readline()
+            if not line:
+                break
+            #self.FPGAComboDUT.addItem(line.strip())
+            line = inputFile.readline()
+            #self.FPGAComboMAC.addItem(line.strip())
+            dstMac = line.strip()
+            self.sendPacket(self,data,64,dstMac)
+            sleep(1)
+            #print("Discover Message Send")
+       
+       
+        inputFile.close();          
+        sleep(1)
+
+   
+    
+    def sendPacket(self,param,packetData,pktLength,dst):
+        if (self.listening == False):
+            QtGui.QMessageBox.about(self, "Network Driver is not Enabled","Please Enable the Driver and  Discover the DUTs")
+            self.manTabWidget.setCurrentIndex(1)
+           #QtGui.QMessageBox.about(self, "DUT is not Connected", "Text1 = %s, Text2 = %s" % ("Yusuf", "Ozturk"))
+            return
+        if (len(dst) == 0 ):
+            return
+        #print dst
+        packet=(c_ubyte * 1500)()
+        srcMac = str(self.HOSTComboMAC.currentText())
+        destMac = dst        
+        #destMac = str(self.FPGAComboMAC.currentText())
+        #destMac = str(self.FPGAComboMAC.currentText())
+        intMacAddr = [int(byte, 16) for byte in srcMac.split(':')]
+        #print(destMac)
+        destMac = [int(byte, 16) for byte in destMac.split(':')]
+        ## set destination mac address
+        for i in range(6):
+            packet[i] = int(destMac[i])
+        # set source mac address
+        for i in range(6, 12):
+            packet[i] = intMacAddr[i-6]
+        ## Fill the rest of the packet
+     
+        packet[12] = 0x05;
+        packet[13] = 0x00;
+       
+        for i in range(14,pktLength+14):
+            packet[i]=packetData[i-14]
+        # attempt sending the packet
+        #for k in range(1,100):
+        #   time.sleep(5)
+        if (pcap_sendpacket(self.senderadapterHandle, packet, 14+pktLength) != 0):
+            print ("\nError sending the packet: %s\n" % pcap_geterr(self.senderadapterHandle))
+
+
+
+    def connectDUT(self): 
+        self.HOSTComboIP.setDisabled(True)
+        self.HOSTComboMAC.setDisabled(True)
+        
+        self.buttonDiscover.setDisabled(True)
+        
+       
+        #self.FPGAComboDUT.currentIndexChanged.connect(self.DUTChanged)
+      
+        alldevs=POINTER(pcap_if_t)()
+        d=POINTER(pcap_if_t)
+        errbuf= create_string_buffer(PCAP_ERRBUF_SIZE)
+
+        ## Retrieve the device list
+        if (pcap_findalldevs(byref(alldevs), errbuf) == -1):
+            print ("Error in pcap_findalldevs: %s\n" % errbuf.value)
+           # sys.exit(1)
+        
+        numInterfaces = 0;
+        d=alldevs.contents
+        self.interfaces = []
+        while d:
+            self.interfaces.append(d)
+            self.HOSTComboInterface.addItem(d.name)            
+            numInterfaces = numInterfaces + 1
+            if d.next:
+                d=d.next.contents
+            else:
+                d=False
+        all_Addresses = QNetworkInterface.allAddresses()    
+        all_info = QNetworkInterface().allInterfaces()
+     
+#        for i in range(3,len(all_Addresses),2):
+        interface = 0
+        for i in range(3,len(all_Addresses),2):
+           self.HOSTComboIP.addItem(all_Addresses[i].toString())
+           interface = interface + 1
+           if (interface == numInterfaces):
+                break
+            
+        interface = 0
+        for i in range(1,len(all_info),1):
+            self.HOSTComboMAC.addItem(all_info[i].hardwareAddress())
+            interface = interface + 1
+            if (interface == numInterfaces):
+                break
+        
+
+#        inputFile = open("DUTS.txt")
+#        while 1: 
+#            
+#            line = inputFile.readline()
+#            if not line:
+#                break
+#            self.FPGAComboDUT.addItem(line.strip())
+#            line = inputFile.readline()
+#            self.FPGAComboMAC.addItem(line.strip())
+#           
+#        inputFile.close();            
+        
+    def chooseDirectory(self):
+        """ (Slot) Browse and get the results folder. """
+        file_dialogobj = QtGui.QFileDialog()
+        file_dialogobj.setFileMode(2)
+        path = unicode(file_dialogobj.getExistingDirectory(self, 'Choose Results Directory'))
+        self.directoryName.setText(path)
+
+
+       
+        
+    def connectDUTAccepted(self):
+        if (self.listening == False): 
+            self.buttonConnect.setText("Disable Network Driver")
+            errbuf= create_string_buffer(PCAP_ERRBUF_SIZE)
+            self.interface = self.interfaces[self.HOSTComboInterface.currentIndex()]
+            #print self.interface.name
+            self.senderadapterHandle = pcap_open_live(self.interface.name,65536,PCAP_OPENFLAG_PROMISCUOUS ,1000,errbuf)
+            if not bool(self.senderadapterHandle):
+                raise Exception("\nUnable to open adapter: {}\n" .format(interface))
+            self.listeneradapterHandle = pcap_open_live(self.interface.name,65536,PCAP_OPENFLAG_PROMISCUOUS ,1000,errbuf)
+            if not bool(self.listeneradapterHandle):
+                raise Exception("\nUnable to open adapter: {}\n" .format(interface))
+            #pcap_compile(self.listeneradapterHandle,funct,"ip proto \\tcp")
+            #filterstatus = pcap_setfilter(self.listeneradapterHandle,funct)
+            
+            program=bpf_program()
+            mask=0xffffff
+            
+            if(pcap_compile(self.listeneradapterHandle,program,"ether host  01:00:01:00:00:00  or ether host 01:00:00:00:00:00",c_int(1),mask) == -1):
+                # this requires we call pcap_geterr() to get the error
+                print("Error could not compile bpf filter because {0}".format(errbuf.value))
+            else:
+                print("Filter Compiled!")
+    
+    
+            if(pcap_setfilter(self.listeneradapterHandle,program)):
+                print("Error couldn't install filter {0}".format(errbuf.value))
+                #sys.exit(0)
+            else:
+                print("Filter installed!")
+            
+            
+            self.startListening()
+#            self.isConnected = True
+            self.isArmed = False
+            self.isTriggered = False
+            self.isCaptured = False
+            #self.buttonConnect.setDisabled(True)
+            self.buttonARM.setDisabled(False)
+            self.buttonDiscover.setDisabled(False)
+            
+            self.updateStatus()
+        else:
+            self.buttonConnect.setText("Enable Network Driver")
+            self.buttonDiscover.setDisabled(True)
+            pcap_breakloop(self.listeneradapterHandle)
+            print(">> Stopped listening on {}".format(self.interface.description))
+            self.listening = False
+            self.isConnected = False
+            self.isArmed = False
+            self.isTriggered = False
+            self.isCaptured = False
+
+            self.updateStatus()
+            #self.buttonConnect.setDisabled(False)
+           
+            if (self.isArmed):
+                   self.armFPGA()
+
+ 
+ 
+    def updateStatus(self):
+        if (self.isConnected):
+            self.FPGAConnected = "CONNECTED"
+            self.labelConnected.setStyleSheet("font:bold 18px;background-color: green") 
+        else:
+            self.FPGAConnected = "NOT CONNECTED"
+            self.labelConnected.setStyleSheet("font:bold 18px;background-color: red") 
+            
+        self.labelFPGA.setText(Qt.QString("FPGA Version:%1") .arg(self.FPGAVersion))
+        self.labelConnected.setText(Qt.QString("%1") .arg(self.FPGAConnected))
+        
+        if (self.isArmed):
+            self.statusLabel.setText("ARMED")
+            self.statusLabel.setStyleSheet("font:bold 18px;background-color: cyan") 
+            self.buttonARM.setText("DISARM")
+            self.buttonARM.setStyleSheet("font:bold 18px") 
+        else:
+            self.statusLabel.setText("DISARMED")
+            self.statusLabel.setStyleSheet("font:bold 18px;background-color: red") 
+            self.buttonARM.setText("ARM")            
+            self.buttonARM.setStyleSheet("font:bold 18px") 
+
+        if (self.isTriggered):
+            self.statusLabel.setText("TRIGGERED")
+            self.statusLabel.setStyleSheet("font:bold 18px;background-color: green") 
+            
+        if (self.isCaptured):
+            self.statusLabel.setText("CAPTURED")
+            self.statusLabel.setStyleSheet("font:bold 18px;background-color: yellow")   
+            self.buttonARM.setDisabled(not(self.isConnected))
+                                                 
+  
+
+        
+    def armFPGA(self):
+        if (self.isArmed):
+            self.buttonARM.setText("ARM")
+            self.buttonARM.setStyleSheet('color:red')
+            self.isArmed = False
+            self.isRunning = 0
+        else:
+            self.isArmed = True
+            self.isRunning = 1
+            self.buttonARM.setText("DISARM")
+            self.buttonARM.setStyleSheet('color:blue')
+        
+        self.writeFSMRegisters()          
+        self.updateStatus()
+        
+ 
+        
+    def NetworkInterfaceChanged(self):
+        index = self.HOSTComboInterface.currentIndex()        
+        self.HOSTComboIP.setCurrentIndex(index)
+        self.HOSTComboMAC.setCurrentIndex(index)
+                
+    def DUTChanged(self):
+        index = self.FPGAComboDUT.currentIndex()        
+        self.FPGAComboMAC.setCurrentIndex(index)
+#*********************************************************************************
+    def setupFPGAConnectTab(self):
+        self.label_3 = QtGui.QLabel(self.tabWidget1)
+        self.label_3.setGeometry(QtCore.QRect(110, 60, 131, 21))
+        self.label_3.setText("Choose Host Interface :")
+#        self.tabLayout1.addWidget(self.label_3)
+        self.HOSTComboInterface = QtGui.QComboBox(self.tabWidget1)
+        self.HOSTComboInterface.setGeometry(QtCore.QRect(250, 60, 321, 22))
+        self.HOSTComboIP = QtGui.QComboBox(self.tabWidget1)
+        self.HOSTComboIP.setGeometry(QtCore.QRect(250, 100, 321, 22))
+        self.HOSTComboMAC = QtGui.QComboBox(self.tabWidget1)
+        self.HOSTComboMAC.setGeometry(QtCore.QRect(250, 140, 321, 22))
+        self.label_4 = QtGui.QLabel(self.tabWidget1)
+        self.label_4.setGeometry(QtCore.QRect(110, 210, 101, 16))
+        self.label_4.setText(QtGui.QApplication.translate("MainWindow", "Choose FPGA :", None, QtGui.QApplication.UnicodeUTF8))
+        self.FPGAComboMAC = QtGui.QComboBox(self.tabWidget1)
+        self.FPGAComboMAC.setGeometry(QtCore.QRect(250, 210, 321, 22))
+        self.buttonDiscover = QtGui.QPushButton(self.tabWidget1)
+        self.buttonDiscover.setGeometry(QtCore.QRect(610, 120, 131, 41))
+        self.buttonDiscover.setText(QtGui.QApplication.translate("MainWindow", "Discover ", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonConnect = QtGui.QPushButton(self.tabWidget1)
+        self.buttonConnect.setGeometry(QtCore.QRect(610, 60, 131, 41))
+        self.buttonConnect.setText(QtGui.QApplication.translate("MainWindow", "Enable Network Driver", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_5 = QtGui.QLabel(self.tabWidget1)
+        self.label_5.setGeometry(QtCore.QRect(110, 330, 131, 16))
+        self.label_5.setText(QtGui.QApplication.translate("MainWindow", "Working Directory :", None, QtGui.QApplication.UnicodeUTF8))
+        self.directoryName = QtGui.QLineEdit(self.tabWidget1)
+        self.directoryName.setGeometry(QtCore.QRect(250, 330, 321, 20))
+        self.buttonChooseDirectory = QtGui.QPushButton(self.tabWidget1)
+        self.buttonChooseDirectory.setGeometry(QtCore.QRect(610, 330, 131, 21))
+        self.buttonChooseDirectory.setText(QtGui.QApplication.translate("MainWindow", "Choose Directory", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_6 = QtGui.QLabel(self.tabWidget1)
+        self.label_6.setGeometry(QtCore.QRect(110, 370, 111, 16))
+        self.label_6.setText(QtGui.QApplication.translate("MainWindow", "Log File Name :", None, QtGui.QApplication.UnicodeUTF8))
+        self.logFileName = QtGui.QLineEdit(self.tabWidget1)
+        self.logFileName.setGeometry(QtCore.QRect(250, 360, 321, 20))
+        self.logFileName.setToolTip(QtGui.QApplication.translate("MainWindow", "<html><head/><body><p>The file name specified here will be used as a root and will be extended with unique day and time.</p><p><br/></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        self.logFileName.setText(QtGui.QApplication.translate("MainWindow", "DefaultFileName", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_20 = QtGui.QLabel(self.tabWidget1)
+        self.label_20.setGeometry(QtCore.QRect(110, 400, 111, 16))
+        self.label_20.setText(QtGui.QApplication.translate("MainWindow", "Sesion File Name:", None, QtGui.QApplication.UnicodeUTF8))
+        self.sessionFileName = QtGui.QLineEdit(self.tabWidget1)
+        self.sessionFileName.setGeometry(QtCore.QRect(250, 400, 321, 20))
+        self.sessionFileName.setToolTip(QtGui.QApplication.translate("MainWindow", "<html><head/><body><p>The file name specified here will be used as a root and will be extended with unique day and time.</p><p><br/></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        self.sessionFileName.setText(QtGui.QApplication.translate("MainWindow", "DefaultFileName", None, QtGui.QApplication.UnicodeUTF8))
+
+        self.buttonSaveSession = QtGui.QPushButton(self.tabWidget1)
+        self.buttonSaveSession.setGeometry(QtCore.QRect(810, 330, 131, 21))
+        self.buttonSaveSession.setText(QtGui.QApplication.translate("MainWindow", "Save Session", None, QtGui.QApplication.UnicodeUTF8))    
+    
+        self.buttonLoadSession = QtGui.QPushButton(self.tabWidget1)
+        self.buttonLoadSession.setGeometry(QtCore.QRect(810, 360, 131, 21))
+        self.buttonLoadSession.setText(QtGui.QApplication.translate("MainWindow", "Load Session", None, QtGui.QApplication.UnicodeUTF8))
+        
+        self.buttonSaveSession.clicked.connect(self.saveSession)
+        self.buttonLoadSession.clicked.connect(self.loadSession)
+                
+        
+        
+    def setupFPGAConfigurationTab(self):
+        self.groupBox_5 = QtGui.QGroupBox(self.FPGAStatus)
+        self.groupBox_5.setGeometry(QtCore.QRect(10, 100, 641, 471))
+        self.groupBox_5.setTitle(QtGui.QApplication.translate("MainWindow", "Current FPGA Configuration", None, QtGui.QApplication.UnicodeUTF8))
+        self.fpgaVersion = QtGui.QLineEdit(self.groupBox_5)
+        self.fpgaVersion.setEnabled(False)
+        self.fpgaVersion.setGeometry(QtCore.QRect(200, 40, 201, 31))
+        self.numTrigger = QtGui.QLineEdit(self.groupBox_5)
+        self.numTrigger.setEnabled(False)
+        self.numTrigger.setGeometry(QtCore.QRect(200, 100, 201, 31))
+        self.numCaptureFilter = QtGui.QLineEdit(self.groupBox_5)
+        self.numCaptureFilter.setEnabled(False)
+        self.numCaptureFilter.setGeometry(QtCore.QRect(200, 160, 201, 31))
+        self.numRTFilter = QtGui.QLineEdit(self.groupBox_5)
+        self.numRTFilter.setEnabled(False)
+        self.numRTFilter.setGeometry(QtCore.QRect(200, 220, 201, 31))
+        self.label_9 = QtGui.QLabel(self.groupBox_5)
+        self.label_9.setGeometry(QtCore.QRect(10, 53, 121, 20))
+        self.label_9.setText(QtGui.QApplication.translate("MainWindow", "FPGA Version (RO)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_10 = QtGui.QLabel(self.groupBox_5)
+        self.label_10.setGeometry(QtCore.QRect(10, 110, 181, 20))
+        self.label_10.setText(QtGui.QApplication.translate("MainWindow", "Number of Triggering Elements(RO)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_11 = QtGui.QLabel(self.groupBox_5)
+        self.label_11.setGeometry(QtCore.QRect(10, 170, 191, 20))
+        self.label_11.setText(QtGui.QApplication.translate("MainWindow", "Number of Capture Filter Elements (RO)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_12 = QtGui.QLabel(self.groupBox_5)
+        self.label_12.setGeometry(QtCore.QRect(10, 230, 181, 20))
+        self.label_12.setText(QtGui.QApplication.translate("MainWindow", "Number of RT Filter Elements (RO)", None, QtGui.QApplication.UnicodeUTF8))
+        self.groupBox_6 = QtGui.QGroupBox(self.groupBox_5)
+        self.groupBox_6.setGeometry(QtCore.QRect(440, 40, 141, 121))
+        self.groupBox_6.setTitle(QtGui.QApplication.translate("MainWindow", "Trigger Status ", None, QtGui.QApplication.UnicodeUTF8))
+        self.trigStatButton = QtGui.QPushButton(self.groupBox_6)
+        self.trigStatButton.setEnabled(True)
+        self.trigStatButton.setGeometry(QtCore.QRect(10, 20, 111, 91))
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setItalic(False)
+        font.setWeight(75)
+        self.trigStatButton.setFont(font)
+        self.trigStatButton.setAutoFillBackground(False)
+        self.trigStatButton.setText(QtGui.QApplication.translate("MainWindow", "IDLE", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_14 = QtGui.QLabel(self.groupBox_5)
+        self.label_14.setGeometry(QtCore.QRect(10, 290, 161, 20))
+        self.label_14.setText(QtGui.QApplication.translate("MainWindow", "FIFO Overflow (RO)", None, QtGui.QApplication.UnicodeUTF8))
+        self.fifoOverflow = QtGui.QLineEdit(self.groupBox_5)
+        self.fifoOverflow.setEnabled(False)
+        self.fifoOverflow.setGeometry(QtCore.QRect(200, 280, 201, 31))
+        self.label_18 = QtGui.QLabel(self.groupBox_5)
+        self.label_18.setGeometry(QtCore.QRect(10, 340, 161, 20))
+        self.label_18.setText(QtGui.QApplication.translate("MainWindow", "Triggered on Trigger  Block (RO)", None, QtGui.QApplication.UnicodeUTF8))
+        self.currentTriggerBlock = QtGui.QLineEdit(self.groupBox_5)
+        self.currentTriggerBlock.setEnabled(False)
+        self.currentTriggerBlock.setGeometry(QtCore.QRect(200, 340, 201, 20))
+        self.buttonFSMRead = QtGui.QPushButton(self.groupBox_5)
+        self.buttonFSMRead.setGeometry(QtCore.QRect(10, 390, 601, 41))
+        self.buttonFSMRead.setText(QtGui.QApplication.translate("MainWindow", "Read  FPGA Configuration", None, QtGui.QApplication.UnicodeUTF8))
+        self.selfGenDataStatus = QtGui.QPushButton(self.groupBox_5)
+        self.selfGenDataStatus.setGeometry(QtCore.QRect(420, 220, 201, 31))
+        self.selfGenDataStatus.setText(QtGui.QApplication.translate("MainWindow", "USING SELF GENERATED TEST DATA", None, QtGui.QApplication.UnicodeUTF8))
+        self.extTrigEnabStatus = QtGui.QPushButton(self.groupBox_5)
+        self.extTrigEnabStatus.setGeometry(QtCore.QRect(420, 260, 201, 31))
+        self.extTrigEnabStatus.setText(QtGui.QApplication.translate("MainWindow", "EXTERNAL TRIGGER  ENABLED", None, QtGui.QApplication.UnicodeUTF8))
+        self.extTrigPolarityStatus = QtGui.QPushButton(self.groupBox_5)
+        self.extTrigPolarityStatus.setGeometry(QtCore.QRect(420, 300, 201, 31))
+        self.extTrigPolarityStatus.setText(QtGui.QApplication.translate("MainWindow", "EXTERNAL TRIGGER POLARITY HIGH", None, QtGui.QApplication.UnicodeUTF8))
+        self.runStopStatus = QtGui.QPushButton(self.groupBox_5)
+        self.runStopStatus.setGeometry(QtCore.QRect(420, 180, 201, 31))
+        self.runStopStatus.setText(QtGui.QApplication.translate("MainWindow", "RUNNING", None, QtGui.QApplication.UnicodeUTF8))
+        self.groupBox_7 = QtGui.QGroupBox(self.FPGAStatus)
+        self.groupBox_7.setGeometry(QtCore.QRect(670, 100, 441, 471))
+        self.groupBox_7.setTitle(QtGui.QApplication.translate("MainWindow", "Configure Test and Debug FPGA", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_16 = QtGui.QLabel(self.groupBox_7)
+        self.label_16.setGeometry(QtCore.QRect(350, 333, 91, 20))
+        self.label_16.setText(QtGui.QApplication.translate("MainWindow", "%   before Trigger", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_16.setTextFormat(QtCore.Qt.PlainText)
+        self.label_13 = QtGui.QLabel(self.groupBox_7)
+        self.label_13.setGeometry(QtCore.QRect(10, 330, 81, 20))
+        self.label_13.setText(QtGui.QApplication.translate("MainWindow", "Trigger Position", None, QtGui.QApplication.UnicodeUTF8))
+        self.triggerSlider = QtGui.QSlider(self.groupBox_7)
+        self.triggerSlider.setGeometry(QtCore.QRect(120, 310, 161, 51))
+        self.triggerSlider.setMinimum(0)
+        self.triggerSlider.setMaximum(4)
+        self.triggerSlider.setSingleStep(1)
+        self.triggerSlider.setPageStep(1)
+        self.triggerSlider.setSliderPosition(0)
+        self.triggerSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.triggerSlider.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.triggerSlider.setTickInterval(1)
+        self.runStopButton = QtGui.QPushButton(self.groupBox_7)
+        self.runStopButton.setGeometry(QtCore.QRect(10, 30, 411, 61))
+        self.runStopButton.setText(QtGui.QApplication.translate("MainWindow", "RUN", None, QtGui.QApplication.UnicodeUTF8))
+        self.extTrigEnabButton = QtGui.QPushButton(self.groupBox_7)
+        self.extTrigEnabButton.setGeometry(QtCore.QRect(10, 100, 411, 61))
+        self.extTrigEnabButton.setText(QtGui.QApplication.translate("MainWindow", "ENABLE EXTERNAL TRIGGER ", None, QtGui.QApplication.UnicodeUTF8))
+        self.extTrigPolarityButton = QtGui.QPushButton(self.groupBox_7)
+        self.extTrigPolarityButton.setGeometry(QtCore.QRect(10, 170, 411, 61))
+        self.extTrigPolarityButton.setText(QtGui.QApplication.translate("MainWindow", "SET  EXTERNAL TRIGGER POLARITY HIGH", None, QtGui.QApplication.UnicodeUTF8))
+        self.selfGenDataButton = QtGui.QPushButton(self.groupBox_7)
+        self.selfGenDataButton.setGeometry(QtCore.QRect(10, 240, 411, 61))
+        self.selfGenDataButton.setText(QtGui.QApplication.translate("MainWindow", "USE SELF-GEN TEST DATA", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonFSMSend = QtGui.QPushButton(self.groupBox_7)
+        self.buttonFSMSend.setGeometry(QtCore.QRect(-10, 380, 441, 41))
+        self.buttonFSMSend.setText(QtGui.QApplication.translate("MainWindow", "Configure FPGA", None, QtGui.QApplication.UnicodeUTF8))
+        self.sliderValue = QtGui.QComboBox(self.groupBox_7)
+        self.sliderValue.setGeometry(QtCore.QRect(290, 330, 51, 22))
+        self.sliderValue.setItemText(0, QtGui.QApplication.translate("MainWindow", "5", None, QtGui.QApplication.UnicodeUTF8))
+        self.sliderValue.setItemText(1, QtGui.QApplication.translate("MainWindow", "25", None, QtGui.QApplication.UnicodeUTF8))
+        self.sliderValue.setItemText(2, QtGui.QApplication.translate("MainWindow", "50", None, QtGui.QApplication.UnicodeUTF8))
+        self.sliderValue.setItemText(3, QtGui.QApplication.translate("MainWindow", "75", None, QtGui.QApplication.UnicodeUTF8))
+        self.sliderValue.setItemText(4, QtGui.QApplication.translate("MainWindow", "95", None, QtGui.QApplication.UnicodeUTF8))
+        
+    def setupRTFilterTab(self):        
+        self.bottonRTAddFilter = QtGui.QPushButton(self.RTFilterTab)
+        self.bottonRTAddFilter.setGeometry(QtCore.QRect(20, 20, 161, 31))
+        self.bottonRTAddFilter.setText(QtGui.QApplication.translate("MainWindow", "Add Filter", None, QtGui.QApplication.UnicodeUTF8))
+        self.bottonRTDelFilter = QtGui.QPushButton(self.RTFilterTab)
+        self.bottonRTDelFilter.setGeometry(QtCore.QRect(200, 20, 161, 31))
+        self.bottonRTDelFilter.setText(QtGui.QApplication.translate("MainWindow", "Delete Filter", None, QtGui.QApplication.UnicodeUTF8))
+        self.bottonRTCopyFilter = QtGui.QPushButton(self.RTFilterTab)
+        self.bottonRTCopyFilter.setGeometry(QtCore.QRect(380, 20, 161, 31))
+        self.bottonRTCopyFilter.setText(QtGui.QApplication.translate("MainWindow", "Copy to Capture Filter", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonRTReadReg = QtGui.QPushButton(self.RTFilterTab)
+        self.buttonRTReadReg.setGeometry(QtCore.QRect(560, 20, 141, 31))
+        self.buttonRTReadReg.setText(QtGui.QApplication.translate("MainWindow", "Read RT Filter Registers", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushRTSendFilters = QtGui.QPushButton(self.RTFilterTab)
+        self.pushRTSendFilters.setGeometry(QtCore.QRect(720, 20, 211, 31))
+        self.pushRTSendFilters.setText(QtGui.QApplication.translate("MainWindow", "Send Filters", None, QtGui.QApplication.UnicodeUTF8))
+        self.RTFilterGroup = QtGui.QGroupBox(self.RTFilterTab)
+        self.RTFilterGroup.setGeometry(QtCore.QRect(20, 70, 1271, 781))
+        self.RTFilterGroup.setTitle(QtGui.QApplication.translate("MainWindow", "RT Filters", None, QtGui.QApplication.UnicodeUTF8))
+         
+    def setupCaptureFilterTab(self):
+        self.bottonCaptureCopyFilter = QtGui.QPushButton(self.CaptureFilterTab)
+        self.bottonCaptureCopyFilter.setGeometry(QtCore.QRect(380, 20, 160, 31))
+        self.bottonCaptureCopyFilter.setText(QtGui.QApplication.translate("MainWindow", "Copy to RT  Filter", None, QtGui.QApplication.UnicodeUTF8))
+        self.bottonCaptureAddFilter = QtGui.QPushButton(self.CaptureFilterTab)
+        self.bottonCaptureAddFilter.setGeometry(QtCore.QRect(20, 20, 161, 31))
+        self.bottonCaptureAddFilter.setText(QtGui.QApplication.translate("MainWindow", "Add Filter", None, QtGui.QApplication.UnicodeUTF8))
+        self.bottonCaptureDelFilter = QtGui.QPushButton(self.CaptureFilterTab)
+        self.bottonCaptureDelFilter.setGeometry(QtCore.QRect(200, 20, 161, 31))
+        self.bottonCaptureDelFilter.setText(QtGui.QApplication.translate("MainWindow", "Delete Filter", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonCaptureReadReg = QtGui.QPushButton(self.CaptureFilterTab)
+        self.buttonCaptureReadReg.setGeometry(QtCore.QRect(560, 20, 171, 31))
+        self.buttonCaptureReadReg.setText(QtGui.QApplication.translate("MainWindow", "Read Capture  Filter Registers", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushCaptureSendFilters = QtGui.QPushButton(self.CaptureFilterTab)
+        self.pushCaptureSendFilters.setGeometry(QtCore.QRect(750, 20, 211, 31))
+        self.pushCaptureSendFilters.setText(QtGui.QApplication.translate("MainWindow", "Send Filters", None, QtGui.QApplication.UnicodeUTF8))
+        self.captureFilterFrame = QtGui.QGroupBox(self.CaptureFilterTab)
+        self.captureFilterFrame.setGeometry(QtCore.QRect(20, 70, 1271, 771))
+        self.captureFilterFrame.setTitle(QtGui.QApplication.translate("MainWindow", "Capture Filter", None, QtGui.QApplication.UnicodeUTF8))
+    
+
+    def setupCsBuffTriggerTab(self):
+        self.horizontalLayoutWidget = QtGui.QWidget(self.CsBufTriggers)
+        self.horizontalLayoutWidget.setMinimumSize(QtCore.QSize(1700,1200))
+        self.csBufLayout = QtGui.QHBoxLayout(self.horizontalLayoutWidget)
+        self.csBufLayout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
+        self.csBufLayout.setMargin(0)
+        self.conditionGroup = QtGui.QGroupBox(self.horizontalLayoutWidget)
+        self.conditionGroup.setMinimumSize(QtCore.QSize(410, 0))
+        self.conditionGroup.setTitle(QtGui.QApplication.translate("MainWindow", "Comparison Group", None, QtGui.QApplication.UnicodeUTF8))
+        self.csBufLayout.addWidget(self.conditionGroup)
+        self.gateGroup1 = QtGui.QGroupBox(self.horizontalLayoutWidget)
+        self.gateGroup1.setTitle(QtGui.QApplication.translate("MainWindow", "Gate Group 1", None, QtGui.QApplication.UnicodeUTF8))
+        self.csBufLayout.addWidget(self.gateGroup1)
+        self.gateGroup2 = QtGui.QGroupBox(self.horizontalLayoutWidget)
+        self.gateGroup2.setTitle(QtGui.QApplication.translate("MainWindow", "Gate Group 2", None, QtGui.QApplication.UnicodeUTF8))
+        self.csBufLayout.addWidget(self.gateGroup2)
+        self.gateGroup3 = QtGui.QGroupBox(self.horizontalLayoutWidget)
+        self.gateGroup3.setTitle(QtGui.QApplication.translate("MainWindow", "Gate Group 3", None, QtGui.QApplication.UnicodeUTF8))
+        self.csBufLayout.addWidget(self.gateGroup3)
+        self.counterGroup = QtGui.QGroupBox(self.horizontalLayoutWidget)
+        self.counterGroup.setMinimumSize(QtCore.QSize(400, 0))
+        self.counterGroup.setTitle(QtGui.QApplication.translate("MainWindow", "Counter Group", None, QtGui.QApplication.UnicodeUTF8))
+        self.csBufLayout.addWidget(self.counterGroup)
+        self.outputGroup = QtGui.QGroupBox(self.horizontalLayoutWidget)
+        self.outputGroup.setTitle(QtGui.QApplication.translate("MainWindow", "Output Gate", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonSendParallelTriggers = QtGui.QPushButton(self.outputGroup)
+        self.buttonSendParallelTriggers.setGeometry(QtCore.QRect(10, 20, 141, 61))
+        self.buttonSendParallelTriggers.setText(QtGui.QApplication.translate("MainWindow", "Send Triggers", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonReadParallelTriggers = QtGui.QPushButton(self.outputGroup)
+        self.buttonReadParallelTriggers.setGeometry(QtCore.QRect(10, 90, 141, 61))
+        self.buttonReadParallelTriggers.setText(QtGui.QApplication.translate("MainWindow", "Read  Triggers", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonClearParallelTriggers = QtGui.QPushButton(self.outputGroup)
+        self.buttonClearParallelTriggers.setGeometry(QtCore.QRect(10, 160, 141, 61))
+        self.buttonClearParallelTriggers.setText(QtGui.QApplication.translate("MainWindow", "Clear  Triggers", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonAddParallelTriggerLines = QtGui.QPushButton(self.outputGroup)
+        self.buttonAddParallelTriggerLines.setGeometry(QtCore.QRect(10, 230, 141, 61))
+        self.buttonAddParallelTriggerLines.setText(QtGui.QApplication.translate("MainWindow", "Add   Trigger Line", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonDeleteParallelTriggerLines = QtGui.QPushButton(self.outputGroup)
+        self.buttonDeleteParallelTriggerLines.setGeometry(QtCore.QRect(10, 300, 141, 61))
+        self.buttonDeleteParallelTriggerLines.setText(QtGui.QApplication.translate("MainWindow", "Delete   Trigger Line", None, QtGui.QApplication.UnicodeUTF8))
+        self.csBufLayout.addWidget(self.outputGroup)
+        
+        
+    def setupTestMuxTriggerTab(self):
+        self.groupBox = QtGui.QGroupBox(self.TriggerTab)
+        self.groupBox.setGeometry(QtCore.QRect(30, 20, 1251, 80))
+        self.groupBox.setTitle(QtGui.QApplication.translate("MainWindow", "Trigger Control ", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonTriggerDelete = QtGui.QPushButton(self.groupBox)
+        self.buttonTriggerDelete.setGeometry(QtCore.QRect(260, 30, 221, 31))
+        self.buttonTriggerDelete.setText(QtGui.QApplication.translate("MainWindow", "Delete  Trigger", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonTriggerSend = QtGui.QPushButton(self.groupBox)
+        self.buttonTriggerSend.setGeometry(QtCore.QRect(500, 30, 221, 31))
+        self.buttonTriggerSend.setText(QtGui.QApplication.translate("MainWindow", "Send  Trigger", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonTriggerRead = QtGui.QPushButton(self.groupBox)
+        self.buttonTriggerRead.setGeometry(QtCore.QRect(740, 30, 171, 31))
+        self.buttonTriggerRead.setText(QtGui.QApplication.translate("MainWindow", "Read Triggers", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonAddTriggerLine = QtGui.QPushButton(self.groupBox)
+        self.buttonAddTriggerLine.setGeometry(QtCore.QRect(30, 30, 211, 31))
+        self.buttonAddTriggerLine.setText(QtGui.QApplication.translate("MainWindow", "Add Trigger", None, QtGui.QApplication.UnicodeUTF8))
+        self.triggerGroup = QtGui.QGroupBox(self.TriggerTab)
+        self.triggerGroup.setGeometry(QtCore.QRect(30, 110, 1261, 771))
+        self.triggerGroup.setTitle(QtGui.QApplication.translate("MainWindow", "Triggers", None, QtGui.QApplication.UnicodeUTF8))
+ 
+    def setupTDPortTab(self):
+        self.tdPortGroup = QtGui.QGroupBox(self.tdPortTab)
+        self.tdPortGroup.setGeometry(QtCore.QRect(10, 70, 1161, 801))
+        self.tdPortGroup.setTitle(QtGui.QApplication.translate("MainWindow", "Configure TDPort", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttontdPortDel = QtGui.QPushButton(self.tdPortTab)
+        self.buttontdPortDel.setGeometry(QtCore.QRect(220, 20, 161, 31))
+        self.buttontdPortDel.setText(QtGui.QApplication.translate("MainWindow", "Delete", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttontdPortSend = QtGui.QPushButton(self.tdPortTab)
+        self.buttontdPortSend.setGeometry(QtCore.QRect(400, 20, 161, 31))
+        self.buttontdPortSend.setText(QtGui.QApplication.translate("MainWindow", "Update", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttontdPortAdd = QtGui.QPushButton(self.tdPortTab)
+        self.buttontdPortAdd.setGeometry(QtCore.QRect(40, 20, 161, 31))
+        self.buttontdPortAdd.setText(QtGui.QApplication.translate("MainWindow", "Add ", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttontdPortRead = QtGui.QPushButton(self.tdPortTab)
+        self.buttontdPortRead.setGeometry(QtCore.QRect(580, 20, 141, 31))
+        self.buttontdPortRead.setText(QtGui.QApplication.translate("MainWindow", "Read", None, QtGui.QApplication.UnicodeUTF8))
+        self.tdPortValuesGroup = QtGui.QGroupBox(self.tdPortTab)
+        self.tdPortValuesGroup.setGeometry(QtCore.QRect(1190, 70, 361, 801))
+        self.tdPortValuesGroup.setTitle(QtGui.QApplication.translate("MainWindow", "tdPort Configuration ", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttontdPortRestoreAll = QtGui.QPushButton(self.tdPortTab)
+        self.buttontdPortRestoreAll.setGeometry(QtCore.QRect(740, 20, 101, 31))
+        self.buttontdPortRestoreAll.setText(QtGui.QApplication.translate("MainWindow", "Restore All ", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttontdPortSave = QtGui.QPushButton(self.tdPortTab)
+        self.buttontdPortSave.setGeometry(QtCore.QRect(860, 20, 111, 31))
+        self.buttontdPortSave.setText(QtGui.QApplication.translate("MainWindow", "Save", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttontdPortLoad = QtGui.QPushButton(self.tdPortTab)
+        self.buttontdPortLoad.setGeometry(QtCore.QRect(990, 20, 91, 31))
+        self.buttontdPortLoad.setText(QtGui.QApplication.translate("MainWindow", "Load", None, QtGui.QApplication.UnicodeUTF8))
+  
+    def setupRTDataDisplay(self):                       
+        
+        self.RTDisplayContGroup = QtGui.QGroupBox("Real Time Display Group")
+    
+        self.RTDisplayPlotGroup = QtGui.QGroupBox("Rel Time Plots")
+        
+        self.RTDisplayContLayout = QtGui.QVBoxLayout(self.RTDisplayContGroup)    
+        self.RTDisplayContLayout.setAlignment(QtCore.Qt.AlignTop)        
+        self.RTDisplayContGroup.setMaximumWidth(200)
+        self.RTDisplayPlotLayout = QtGui.QVBoxLayout(self.RTDisplayPlotGroup)
+        
+        self.RTDisplayqscroll = QtGui.QScrollArea(self.RTDisplayPlotGroup)
+#        qscroll.setGeometry(QtCore.QRect(0, 0, 500, 500))
+        self.RTDisplayqscroll.setFrameStyle(QtGui.QFrame.NoFrame)
+        self.RTDisplayPlotLayout.addWidget(self.RTDisplayqscroll)
+        
+        self.RTDisplayqscrollContents = QtGui.QWidget()
+        self.RTDisplayqscrollLayout = QtGui.QVBoxLayout(self.RTDisplayqscrollContents)
+#        qscrollLayout.setGeometry(QtCore.QRect(0, 0, 500, 500))
+        
+        self.RTDisplayqscroll.setWidget(self.RTDisplayqscrollContents)
+        self.RTDisplayqscroll.setWidgetResizable(True)
+
+        self.tabLayout8.addWidget(self.RTDisplayContGroup)
+        self.tabLayout8.addWidget(self.RTDisplayPlotGroup)
+        self.RTDisplayqscrollContents.setLayout(self.RTDisplayqscrollLayout)
+        self.RTFigures = []
+        
+        self.RTDisplayAddVariable = QtGui.QPushButton()
+        self.RTDisplayAddVariable.setMinimumHeight(50)
+        self.RTDisplayAddVariable.setText(QtGui.QApplication.translate("MainWindow", "Add Variable", None, QtGui.QApplication.UnicodeUTF8))
+        self.RTDisplayContLayout.addWidget(self.RTDisplayAddVariable)
+
+
+
+    def setupCaptureDisplay(self):
+        self.CaptureDisplayContGroup = QtGui.QGroupBox("Capture Display Group")
+        self.CaptureDisplayPlotGroup = QtGui.QGroupBox("Cature Display")
+        
+        self.CaptureDisplayContLayout = QtGui.QVBoxLayout(self.CaptureDisplayContGroup)    
+        self.CaptureDisplayContLayout.setAlignment(QtCore.Qt.AlignTop)        
+        self.CaptureDisplayContGroup.setMaximumWidth(200)
+        self.CaptureDisplayPlotLayout = QtGui.QVBoxLayout(self.CaptureDisplayPlotGroup)
+        
+        self.CaptureDisplayqscroll = QtGui.QScrollArea(self.CaptureDisplayPlotGroup)
+#        qscroll.setGeometry(QtCore.QRect(0, 0, 500, 500))
+        self.CaptureDisplayqscroll.setFrameStyle(QtGui.QFrame.NoFrame)
+        self.CaptureDisplayPlotLayout.addWidget(self.CaptureDisplayqscroll)
+        
+        self.CaptureDisplayqscrollContents = QtGui.QWidget()
+        self.CaptureDisplayqscrollLayout = QtGui.QVBoxLayout(self.CaptureDisplayqscrollContents)
+#        qscrollLayout.setGeometry(QtCore.QRect(0, 0, 500, 500))
+        
+        self.CaptureDisplayqscroll.setWidget(self.CaptureDisplayqscrollContents)
+        self.CaptureDisplayqscroll.setWidgetResizable(True)
+
+        self.tabLayout7.addWidget(self.CaptureDisplayContGroup)
+        self.tabLayout7.addWidget(self.CaptureDisplayPlotGroup)
+        self.CaptureDisplayqscrollContents.setLayout(self.CaptureDisplayqscrollLayout)
+        self.numCaptureFigures = 0
+        
+        self.CaptureDisplayAddVariable = QtGui.QPushButton()
+        self.CaptureDisplayAddVariable.setMinimumHeight(50)
+        self.CaptureDisplayAddVariable.setText(QtGui.QApplication.translate("MainWindow", "Add Variable", None, QtGui.QApplication.UnicodeUTF8))
+        self.CaptureDisplayContLayout.addWidget(self.CaptureDisplayAddVariable)
+
+
+        self.CaptureDisplayWidget = MplWidget_Single(self.CaptureDisplayPlotGroup)
+        self.CaptureDisplayqscrollLayout.addWidget(self.CaptureDisplayWidget)
+#        qfigWidget = QtGui.QWidget(self.CaptureDisplayqscrollContents)      
+##        #fig = Figure((3, 3), dpi=100)
+#        self.captureFigure = plt.figure(figsize=(3,3)) 
+#        canvas = FigureCanvas(self.captureFigure)
+#        canvas.setParent(qfigWidget)
+#        toolbar = NavigationToolbar(canvas, qfigWidget)
+#        axes = self.captureFigure.add_subplot(111)
+#        axes.plot([1,2,3,4])        
+#        
+#          # place plot components in a layout
+#        plotLayout = QtGui.QVBoxLayout()
+#        plotLayout.addWidget(canvas)
+#        plotLayout.addWidget(toolbar)
+#        qfigWidget.setLayout(plotLayout)
+#
+#         # prevent the canvas to shrink beyond a point
+#         # original size looks like a good minimum size
+#        canvas.setMinimumSize(canvas.size())        
+#        self.CaptureDisplayqscrollLayout.addWidget(qfigWidget)
+    
+#        self.CaptureDisplayWidget = MplWidget_Single(self.CaptureDataDisplay)
+#        self.CaptureDisplayWidget.setGeometry(QtCore.QRect(260, 0, 1041, 975))
+#        self.CaptureDisplayGroup = QtGui.QGroupBox(self.CaptureDataDisplay)
+#        self.CaptureDisplayGroup.setGeometry(QtCore.QRect(0, 74, 261, 901))
+#        self.verticalLayoutWidget = QtGui.QWidget(self.CaptureDisplayGroup)
+#        self.veCaptureicalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 261, 811))
+#        self.CaptureDisplayLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
+#        self.CaptureDisplayLayout.setMargin(0)
+#        self.CaptureDisplayAddVariable = QtGui.QPushButton(self.CaptureDataDisplay)
+#        self.CaptureDisplayAddVariable.setGeometry(QtCore.QRect(10, 10, 241, 51))
+#        self.CaptureDisplayAddVariable.setText(QtGui.QApplication.translate("MainWindow", "Add Variable", None, QtGui.QApplication.UnicodeUTF8))
+    
+  
+    def setupStatusMonitor(self):
+        self.queuedPackets = QtGui.QLineEdit(self.statusTab)
+        self.queuedPackets.setGeometry(QtCore.QRect(260, 60, 301, 20))
+        self.processedPackets = QtGui.QLineEdit(self.statusTab)
+        self.processedPackets.setGeometry(QtCore.QRect(260, 110, 301, 20))
+        self.seqNumber = QtGui.QLineEdit(self.statusTab)
+        self.seqNumber.setGeometry(QtCore.QRect(260, 160, 301, 20))
+        self.RTOff = QtGui.QLineEdit(self.statusTab)
+        self.RTOff.setGeometry(QtCore.QRect(260, 210, 113, 20))
+        self.bufSize = QtGui.QLineEdit(self.statusTab)
+        self.bufSize.setGeometry(QtCore.QRect(260, 250, 113, 20))
+          
+    def ShortToArray(self,number):
+        shortData=[0x0]*2
+        strValue = "{0:04x}" .format(number)
+        shortData[0] =int(strValue[0:2],16)
+        shortData[1] =int(strValue[2:4],16)  
+        return shortData
+
+    def IntToArray(self,number):
+        intData=[0x0]*4    
+        strValue = "{0:08x}" .format(number)
+        intData[0] =int(strValue[0:2],16)
+        intData[1] =int(strValue[2:4],16)
+        intData[2] =int(strValue[4:6],16)
+        intData[3] =int(strValue[6:8],16)        
+        return intData     
+        
+    def data_to_num(self,data, offset, len):
+        """ Convert data from a byte array into an integer (big-endian). """
+        num = 0
+        for i in xrange(len):
+            num <<= 8
+            num |= data[offset+i]
+        return num
+        
+        
+    def refresh_vexplorer_table(self):
+        """ (Utility) Refresh variable explorer table"""
+        if self.nsb.is_visible and self.nsb.isVisible():
+            if self.nsb.is_internal_shell:
+                wsfilter = self.nsb.get_internal_shell_filter('editable')
+                self.nsb.editor.set_filter(wsfilter)
+                interpreter = self.nsb.shellwidget.interpreter
+                if interpreter is not None:
+                    self.nsb.editor.set_data(self.guidata)
+                    self.nsb.editor.adjust_columns()
+        
+def main():
+    
+    app = QtGui.QApplication(sys.argv)
+
+    
+    splash_pix = QtGui.QPixmap('entropic_logo_detail.png')
+    splash = QtGui.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
+    splash.setMask(splash_pix.mask())
+    splash.show()
+
+    time.sleep(1)
+    
+    GUI = UserInterface()
+    
+    app.processEvents()
+    GUI.show()
+    
+    splash.finish(GUI)
+
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,380 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+
+entity TesterFpgaParallelTrigger is
+   generic ( 
+      NumOfMemoryElements        : integer := 16
+   );
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      DataIn    : in std_logic_vector(31 downto 0);
+      HdrIn     : in std_logic_vector( 3 downto 0);
+      OffsetIn  : in std_logic_vector(15 downto 0);
+      PktTypeIn : in std_logic_vector( 3 downto 0);
+      DataInEn  : in std_logic;
+
+      ConfigRegsIn : in std_logic_vector(31 downto 0);
+      ConfigRegsOut: out std_logic_vector(31 downto 0);
+      ConfigRegsEn : in std_logic;
+      ConfigRegsLd : in std_logic;
+      ConfigRegsSt : in std_logic;
+
+      TriggerArmed     : in std_logic;
+      TriggerTriggered : out std_logic
+   );
+end TesterFpgaParallelTrigger;
+
+architecture RTL of TesterFpgaParallelTrigger is
+
+   constant NumOfComperators : integer := NumOfMemoryElements/2;
+
+   signal CurPktId     : std_logic_vector(1 downto 0);
+   signal PktIdToComp  : std_logic_vector(1 downto 0);
+   signal CurPktType   : std_logic_vector(3 downto 0);
+   signal CompNow      : std_logic;
+
+   component TesterFpgaTriggerSync is
+      port (
+         RST       : in std_logic;
+         CLK       : in std_logic;
+
+         Armed     : in std_logic;
+
+         DataIn    : in std_logic_vector(31 downto 0);
+         HdrIn     : in std_logic_vector( 3 downto 0);
+         OffsetIn  : in std_logic_vector(15 downto 0);
+         DataInEn  : in std_logic;
+
+         PktIdToComp : out std_logic_vector(1 downto 0);
+         CompNow     : out std_logic;
+
+         ConfigRegsIn   : in std_logic_vector(31 downto 0);
+         ConfigRegsOut  : out std_logic_vector(31 downto 0);
+         ConfigRegsEn   : in std_logic;
+         ConfigRegsLd   : in std_logic;
+         ConfigRegsSt   : in std_logic
+   );
+   end component;
+   signal TriggerSyncRegsIn  : std_logic_vector(31 downto 0);
+   signal TriggerSyncRegsOut : std_logic_vector(31 downto 0);
+   
+   component TesterFpgaMemoryElement is
+      port (
+         RST       : in std_logic;
+         CLK       : in std_logic;
+
+         DataIn    : in std_logic_vector(31 downto 0);
+         HdrIn     : in std_logic_vector( 3 downto 0);
+         OffsetIn  : in std_logic_vector(15 downto 0);
+         PktIdIn   : in std_logic_vector( 1 downto 0);
+         PktTypeIn : in std_logic_vector( 3 downto 0);
+         DataInEn  : in std_logic;
+
+         PktIdSelIn : in  std_logic_vector( 1 downto 0);
+         DataOut    : out std_logic_vector(31 downto 0);
+
+         ConfigRegsIn   : in std_logic_vector(31 downto 0);
+         ConfigRegsOut  : out std_logic_vector(31 downto 0);
+         ConfigRegsEn   : in std_logic;
+         ConfigRegsLd   : in std_logic;
+         ConfigRegsSt   : in std_logic
+      );
+   end component;
+   type WordBus_t is array(0 to NumOfMemoryElements-1) of std_logic_vector(31 downto 0);
+   signal DataOutBus : WordBus_t;
+   type MemConfigRegBus_t is array (0 to NumOfMemoryElements) of std_logic_vector(31 downto 0);
+   signal MemElemRegsInIntrCon  : MemConfigRegBus_t;
+   signal MemElemRegsOutIntrCon : MemConfigRegBus_t;
+
+   component TesterFpgaCompareElement is
+      port (
+         RST       : in std_logic;
+         CLK       : in std_logic;
+
+         DataIn0   : in  std_logic_vector(31 downto 0);
+         DataIn1   : in  std_logic_vector(31 downto 0);
+         CmpOut    : out std_logic;
+
+         ConfigRegsIn   : in std_logic_vector(31 downto 0);
+         ConfigRegsOut  : out std_logic_vector(31 downto 0);
+         ConfigRegsEn   : in std_logic;
+         ConfigRegsLd   : in std_logic;
+         ConfigRegsSt   : in std_logic
+      );
+   end component;
+   signal CompOutBus : std_logic_vector(NumOfComperators-1 downto 0);
+   type CompConfigRegBus_t is array (0 to NumOfComperators) of std_logic_vector(31 downto 0);
+   signal CompElemRegsInIntrCon  : CompConfigRegBus_t;
+   signal CompElemRegsOutIntrCon : CompConfigRegBus_t;
+
+   component TesterFpgaAndOrElement is
+      port (
+         RST       : in std_logic;
+         CLK       : in std_logic;
+
+         CmpInBus  : in  std_logic_vector(7 downto 0);
+         CmpOut    : out std_logic;
+
+         ConfigRegsIn   : in std_logic_vector(31 downto 0);
+         ConfigRegsOut  : out std_logic_vector(31 downto 0);
+         ConfigRegsEn   : in std_logic;
+         ConfigRegsLd   : in std_logic;
+         ConfigRegsSt   : in std_logic
+      );
+   end component;
+   type CmpOutBus_t is array (0 to 2) of std_logic_vector(7 downto 0);
+   signal CmpOutBus : CmpOutBus_t;
+   type CmpInBus_t is array (0 to 2, 0 to NumOfComperators-1) of std_logic_vector(7 downto 0);
+   signal CmpInBus : CmpInBus_t;
+   type AndOrConfigRegBus_t is array (0 to 2, 0 to NumOfComperators) of std_logic_vector(31 downto 0);
+   signal AndOrElemRegsInIntrCon  : AndOrConfigRegBus_t;
+   signal AndOrElemRegsOutIntrCon : AndOrConfigRegBus_t;
+
+   
+   component TesterFpgaCounterElement is port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      CntInBus  : in  std_logic_vector(7 downto 0);
+      CntEnBus  : in  std_logic_vector(7 downto 0);
+      CountZero : out std_logic;
+      ActionEn  : in  std_logic;
+
+      ConfigRegsIn   : in std_logic_vector(31 downto 0);
+      ConfigRegsOut  : out std_logic_vector(31 downto 0);
+      ConfigRegsEn   : in std_logic;
+      ConfigRegsLd   : in std_logic;
+      ConfigRegsSt   : in std_logic
+   );
+   end component;
+   type CntInBus_t is array (0 to 7) of std_logic_vector(7 downto 0);
+   signal CntInBus  : CntInBus_t;
+   signal CountZero : std_logic_vector(7 downto 0);
+   type CntConfigRegBus_t is array (0 to 7) of std_logic_vector(31 downto 0);
+   signal CntElemRegsInIntrCon  : CntConfigRegBus_t;
+   signal CntElemRegsOutIntrCon : CntConfigRegBus_t;
+   
+   signal FinalCompOut      : std_logic;
+--   signal FinalAndOrOut     : std_logic;
+   signal FinalAndOrRegsIn  : std_logic_vector(31 downto 0);
+   signal FinalAndOrRegsOut : std_logic_vector(31 downto 0);
+--   signal FinalCntrRegsIn   : std_logic_vector(31 downto 0);
+--   signal FinalCntrRegsOut  : std_logic_vector(31 downto 0);
+--   signal FinalCmpBus       : std_logic_vector( 7 downto 0);
+   signal dCompNow          : std_logic;
+   
+begin
+   -- Instantiate Trigger Sync
+   TriggerSync : TesterFpgaTriggerSync port map (
+      RST => RST,
+      CLK => CLK,
+
+      Armed     => TriggerArmed,
+
+      DataIn    => DataIn,
+      HdrIn     => HdrIn,
+      OffsetIn  => OffsetIn,
+      DataInEn  => DataInEn,
+
+      PktIdToComp => PktIdToComp,
+      CompNow     => CompNow,
+
+      ConfigRegsIn   => TriggerSyncRegsIn,
+      ConfigRegsOut  => TriggerSyncRegsOut,
+      ConfigRegsEn   => ConfigRegsEn,
+      ConfigRegsLd   => ConfigRegsLd,
+      ConfigRegsSt   => ConfigRegsSt
+   );
+   TriggerSyncRegsIn <= MemElemRegsOutIntrCon(0);
+   ConfigRegsOut     <= TriggerSyncRegsOut;
+
+   -- Memory Elements Instantiation
+   gen_memory_elements: for i in 0 to NumOfMemoryElements-1 generate
+      MemoryElement : TesterFpgaMemoryElement port map (
+         RST => RST,
+         CLK => CLK,
+         
+         DataIn    => DataIn,
+         HdrIn     => HdrIn,
+         OffsetIn  => OffsetIn,
+         PktIdIn   => CurPktId,
+         PktTypeIn => CurPktType,
+         DataInEn  => DataInEn,
+
+         PktIdSelIn => PktIdToComp,
+         DataOut    => DataOutBus(i),
+
+         ConfigRegsIn   => MemElemRegsInIntrCon(i),
+         ConfigRegsOut  => MemElemRegsOutIntrCon(i),
+         ConfigRegsEn   => ConfigRegsEn,
+         ConfigRegsLd   => ConfigRegsLd,
+         ConfigRegsSt   => ConfigRegsSt
+      );
+   end generate gen_memory_elements;
+   con_mem_elem_regs: for i in 0 to NumOfMemoryElements-2 generate
+      MemElemRegsInIntrCon(i) <= MemElemRegsOutIntrCon(i+1);
+   end generate con_mem_elem_regs;
+   MemElemRegsInIntrCon(NumOfMemoryElements-1) <= CompElemRegsOutIntrCon(0);
+
+   -- Compare Elements Instantiation
+   gen_compare_elements: for i in 0 to NumOfComperators-1 generate
+      CompElement : TesterFpgaCompareElement port map (
+         RST => RST,
+         CLK => CLK,
+
+         DataIn0 => DataOutBus(i*2),
+         DataIn1 => DataOutBus(i*2+1),
+         CmpOut  => CompOutBus(i),
+
+         ConfigRegsIn  => CompElemRegsInIntrCon(i),
+         ConfigRegsOut => CompElemRegsOutIntrCon(i),
+         ConfigRegsEn  => ConfigRegsEn,
+         ConfigRegsLd  => ConfigRegsLd,
+         ConfigRegsSt  => ConfigRegsSt
+      );
+   end generate gen_compare_elements;
+   con_comp_elem_regs: for i in 0 to NumOfComperators-2 generate
+      CompElemRegsInIntrCon(i) <= CompElemRegsOutIntrCon(i+1);
+   end generate con_comp_elem_regs;
+   CompElemRegsInIntrCon(NumOfComperators-1) <= AndOrElemRegsOutIntrCon(0,0);
+
+   -- AndOr Elements Instantiation
+   gen_andor_elements_i: for i in 0 to 2 generate
+      gen_andor_elements_j: for j in 0 to NumOfComperators-1 generate
+         AndOrElement : TesterFpgaAndOrElement port map (
+            RST => RST,
+            CLK => CLK,
+
+            CmpInBus  => CmpInBus(i,j),
+            CmpOut    => CmpOutBus(i)(j),
+
+            ConfigRegsIn  => AndOrElemRegsInIntrCon(i,j),
+            ConfigRegsOut => AndOrElemRegsOutIntrCon(i,j),
+            ConfigRegsEn  => ConfigRegsEn,
+            ConfigRegsLd  => ConfigRegsLd,
+            ConfigRegsSt  => ConfigRegsSt
+         );
+      end generate gen_andor_elements_j;
+   end generate gen_andor_elements_i;
+   
+   con_andor_regs_i: for i in 0 to 2 generate
+      con_andor_regs_j: for j in 0 to NumOfComperators-2 generate
+            AndOrElemRegsInIntrCon(i,j) <= AndOrElemRegsOutIntrCon(i,j+1);
+      end generate con_andor_regs_j;
+   end generate con_andor_regs_i;
+   con_andor_regs: for i in 0 to 1 generate
+      AndOrElemRegsInIntrCon(i,NumOfComperators-1) <= AndOrElemRegsOutIntrCon(i+1,0);
+   end generate con_andor_regs;
+   
+   interconnect_andors_i: for i in 1 to 2 generate
+      interconnect_andors_j: for j in 0 to NumOfComperators-1 generate
+         CmpInBus(i,j) <= CmpOutBus(i-1);
+      end generate;
+   end generate;
+   connect_firstlinr_andors_j: for j in 0 to NumOfComperators-1 generate
+      CmpInBus(0,j) <= CompOutBus;
+   end generate;
+   AndOrElemRegsInIntrCon(2, NumOfComperators-1) <= CntElemRegsOutIntrCon(0);
+   
+   -- Counter Elements Instantiation
+   gen_counter_elements_i: for i in 0 to 7 generate
+      CounterElement : TesterFpgaCounterElement port map (
+         RST => RST,
+         CLK => CLK,
+
+         CntInBus  => CntInBus(i),
+         CntEnBus  => CountZero,
+         CountZero => CountZero(i),
+         ActionEn  => CompNow,
+
+         ConfigRegsIn  => CntElemRegsInIntrCon(i),
+         ConfigRegsOut => CntElemRegsOutIntrCon(i),
+         ConfigRegsEn  => ConfigRegsEn,
+         ConfigRegsLd  => ConfigRegsLd,
+         ConfigRegsSt  => ConfigRegsSt
+      );
+      CntInBus(i) <= CmpOutBus(2);
+   end generate gen_counter_elements_i;
+   con_counter_regs: for i in 0 to 6 generate
+      CntElemRegsInIntrCon(i) <= CntElemRegsOutIntrCon(i+1);
+   end generate con_counter_regs;
+   CntElemRegsInIntrCon(7) <= FinalAndOrRegsOut;
+
+   -- Final AndOr Elements Instantiation
+   FinalAndOrElement : TesterFpgaAndOrElement port map (
+      RST => RST,
+      CLK => CLK,
+
+      CmpInBus  => CountZero,
+--      CmpOut    => FinalAndOrOut,
+      CmpOut    => FinalCompOut,
+
+      ConfigRegsIn  => FinalAndOrRegsIn,
+      ConfigRegsOut => FinalAndOrRegsOut,
+      ConfigRegsEn  => ConfigRegsEn,
+      ConfigRegsLd  => ConfigRegsLd,
+      ConfigRegsSt  => ConfigRegsSt
+   );
+   FinalAndOrRegsIn <=ConfigRegsIn;
+
+--   FinalAndOrRegsIn <= FinalCntrRegsOut;
+--   -- Final Counter Elements Instantiation
+--   FinatCounterElement : TesterFpgaCounterElement port map (
+--      RST => RST,
+--      CLK => CLK,
+--
+--      CntInBus  => FinalCmpBus,
+--      CountZero => FinalCompOut,
+--      ActionEn  => dCompNow,
+--
+--      ConfigRegsIn  => FinalCntrRegsIn,
+--      ConfigRegsOut => FinalCntrRegsOut,
+--      ConfigRegsEn  => ConfigRegsEn,
+--      ConfigRegsLd  => ConfigRegsLd,
+--      ConfigRegsSt  => ConfigRegsSt
+--   );
+--   FinalCmpBus     <= ("0000000" & FinalAndOrOut);
+--   FinalCntrRegsIn <= ConfigRegsIn;
+   
+   -- Trigger Management
+   process(CLK, RST)
+   begin
+      if (RST = '1') then
+         TriggerTriggered <= '0';
+         dCompNow         <= '0';
+         
+      elsif (CLK'event and CLK='1') then
+         if (TriggerArmed = '0') then
+            TriggerTriggered <= '0';
+         elsif (FinalCompOut = '1') then
+            TriggerTriggered <= '1';
+         end if;
+         dCompNow <= CompNow;
+         
+      end if;
+   end process;
+   
+   -- Extract PktId & PktType
+   process(CLK, RST)
+   begin
+      if (RST = '1') then
+         CurPktId   <= (others=>'0');
+         CurPktType <= (others=>'0');
+      elsif (CLK'event and CLK='1') then
+         if (DataInEn='1') then
+            if ( HdrIn    = std_logic_vector(to_unsigned(6, 4)) and
+                 OffsetIn = std_logic_vector(to_unsigned(0,16)) ) then
+               CurPktId   <= DataIn(21 downto 20);
+               CurPktType <= DataIn(19 downto 16);
+            end if;
+         end if;
+      end if;
+   end process;
+   
+end RTL;

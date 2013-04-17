@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'trigTemplate.ui'
+#
+# Created: Wed Feb 27 07:29:52 2013
+#      by: PyQt4 UI code generator 4.8.6
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt4 import QtCore, QtGui
+
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
+
+class Ui_GroupBox(object):
+    def setupUi(self, GroupBox):
+        GroupBox.setObjectName(_fromUtf8("GroupBox"))
+        GroupBox.resize(488, 139)
+        GroupBox.setWindowTitle(QtGui.QApplication.translate("GroupBox", "GroupBox", None, QtGui.QApplication.UnicodeUTF8))
+        GroupBox.setTitle(QtGui.QApplication.translate("GroupBox", "GroupBox", None, QtGui.QApplication.UnicodeUTF8))
+        self.comboBox = QtGui.QComboBox(GroupBox)
+        self.comboBox.setGeometry(QtCore.QRect(10, 20, 251, 22))
+        self.comboBox.setObjectName(_fromUtf8("comboBox"))
+        self.comboBox_2 = QtGui.QComboBox(GroupBox)
+        self.comboBox_2.setGeometry(QtCore.QRect(10, 60, 251, 22))
+        self.comboBox_2.setObjectName(_fromUtf8("comboBox_2"))
+        self.lineEdit = QtGui.QLineEdit(GroupBox)
+        self.lineEdit.setGeometry(QtCore.QRect(281, 103, 61, 20))
+        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
+        self.comboBox_3 = QtGui.QComboBox(GroupBox)
+        self.comboBox_3.setGeometry(QtCore.QRect(360, 20, 69, 61))
+        self.comboBox_3.setObjectName(_fromUtf8("comboBox_3"))
+        self.comboBox_3.addItem(_fromUtf8(""))
+        self.comboBox_3.setItemText(0, QtGui.QApplication.translate("GroupBox", "=", None, QtGui.QApplication.UnicodeUTF8))
+        self.comboBox_3.addItem(_fromUtf8(""))
+        self.comboBox_3.setItemText(1, QtGui.QApplication.translate("GroupBox", ">", None, QtGui.QApplication.UnicodeUTF8))
+        self.line = QtGui.QFrame(GroupBox)
+        self.line.setGeometry(QtCore.QRect(260, 30, 101, 10))
+        self.line.setFrameShape(QtGui.QFrame.HLine)
+        self.line.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line.setObjectName(_fromUtf8("line"))
+        self.label_2 = QtGui.QLabel(GroupBox)
+        self.label_2.setGeometry(QtCore.QRect(299, 63, 21, 21))
+        self.label_2.setText(QtGui.QApplication.translate("GroupBox", "<html><head/><body><p><span style=\" font-size:16pt; font-weight:600;\">+</span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setTextFormat(QtCore.Qt.RichText)
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.line_2 = QtGui.QFrame(GroupBox)
+        self.line_2.setGeometry(QtCore.QRect(298, 84, 20, 20))
+        self.line_2.setFrameShape(QtGui.QFrame.VLine)
+        self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line_2.setObjectName(_fromUtf8("line_2"))
+        self.line_3 = QtGui.QFrame(GroupBox)
+        self.line_3.setGeometry(QtCore.QRect(260, 70, 41, 16))
+        self.line_3.setFrameShape(QtGui.QFrame.HLine)
+        self.line_3.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line_3.setObjectName(_fromUtf8("line_3"))
+        self.line_5 = QtGui.QFrame(GroupBox)
+        self.line_5.setGeometry(QtCore.QRect(310, 70, 51, 16))
+        self.line_5.setFrameShape(QtGui.QFrame.HLine)
+        self.line_5.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line_5.setObjectName(_fromUtf8("line_5"))
+
+        self.retranslateUi(GroupBox)
+        QtCore.QMetaObject.connectSlotsByName(GroupBox)
+
+    def retranslateUi(self, GroupBox):
+        pass
+

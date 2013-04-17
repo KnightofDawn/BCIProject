@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <event name="reserved" id="0" descr="No description" />
+  <event name="rfTfrCtrlEvent" id="1" descr="The RF Transfer Controller can generate an event via a special opcode and tag that event with an arbitrary 12-bit associated information field.  This enables logging of up to 4096 test points and error conditions.Frequency:  Assume low frequency and/or low timestamp accuracy requirements.">
+    <data dataNum="0" LSB="0" MSB="11" name="eventTag" signed="no" decimal="12" bit="12" />
+  </event>
+  <event name="rxTfrCtrlEvent" id="2" descr="The RX Transfer Controller can generate an event via a special opcode and tag that event with an arbitrary 12-bit associated information field.  This enables logging of up to 4096 test points and error conditions.Frequency:  Assume low frequency and/or low timestamp accuracy requirements.">
+    <data dataNum="0" LSB="0" MSB="11" name="eventTag" signed="no" decimal="12" bit="12" />
+  </event>
+  <event name="txTfrCtrlEvent" id="3" descr="The TX Transfer Controller can generate an event via a special opcode and tag that event with an arbitrary 12-bit associated information field.  This enables logging of up to 4096 test points and error conditions.Frequency:  Assume low frequency and/or low timestamp accuracy requirements.">
+    <data dataNum="0" LSB="0" MSB="11" name="eventTag" signed="no" decimal="12" bit="12" />
+  </event>
+  <event name="crcErrorDIC" id="4" descr="An event is generated whenever a CRC error occurs within the DIC_RX DMA block.  The specifics of this event are defined in the section “CRC Events” below.  For each packet, a crcType is provided which identifies the CRC type (see “CRC Events” section below) and a dmaCnt is provided which can be used to identify OFDMA contexts and PDU numbers.Frequency:  At most, one event per DMA transfer.">
+    <data dataNum="0" LSB="4" MSB="9" name="dmaCnt" signed="no" decimal="6" bit="6" />
+    <data dataNum="0" LSB="0" MSB="2" name="crcType" signed="no" decimal="3" bit="3" />
+  </event>
+  <event name="crcErrorOFDMA" id="5" descr="An event is generated whenever a CRC error occurs within the OFDMA DMA block.  The specifics of this event are defined in the section “CRC Events” below.  For each packet, a crcType is provided which identifies the CRC type (see “CRC Events” section below) and a dmaCnt is provided which can be used to identify OFDMA contexts and PDU numbers.Frequency:  At most, one event per DMA transfer.">
+    <data dataNum="0" LSB="4" MSB="9" name="dmaCnt" signed="no" decimal="6" bit="6" />
+    <data dataNum="0" LSB="0" MSB="2" name="crcType" signed="no" decimal="3" bit="3" />
+  </event>
+  <event name="crcErrorCPC" id="6" descr="An event is generated whenever a CRC error occurs within the CPC_RX DMA block.  The specifics of this event are defined in the section “CRC Events” below.  For each packet, a crcType is provided which identifies the CRC type (see “CRC Events” section below) and a dmaCnt is provided which can be used to identify OFDMA contexts and PDU numbers.Frequency:  At most, one event per DMA transfer.">
+    <data dataNum="0" LSB="4" MSB="9" name="dmaCnt" signed="no" decimal="6" bit="6" />
+    <data dataNum="0" LSB="0" MSB="2" name="crcType" signed="no" decimal="3" bit="3" />
+  </event>
+  <event name="dllBerLostSync" id="7" descr="An event is generated whenever the DLL BERT lost PN-23 synchronization (or failed to achieve synchronization).  The following associated information is provided:  the ofdmaIndex (identifies which OFDMA stream is being monitored or 0 if not OFDMA), the number of byte errors in the packet and whether or not this packet was considered an outlier.Frequency:  This event is generated at most once per packet.">
+    <data dataNum="0" LSB="29" MSB="29" name="outlier" signed="no" decimal="1" bit="1" />
+    <data dataNum="0" LSB="3" MSB="28" name="byteErrorCnt LSB’s – u26" signed="no" decimal="26" bit="26" />
+    <data dataNum="0" LSB="0" MSB="2" name="ofdmaIndex " signed="no" decimal="3" bit="3" />
+  </event>
+  <event name="dllBerPktError" id="8" descr="An event is generated whenever the current packet has one or more bit errors.  The following associated information is provided:  the ofdmaIndex (identifies which OFDMA stream is being monitored or 0 if not OFDMA), the number of byte errors in the packet and whether or not this packet was considered an outlier.Frequency:  This event is generated at most once per packet.">
+    <data dataNum="0" LSB="29" MSB="29" name="outlier" signed="no" decimal="1" bit="1" />
+  </event>
+  <event name="fdBertErrEvent" id="9" descr="An event is generated if the per-packet bit error counter exceeded a threshold.Frequency:  This event is generated at most once per packet.">
+    <data dataNum="0" LSB="0" MSB="29" name="perPktBitErrorCnt LSBs" signed="no" decimal="30" bit="30" />
+  </event>
+  <event name="interferenceDetectCE" id="10" descr="An event is generated if the interfFlag for any subcarrier within the CE symbol exceeds the ceInterfEventThresh.  The number of subcarriers for which the flag exceeded the threshold is reported as associated information.Frequency:  This event is generated at most once per packet.">
+    <data dataNum="0" LSB="0" MSB="8" name="numSub" signed="no" decimal="9" bit="9" />
+  </event>
+  <event name="fdEppDmaInputSat" id="11" descr="An event is generated whenever any sample within the HW-EPP symbol at the input to the FD-EPP DMA block are saturated (i.e. in its conversion from a Cx&lt;17,7&gt; to a Cx&lt;13,3&gt;).  NOTE:  The C++ model generates this event whenever the I or Q components of the complex samples are at MAX_POS or MAX_NEG.Frequency:  This event can occur at most once per packet." />
+  <event name="ceAnalogEnergyRange" id="12" descr="An event is generated whenever the analog energy estimate is greater than ceAnalogEnergyMax or less than ceAnalogEnergyMin.Frequency:  This event is generated at most once per packet.">
+    <data dataNum="0" LSB="0" MSB="27" name="analogCeEnergyEst" signed="no" decimal="10" bit="28" />
+  </event>
+  <event name="ceDigitalEnergyRange" id="13" descr="An event is generated whenever the digital energy estimate is greater than ceDigitalEnergyMax or less than ceDigitalEnergyMin.Frequency:  This event is generated at most once per packet.">
+    <data dataNum="0" LSB="0" MSB="27" name="digitalCeEnergyEst" signed="no" decimal="10" bit="28" />
+  </event>
+  <event name="rxDCBiasLarge" id="14" descr="An event is generated once per packet at the first instance of where the max(abs(dcBiasI)) or the max(abs(dcBiasQ)) exceeds the programmable threshold level dcBiasEventThresh (defined in the RX Analog Interface).  This event may be triggered at pktStart if, for the very first sample, the dcBiasI or dcBiasQ exceeds the threshold.Frequency:  At most, only one event per packet." />
+  <event name="txPktLate" id="15" descr="A txPktLate error event is generated whenever the number of samples between when the packet arrives at the CTC Packet Gate and when it starts transmission falls below the txPktLateThresh threshold. Frequency:  At most, only one event per packet shall be generated." />
+  <event name="reserved" id="16" descr="No description" />
+  <event name="ldpcNotConverged" id="17" descr="An event is generated whenever the LDPC decoder does not converge.  The number of decoding layers for the codeword set and the decoder mask are provided as additional information (for non-OFDMA, set to 0x01; for OFDMA, it is a bitmask indicating which codewords of the 8 possible did not converge).  The codeword count starting from 0 for the first codeword of the packet is also recorded as associated information.Frequency:  This event is generated at most once per codeword or set of codewords in the case of OFDMA.  This corresponds to at most once per OFDM symbol.">
+    <data dataNum="0" LSB="17" MSB="24" name="DecoderMask" signed="no" decimal="8" bit="8" />
+    <data dataNum="0" LSB="6" MSB="19" name="DecLayerCnt" signed="no" decimal="8" bit="8" />
+    <data dataNum="0" LSB="0" MSB="8" name="Index" signed="no" decimal="9" bit="9" />
+  </event>
+  <event name="ldpcIterationsLarge" id="18" descr="An event is generated whenever the number of LDPC decLayerCnt exceeds ldpcItnLargeLongThresh for long codes and ldpcItnLargeShortThresh for short codes.  The number of decoding layers required for the codeword set and the decoder mask are provided as associated information (for non-OFDMA, set to 0x01; for OFDMA, it is a bitmask indicating which codewords of the 8 possible required excessive decoding layers).  The codeword count starting from 0 for the first codeword of the packet is also recorded as associated information.Frequency:  This event is generated at most once per codeword or set of codewords in the case of OFDMA.  This corresponds to at most once per OFDM symbol.">
+    <data dataNum="0" LSB="17" MSB="24" name="DecoderMask" signed="no" decimal="8" bit="8" />
+    <data dataNum="0" LSB="9" MSB="16" name="DecLayerCnt" signed="no" decimal="8" bit="8" />
+  </event>
+  <event name="rsUncorrectableCW" id="19" descr="An event is generated whenever the RS Decoder encounters an uncorrectable RS codeword.  The codeword count starting from 0 for the first codeword of the packet is recorded as associated information.Frequency:  This event is generated at most once per codeword (which is roughly once per OFDM symbol).">
+    <data dataNum="0" LSB="0" MSB="8" name="Index" signed="no" decimal="9" bit="9" />
+  </event>
+  <event name="rsCorrBytesLarge" id="20" descr="An event is generated if the number of bytes corrected by the RS decoder is greater than or equal to rsCorrByteLargeThresh.  If the codeword is deemed uncorrectable, an event is not generated (see ‘rsUncorrectableCW’ event).  The following information is recorded: number of corrected bytes and the codeword count starting from 0 for the first codeword of the packet.Frequency:  This event is generated at most once per codeword (which is roughly once per OFDM symbol).">
+    <data dataNum="0" LSB="0" MSB="8" name="Index" signed="no" decimal="9" bit="9" />
+    <data dataNum="0" LSB="9" MSB="20" name="numCorrectedBytes" signed="no" decimal="4" bit="4" />
+    <data dataNum="0" LSB="0" MSB="8" name="Index" signed="no" decimal="9" bit="9" />
+  </event>
+  <event name="fastLoopTrigEvent" id="21" descr="An event is generated if for a given OFDM data symbol, the instantaneous decision directed error exceeds the expected EVM by a factor of nveFastLoopThreshPos.  The following associated information is recorded:  OFDM symbol index and the number of subcarriers with the fast loop update.Frequency:  This event is generated at most once per OFDM symbol.">
+    <data dataNum="0" LSB="9" MSB="17" name="NumSub" signed="no" decimal="9" bit="9" />
+    <data dataNum="0" LSB="0" MSB="8" name="SymIdx" signed="no" decimal="9" bit="9" />
+  </event>
+  <event name="interferenceDetectData" id="22" descr="An event is generated if the decision directed interference estimate interfEst for any subcarrier within a Data symbol exceeds the expected EVM in powers of 2 by nveInterfDetThresh.  The following associated information is recorded:  OFDM symbol index, value of the largest detected power of 2 difference, the subcarrier associated with the maximum difference and number of subcarriers which exceeded nveInterfDetThresh.Frequency:  This event is generated at most once per OFDM symbol.">
+    <data dataNum="0" LSB="14" MSB="22" name="MaxIdx" signed="no" decimal="9" bit="9" />
+    <data dataNum="0" LSB="9" MSB="13" name="MaxVal" signed="no" decimal="5" bit="5" />
+    <data dataNum="0" LSB="0" MSB="8" name="MaxVal" signed="no" decimal="5" bit="5" />
+    <data dataNum="1" LSB="0" MSB="8" name="NumSub" signed="no" decimal="9" bit="9" />
+  </event>
+  <event name="timeTrackRange" id="23" descr="An event is generated for the selected OFDMA context (as indicated by statusContextID), if abs(timeEst) is greater than or equal to  timeEstRangeThresh.Frequency:  This event is generated at most once per OFDM symbol.">
+    <data dataNum="0" LSB="14" MSB="27" name="timeEst" signed="yes" decimal="1" bit="14" />
+    <data dataNum="0" LSB="0" MSB="13" name="freqEst" signed="yes" decimal="1" bit="14" />
+  </event>
+  <event name="freqTrackRange" id="24" descr="An event is generated for the selected OFDMA context (as indicated by statusContextID), if abs(freqEst) is greater than or equal to  freqEstRangeThresh.Frequency:  This event is generated at most once per OFDM symbol.">
+    <data dataNum="0" LSB="14" MSB="27" name="timeEst" signed="yes" decimal="1" bit="14" />
+    <data dataNum="0" LSB="0" MSB="13" name="freqEst" signed="yes" decimal="1" bit="14" />
+  </event>
+  <event name="cpeEstRange" id="25" descr="An event is generated for the selected OFDMA context (as indicated by statusContextID), if abs(cpeEst) is greater than or equal to  cpeRangeThresh.Frequency:  This event is generated at most once per OFDM symbol.">
+    <data dataNum="0" LSB="0" MSB="11" name="cpeEst" signed="yes" decimal="1" bit="12" />
+  </event>
+  <event name="slicerAgcRange" id="26" descr="An event is generated whenever the abs( slicerAgc – 1.0 ) is greater than or equal to slicerAgcRange.Frequency:  This event is generated at most once per OFDM symbol.">
+    <data dataNum="0" LSB="0" MSB="11" name="slicerAgcGain" signed="no" decimal="1" bit="12" />
+  </event>
+  <event name="rxIQCompInputSat" id="27" descr="An event is generated whenever any sample within a single OFDM symbol at the input to the IQ compensator is saturated (i.e. in its conversion from a Cx&lt;17,7&gt; to a Cx&lt;13,3&gt;).  NOTE:  The C++ model generates this event whenever the I or Q components of the complex samples are at MAX_POS or MAX_NEG.Frequency:  This event can occur at most once per OFDM symbol." />
+  <event name="iqProbeDmaInputSat" id="28" descr="An event is generated whenever any sample within a single OFDM symbol at the input to the iqProbeDMA block are saturated.  NOTE:  The C++ model generates this event whenever the I or Q components of the complex samples are at MAX_POS or MAX_NEG.Frequency:  This event can occur at most once per OFDM symbol." />
+  <event name="isiLarge" id="29" descr="An event is generated whenever the absolute value of the estimated inter-symbol interference level is equal to or exceeds maxExpectedISI.Frequency:  This event is generated at most once per OFDM symbol.">
+    <data dataNum="0" LSB="3" MSB="28" name="byteErrorCnt LSB’s" signed="no" decimal="26" bit="26" />
+    <data dataNum="0" LSB="0" MSB="2" name="ofdmaIndex" signed="no" decimal="3" bit="3" />
+    <data dataNum="0" LSB="6" MSB="20" name="abs(I)+abs(Q)" signed="no" decimal="3" bit="15" />
+    <data dataNum="0" LSB="6" MSB="6" name="addressIndex" signed="no" decimal="6" bit="6" />
+  </event>
+  <event name="txIQLarge" id="30" descr="An event is generated whenever either the abs(I) or abs(Q) component of a complex sample at the output of the PAR Reduction block exceeds the  programmable threshold iqLargeThresh (defined in the PAR Reduction module).Frequency:  This event can occur at most once per-symbol but typically much less often." />
+  <event name="parReduction" id="31" descr="An event is generated whenever PAR reduction is applied to an OFDM symbol.Frequency:  This event can occur at most once per-symbol but typically much less often." />
+  <event name="ifftSat" id="32" descr="An event is generated once per OFDM symbol if one more more of the I or Q components of an OFDM symbol saturates.  NOTE:  The C++ model generates an ifftSat event whenever the I or Q components of the complex samples are at MAX_POS or MAX_NEG. Frequency:  This event can occur at most once per-symbol but typically much less often." />
+  <event name="reserved" id="33" descr="No description" />
+  <event name="reserved" id="34" descr="No description" />
+  <event name="meanBDetTimeRange" id="35" descr="The OFDM Symbol Framer computes ofdmStartTime – the time of the first sample of the first OFDM symbol minus the windowLength from packetStart (NOTE:  this is the actual time relative to packetStart and not the actual time of the first sample into the FFT which is affected by rewindTime).  An event is generated whenever abs( ofdmStartTime – expectedOfdmStart ) is greater than or equal to ofdmStartThresh.  During Beacon search, ofdmStartTime may be as long as 10msec or ~220 10nsec clock ticks – a 22-bit counter is proposed.Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec).">
+    <data dataNum="0" LSB="8" MSB="29" name="ofdmStartTime" signed="no" decimal="22" bit="22" />
+    <data dataNum="0" LSB="0" MSB="7" name="meakPktStartTime" signed="yes" decimal="8" bit="8" />
+  </event>
+  <event name="freqOffsetEstRange" id="36" descr="An event is generated whenever abs( freqOffDiff ) &gt;= freqOffThresh where freqOffDiff = trueFreqOff – freqOffEst (at the output of the pktStart mux and before adding initPhase).Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec).">
+    <data dataNum="0" LSB="0" MSB="15" name="freqOffDiff" signed="yes" decimal="-6" bit="16" />
+  </event>
+  <event name="acqErrorEvent" id="37" descr="An event is generated whenever the acqError signal goes high.Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec)." />
+  <event name="finalAgcAdjRange" id="38" descr="An event is generated whenever the absolute value of the requested adjustment made to the total gain or backend gain is greater than or equal to maxExpectedFinalAgcAdjustment during a final gain adjustment event (i.e. burst detect).  Note that the actual adjustment may be less if the minimum or maximum analog gain is reached, final AGC adjust is disabled or if the final AGC adjust step size is limited.Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec).">
+    <data dataNum="0" LSB="7" MSB="13" name="analogGainAdjustActual" signed="no" decimal="7" bit="7" />
+    <data dataNum="0" LSB="0" MSB="6" name="analogGainAdjustRequest" signed="no" decimal="7" bit="7" />
+  </event>
+  <event name="agcDetAgcAdjRange" id="39" descr="An event is generated whenever the absolute value of the requested adjustment to the total gain or backend gain is greater than or equal to maxExpectedAgcDetAdjustment during an agcDetect event.  Note that the actual adjustment may be less if the minimum or maximum analog gain is reached.Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec).">
+    <data dataNum="0" LSB="7" MSB="13" name="analogGainAdjustActual" signed="no" decimal="7" bit="7" />
+    <data dataNum="0" LSB="0" MSB="6" name="analogGainAdjustRequest" signed="no" decimal="7" bit="7" />
+  </event>
+  <event name="agcSatDetectTimeout" id="40" descr="An event is generated whenever the agcTimeout signal goes highdue to a Saturation Detect Timeout.Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec)." />
+  <event name="agcFalseAlarmTimeout" id="41" descr="An event is generated whenever the agcTimeout signal goes high due to an AGC False Alarm Timeout.Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec)." />
+  <event name="agcDetectEvent" id="42" descr="An event is generated whenever the agcDetect signal goes high.  The sseqCorrelation and analogEnergy values that triggered the large signal detect event are provided as associated information.Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec).">
+    <data dataNum="0" LSB="14" MSB="20" name="analogGain" signed="no" decimal="7" bit="7" />
+    <data dataNum="0" LSB="0" MSB="13" name="analogEnergy" signed="no" decimal="8" bit="14" />
+    <data dataNum="1" LSB="0" MSB="17" name="ssCorrelation" signed="no" decimal="8" bit="18" />
+  </event>
+  <event name="largeSigDetectEvent" id="43" descr="An event is generated whenever the largeSignalDetect signal goes high.  The analogEnergy value that triggered the large signal detect event and the new analogGain value are provided as associated information.Frequency:  This event is generated at most 1 – 2 times per packet and if present, these events will be at least 1usec apart in time." />
+  <event name="satDetectEvent" id="44" descr="An event is generated whenever the satDetect signal goes high.  The analogEnergy value that triggered the large signal detect event and the new analogGain value are provided as associated information.Frequency:  This event is generated at most 3 – 4 times per packet and if present, these events will be at least 1usec apart in time.">
+    <data dataNum="0" LSB="14" MSB="20" name="analogGain" signed="no" decimal="0" bit="7" />
+    <data dataNum="0" LSB="0" MSB="13" name="analogEnergy" signed="no" decimal="8" bit="14" />
+  </event>
+  <event name="rxAdcSat" id="45" descr="An event is generated whenever within a pair of concurrent I/Q samples (10-bit ADC output samples), either the abs(I) or abs(Q) equals or exceeds the programmable threshold level iqSatThresh but only after burstDetect has occurred.  By looking at saturation within pairs of samples, the event frequency is limited to 100MHz.Frequency:  This event occur on a 100MHz basis but typially should not occur more than once per many OFDM symbols (but of course can occur more frequently if iqSatThresh is set low)." />
+  <event name="reserved" id="46" descr="No description" />
+  <event name="reserved" id="47" descr="No description" />
+  <event name="pktStart6" id="48" descr="An event is generated whenever a new packet starts at the input of the receiver DLL BER tester.  This pktStart covers the DLL BERT events.Frequency:  At most, one event per packet" />
+  <event name="pktStart5" id="49" descr="An event is generated whenever a new packet starts at the input of the receiver DLL (RS or LDPC).  This pktStart covers the RS and LDPC decoder events.Frequency:  At most, one event per packet" />
+  <event name="pktStart4" id="50" descr="An event is generated whenever a new packet starts at the input of the receiver NVE module.  This pktStart covers the NVE and FD-BERT events.Frequency:  At most, one event per packet" />
+  <event name="pktStart3" id="51" descr="An event is generated whenever a new packet starts at the receiver SlicerAGC input.  This pktStart covers the SlicerAGC and Freq/Time tracking subsystem events.Frequency:  At most, one event per packet." />
+  <event name="pktStart2" id="52" descr="An event is generated whenever a new packet starts at the output of the receiver FFT (in RTL, this corresponds to the input of the RX frequency domain Input Formatter).  This pktStart covers the three FFT saturation events.Frequency:  At most, one event per packet" />
+  <event name="pktStart1" id="53" descr="An event is generated whenever a new packet starts at the input to the receiver TD-PHY subsystem.  This pktStart covers all time-domain events up to the FFT input.Frequency:  At most, one event per packet" />
+  <event name="reserved" id="54" descr="No description" />
+  <event name="reserved" id="55" descr="No description" />
+  <event name="packetEndEvent" id="56" descr="An event is generated whenever the packetEnd signal goes high.  The packetEnd signal is a consequence of either a failed burst detect or the last symbol has been processed.Frequency:  This event is generated at most once per packet." />
+  <event name="burstDetectEvent" id="57" descr="An event is generated whenever the burstDetect signal goes high. The meanPktStartTime, which is computed at burstDetect, is reported as associated information.Frequency:  This event is generated at most once per packet (unless we are in Beacon search in which case, it may be generated at most once very 10usec).">
+    <data dataNum="0" LSB="0" MSB="7" name="meakPktStartTime" signed="yes" decimal="8" bit="8" />
+  </event>
+  <event name="mResetEvent" id="58" descr="An event is generated whenever the mReset signal goes high.  mReset is not set high at the start of each packet – it is only raised in case of an AGC or ACQ error (and only if the RX Controller is configured to do so).Frequency:  This event is generated at most once per packet once Beacon search is complete; when searching for a Beacon, this may occur at most once every ~10usec." />
+  <event name="mClearEvent" id="59" descr="An event is generated whenever the mClear signal goes high.  mClear is only in case of large AGC adjustments.Frequency:  This event is generated at most 3 – 4 times per packet and if present, these events will be at least 1usec apart in time." />
+  <event name="peakDetectEvent" id="60" descr="An event is generated whenever the peakDetect signal goes high. The lsCorrelation and lsEnergy values that triggered the peak detect event are provided as associated information.  NOTE:  for the lsEnergy and lsCorrelation associated information fields, the LSB of each of the values is discarded to keep the associated info within one word.Frequency:  This event is generated at a 100MHz rate during burst detection and may generate multiple peaks back-to-back.  This is likely the highest rate event in the receiver.">
+    <data dataNum="0" LSB="17" MSB="29" name="lsEnergy" signed="no" decimal="8" bit="13" />
+    <data dataNum="0" LSB="0" MSB="16" name="lsCorrelation" signed="no" decimal="15" bit="17" />
+  </event>
+  <event name="ctcWrap" id="61" descr="An event is generated whenever the time between successive events exceeds 220 (1,048,576) clock ticks. Frequency:  The event can occur at most once every 21msec." />
+  <event name="reserved" id="62" descr="No description" />
+  <event name="reserved" id="63" descr="No description" />
+</root>
+

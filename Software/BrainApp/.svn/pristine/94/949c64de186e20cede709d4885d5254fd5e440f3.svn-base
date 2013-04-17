@@ -1,0 +1,347 @@
+// this module sits in between the PFT block (capture filter) and the DDR3 memory and is used to
+// buffer data and also readback data
+
+`define LAST_MEM_ADDR 32'h0FFFFFF0
+
+module capture_to_memory
+  (
+   input 	     clk166,
+   input 	     reset,
+
+   //capture data from filter block
+   input [31:0]      capture_data32,
+   input [3:0] 	     capture_hdr4,
+   input [15:0]      capture_ofst16,
+   input 	     capture_en,
+
+   //ddr3 avalon memory mapped interface
+   output reg [31:0] avl_addr, 
+   output [2:0]      avl_size, 
+   output [15:0]     avl_be, 
+   input 	     avl_ready, 
+   output [127:0]    avl_wdata,
+   output reg 	     avl_write_req,
+
+   //control and status
+   input 	     arm,
+   input 	     trigger,
+   input [2:0] 	     trigger_position, 
+   
+   output reg [31:0] oldest_sample_addr,
+   output [31:0]     newest_sample_addr,
+   output 	     capture_done,
+   output reg 	     ff_40_overflow_sticky
+   );
+
+   reg 		      capture_enable;
+   
+   assign capture_done = ~capture_enable;
+
+   //process to write the 40bit capture data to the 128 bit memory
+   wire [39:0] 	      capture_data40;
+   assign capture_data40 = {capture_ofst16[3:0],capture_hdr4,capture_data32};
+   
+   reg 		      ff_rd_req;
+
+   reg [7:0] 	      ram[0:639];
+   
+   
+   reg [9:0] 	      wr_ptr;
+   reg [9:0] 	      rd_ptr;
+   reg [9:0] 	      size;
+   reg [127:0] 	      data128;
+
+   wire 	      ff_wr_req;
+
+   reg [31:0] 	      post_trig_byte_cnt;
+   
+   assign ff_wr_req = capture_en & capture_enable;
+   
+   //Process that takes 40bit data and converts to a 128bit interface.
+   always @ (posedge clk166)
+     begin
+	if(reset)
+	  begin
+	     wr_ptr <= 10'h000;
+	     rd_ptr <= 10'h000;
+	     size   <= 10'h000;
+	     ff_40_overflow_sticky <= 1'b0;
+	     post_trig_byte_cnt <= 32'h00000000;
+	     data128 <= 128'd0;
+	  end
+	else
+	  begin
+
+	     if(~trigger | ~arm)
+	       begin
+		  post_trig_byte_cnt <= 32'h00000000;
+	       end
+	     
+	     if((ff_rd_req==1'b0)&&(ff_wr_req==1'b1))
+	       begin
+		  ram[wr_ptr]   <= capture_data40[7:0];
+		  ram[wr_ptr+1] <= capture_data40[15:8];
+		  ram[wr_ptr+2] <= capture_data40[23:16];
+		  ram[wr_ptr+3] <= capture_data40[31:24];
+		  ram[wr_ptr+4] <= capture_data40[39:32];
+		  
+		  size <= size + 10'h005;
+
+		  if(size >= 10'h270)
+		    begin
+		       ff_40_overflow_sticky <= 1'b1;
+		    end
+		  
+		  if(wr_ptr >= 10'h27b)  //if 636 wrap around
+		    begin
+		       wr_ptr <= 10'h000;
+		    end
+		  else
+		    begin
+		       wr_ptr <= wr_ptr + 10'h005;
+		    end
+
+		  
+		  if(arm & trigger)
+		    begin
+		       post_trig_byte_cnt <= post_trig_byte_cnt + 32'h00000005;
+		    end
+		  
+	       end
+	     else if((ff_rd_req==1'b1)&&(ff_wr_req==1'b0))
+	       begin
+		  data128[7:0] <= ram[rd_ptr];
+		  data128[15:8] <= ram[rd_ptr+1];
+		  data128[23:16] <= ram[rd_ptr+2];
+		  data128[31:24] <= ram[rd_ptr+3];
+		  data128[39:32] <= ram[rd_ptr+4];
+		  data128[47:40] <= ram[rd_ptr+5];
+		  data128[55:48] <= ram[rd_ptr+6];
+		  data128[63:56] <= ram[rd_ptr+7];
+		  data128[71:64] <= ram[rd_ptr+8];
+		  data128[79:72] <= ram[rd_ptr+9];
+		  data128[87:80] <= ram[rd_ptr+10];
+		  data128[95:88] <= ram[rd_ptr+11];
+		  data128[103:96] <= ram[rd_ptr+12];
+		  data128[111:104] <= ram[rd_ptr+13];
+		  data128[119:112] <= ram[rd_ptr+14];
+		  data128[127:120] <= ram[rd_ptr+15];
+
+		  size <= size - 10'h010;
+		  
+		  if(rd_ptr >= 10'h270)  //if 636 wrap around
+		    begin
+		       rd_ptr <= 10'h000;
+		    end
+		  else
+		    begin
+		       rd_ptr <= rd_ptr + 10'h010;
+		    end
+	       end
+ 	     else if((ff_rd_req==1'b1)&&(ff_wr_req==1'b1))
+	       begin
+		  ram[wr_ptr]   <= capture_data40[7:0];
+		  ram[wr_ptr+1] <= capture_data40[15:8];
+		  ram[wr_ptr+2] <= capture_data40[23:16];
+		  ram[wr_ptr+3] <= capture_data40[31:24];
+		  ram[wr_ptr+4] <= capture_data40[39:32];
+		  
+		  if(wr_ptr >= 10'h27b)  //if 636 wrap around
+		    begin
+		       wr_ptr <= 10'h000;
+		    end
+		  else
+		    begin
+		       wr_ptr <= wr_ptr + 10'h005;
+		    end
+
+		  if(arm & trigger)
+		    begin
+		       post_trig_byte_cnt <= post_trig_byte_cnt + 32'h00000005;
+		    end
+		  
+	       	  data128[7:0]     <= ram[rd_ptr];
+		  data128[15:8]    <= ram[rd_ptr+1];
+		  data128[23:16]   <= ram[rd_ptr+2];
+		  data128[31:24]   <= ram[rd_ptr+3];
+		  data128[39:32]   <= ram[rd_ptr+4];
+		  data128[47:40]   <= ram[rd_ptr+5];
+		  data128[55:48]   <= ram[rd_ptr+6];
+		  data128[63:56]   <= ram[rd_ptr+7];
+		  data128[71:64]   <= ram[rd_ptr+8];
+		  data128[79:72]   <= ram[rd_ptr+9];
+		  data128[87:80]   <= ram[rd_ptr+10];
+		  data128[95:88]   <= ram[rd_ptr+11];
+		  data128[103:96]  <= ram[rd_ptr+12];
+		  data128[111:104] <= ram[rd_ptr+13];
+		  data128[119:112] <= ram[rd_ptr+14];
+		  data128[127:120] <= ram[rd_ptr+15];
+		  
+		  if(rd_ptr >= 10'h270)  //if 636 wrap around
+		    begin
+		       rd_ptr <= 10'h000;
+		    end
+		  else
+		    begin
+		       rd_ptr <= wr_ptr + 10'h010;
+		    end
+		  
+		  size <= size - 10'h00b;
+	       end
+	  end
+     end
+
+
+   wire ff_ready;
+   
+   assign ff_ready = (size >= 10'h010);
+   
+`define STATE_IDLE 2'b00
+`define STATE_RD_FF 2'b01
+`define STATE_WRITE_HOLD 2'b10
+   
+   assign avl_be = 16'hFFFF;
+   assign avl_size = 3'h1;
+   
+   reg [1:0] state;
+
+   //these are variables to keep track of the position of last 5 byte word and the last 128bit address written to.
+   //we will have the 5 byte boundary at the first empty 5 byte boundary position.
+   //for example at time 0, we write in 16 bytes to the ram but and now the 5 byte boundary points to 15 since
+   //3 5 byte words were written and byte 15 is empty.  In this case we can use the 128bit addr + 
+   // the 5byte boundary as a "read up until" address. 
+   reg [3:0] five_byte_boundary;
+   reg [31:0] avl_addr_delayed;
+   wire [31:0] avl_addr_next;
+
+   assign avl_wdata = data128;
+   
+   //buffer the 128 bit samples to the DDR3
+   always @(posedge clk166)
+     begin
+        if(reset)
+          begin
+             avl_addr           <= 32'h00000000;
+             avl_addr_delayed   <= `LAST_MEM_ADDR;
+	     //avl_wdata          <= 128'h0000000000000000;
+             avl_write_req      <= 1'b0;
+	     ff_rd_req          <= 1'b0;
+             state              <= `STATE_IDLE;
+	     five_byte_boundary <= 4'h0;
+	     oldest_sample_addr <= 32'h00000000;
+	  end
+        else
+          begin
+             case(state)
+               `STATE_IDLE:
+                 begin
+		    avl_write_req  <= 1'b0;
+
+		    if(ff_ready) //assert the ff_rd_request if there is something in the fifo
+		      begin
+			 ff_rd_req      <= 1'b1;
+			 state          <= `STATE_RD_FF;			 
+                      end
+		    else
+		      begin
+			 ff_rd_req      <= 1'b0;
+			 state          <= `STATE_IDLE;			 
+		      end
+		 end
+	       `STATE_RD_FF:
+		 begin
+                    //avl_wdata      <= data128;
+                    avl_write_req  <= 1'b1;
+                    ff_rd_req      <= 1'b0;
+		    state          <= `STATE_WRITE_HOLD;
+		 end
+	       `STATE_WRITE_HOLD:
+                 begin
+                    if(avl_ready)
+                      begin
+			 if(five_byte_boundary == 4'hB)
+			   begin
+			      five_byte_boundary <= 4'hF;
+			   end
+			 else
+			   begin
+			      five_byte_boundary <= five_byte_boundary + 4'hF;
+			   end
+			      
+			 avl_addr_delayed <= avl_addr;
+
+			 avl_addr <= avl_addr_next;
+                         avl_write_req  <= 1'b0;
+
+			 if(oldest_sample_addr[31:4] == avl_addr_next[31:4])
+			   begin
+			      if(oldest_sample_addr >= (`LAST_MEM_ADDR - 32'h00000004))
+				begin
+				   oldest_sample_addr <= (oldest_sample_addr + 32'h00000014) & 32'h0000000f;
+				end
+			      else
+				begin
+				   oldest_sample_addr <= oldest_sample_addr + 32'h00000014;
+				end
+			   end
+			 if(ff_ready)
+			   begin
+			      ff_rd_req      <= 1'b1;
+			      state          <= `STATE_RD_FF;
+			   end
+			 else 
+			   begin
+			      ff_rd_req      <= 1'b0;
+			      state          <= `STATE_IDLE;
+			   end			 
+                      end
+                    else
+                      begin
+			 ff_rd_req      <= 1'b0;
+                         state          <= `STATE_WRITE_HOLD;
+                      end // else: !if(avl_ready)
+                 end
+             endcase // case (state)
+          end // else: !if(reset)
+     end // always @ (posedge clk166)
+
+   assign avl_addr_next = (avl_addr >= `LAST_MEM_ADDR)? 32'h00000000 : (avl_addr + 32'h00000010);
+   
+   
+   //everything up to this byte addr is written and it is full 5 byte data written to DDR3
+   assign newest_sample_addr = avl_addr_delayed + five_byte_boundary;
+   
+   
+   
+   //these are how many samples to keep after a trigger based on the trigger position input 3 bit value
+   //trigger_pos = 0 = 100% post = 0x0FFFFF80 bytes
+   //trigger_pos = 1 = 75% post = 0x0C000000 bytes
+   //trigger_pos = 1 = 50% post =  0x08000000 bytes
+   //trigger_pos = 1 = 25% post = 0x04000000 bytes
+   //trigger_pos = 1 = 0% post = 0x80 bytes
+
+`define TRIG_POS_0_SAMPLES 32'h0FFFFF80
+`define TRIG_POS_1_SAMPLES 32'h0C000000
+`define TRIG_POS_2_SAMPLES 32'h08000000
+`define TRIG_POS_3_SAMPLES 32'h04000000
+`define TRIG_POS_4_SAMPLES 32'h00000080
+   
+   wire [31:0] post_trig_limit = (trigger_position == 3'h0) ? `TRIG_POS_0_SAMPLES :
+				 (trigger_position == 3'h1) ? `TRIG_POS_1_SAMPLES :
+				 (trigger_position == 3'h2) ? `TRIG_POS_2_SAMPLES :
+				 (trigger_position == 3'h3) ? `TRIG_POS_3_SAMPLES : `TRIG_POS_4_SAMPLES;
+   
+   always @(posedge clk166)
+     begin
+	if(reset)
+	  begin
+	     capture_enable <= 1'b0;
+	  end
+	else
+	  begin
+	     capture_enable <= (post_trig_byte_cnt <= post_trig_limit) & arm;
+	  end
+     end // always @ (posedge clk166)
+   
+endmodule // capture_to_memory
+

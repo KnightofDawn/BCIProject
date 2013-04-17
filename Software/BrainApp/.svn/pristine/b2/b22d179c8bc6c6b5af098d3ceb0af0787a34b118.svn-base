@@ -1,0 +1,264 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+
+entity TesterFpgaTriggerModule is
+   generic ( 
+      FpgaVersion                : integer;
+      NumOfTriggerElements       : integer;
+      NumOfCaptureFilterElements : integer;
+      NumOfDripFilterElements    : integer
+   );
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      DataIn    : in std_logic_vector(31 downto 0);
+      HdrIn     : in std_logic_vector( 3 downto 0);
+      OffsetIn  : in std_logic_vector(15 downto 0);
+      DataInEn  : in std_logic;
+
+      TriggerConfigRegsIn : in std_logic_vector(31 downto 0);
+      TriggerConfigRegsOut: out std_logic_vector(31 downto 0);
+      TriggerConfigRegsEn : in std_logic;
+      TriggerConfigRegsLd : in std_logic;
+      TriggerConfigRegsSt : in std_logic;
+
+      FSMConfigRegsIn  : in  std_logic_vector(31 downto 0);
+      FSMConfigRegsOut : out std_logic_vector(31 downto 0);
+      FSMConfigRegsEn  : in  std_logic;
+      FSMConfigRegsSt  : in  std_logic;
+      FSMConfigRegsLd  : in  std_logic;
+      
+      TriggerPosition  : out std_logic_vector(2 downto 0);
+      ExtTriggerSource : in  std_logic;
+      TriggerArmed     : out std_logic;
+      TriggerTriggered : out std_logic;
+      SelfGenData      : out std_logic;  -- Reg1[13] - when '1' generate debug internally
+      CaptureDone      : in  std_logic;
+      FifoOverflow     : in  std_logic_vector(3 downto 0) := (others=>'0')
+      
+   );
+end TesterFpgaTriggerModule;
+
+architecture RTL of TesterFpgaTriggerModule is
+   function BrlShftr(
+      BitNum : std_logic_vector(7 downto 0)
+   ) return std_logic_vector is 
+      variable Zeros : std_logic_vector(NumOfTriggerElements-1 downto 1) := (others=>'0');
+      variable One   : std_logic_vector(NumOfTriggerElements-1 downto 0) := Zeros & '1';
+   begin
+      return std_logic_vector(SHL(One, BitNum));
+   end function;
+
+   component TesterFpgaTriggerElement is
+      port (
+         RST       : in std_logic;
+         CLK       : in std_logic;
+
+         MyBlockId : in std_logic_vector(7 downto 0);
+
+         StartIn   : in std_logic;  -- Pulse reloads counter to its initial values.
+         EnableIn  : in std_logic;
+
+         DataIn    : in std_logic_vector(31 downto 0);
+         HdrIn     : in std_logic_vector( 3 downto 0);
+         OffsetIn  : in std_logic_vector(15 downto 0);
+         DataInEn  : in std_logic;
+         
+         ConfigRegsIn   : in std_logic_vector(31 downto 0);
+         ConfigRegsOut  : out std_logic_vector(31 downto 0);
+         ConfigRegsEn   : in std_logic;
+         ConfigRegsLd   : in std_logic;
+         ConfigRegsSt   : in std_logic;
+      
+         NextBlock      : out std_logic_vector(7 downto 0);
+         TriggerOut     : out std_logic;
+         CompDone       : out std_logic
+   );
+   end component;
+
+   signal ActiveElement : std_logic_vector(NumOfTriggerElements-1 downto 0);
+
+   type ConfigRegBus_t        is array (0 to NumOfTriggerElements) of std_logic_vector(31 downto 0);
+   signal ConfigRegsInIntrCon  : ConfigRegBus_t;
+   signal ConfigRegsOutIntrCon : ConfigRegBus_t;
+
+   type NextBlockBus_t   is array(0 to NumOfTriggerElements-1) of std_logic_vector(7 downto 0);
+   signal NextBlockBus   : NextBlockBus_t;
+   signal InterNextBlock : NextBlockBus_t;
+   signal TriggerOut     : std_logic_vector(NumOfTriggerElements-1 downto 0);
+   signal CompDone       : std_logic_vector(NumOfTriggerElements-1 downto 0);
+
+   -- FSM Control Register
+   -- Reg 0
+   -- |   [31:24] |     [23:16]     |      [15:8]     |     [7:0]        |
+   -- |  FPGA Ver | NO Trigger Elem | NO Cap Fil Elem | No Drip Fil Elem |
+   -- Reg 1
+   -- |    [31]  |   [30:28]    | [27:13] |  [12]   |    [11]     |    [10]      |   [9:8]   |   [7:0]    |
+   -- | Run/Stop | Trig Mem Pos |    NA   | SelfGen | Ext Trig En | Ext Trig Pol | Trig Stat | Curr Block | 
+   
+   type RegisterBank_t is array (0 to 1) of std_logic_vector(31 downto 0);
+   signal RegisterBank       : RegisterBank_t;
+   signal RegisterBankStatic : RegisterBank_t;
+   
+   signal  TriggerRunStop : std_logic;
+   signal dRegsSt         : std_logic; 
+   signal StartElements   : std_logic;
+   
+   signal CurrBlock        : std_logic_vector(7 downto 0);
+   signal OredNextBlock    : std_logic_vector(7 downto 0) := (others=>'0');
+   signal Armed, Triggered : std_logic;
+   signal TesterState      : std_logic_vector(1 downto 0);
+   signal ResetRunStop     : std_logic;
+
+   
+   signal FpgaVer     : std_logic_vector(7 downto 0) := std_logic_vector(to_unsigned(FpgaVersion,8));
+   signal NOTrigElems : std_logic_vector(7 downto 0) := std_logic_vector(to_unsigned(NumOfTriggerElements,8));
+   signal NOCapElems  : std_logic_vector(7 downto 0) := std_logic_vector(to_unsigned(NumOfCaptureFilterElements,8));
+   signal NODripElems : std_logic_vector(7 downto 0) := std_logic_vector(to_unsigned(NumOfDripFilterElements,8));
+begin
+   gen_trigger: for i in 0 to NumOfTriggerElements-1 generate
+      TriggerElement : TesterFpgaTriggerElement port map (
+         RST => RST,
+         CLK => CLK,
+
+         MyBlockId => std_logic_vector(to_unsigned(i,8)),
+      
+         StartIn   => StartElements,
+         EnableIn  => ActiveElement(i),
+
+         DataIn    => DataIn,
+         HdrIn     => HdrIn,
+         OffsetIn  => OffsetIn,
+         DataInEn  => DataInEn,
+         
+         ConfigRegsIn   => ConfigRegsInIntrCon(i),
+         ConfigRegsOut  => ConfigRegsOutIntrCon(i),
+         ConfigRegsEn   => TriggerConfigRegsEn,
+         ConfigRegsLd   => TriggerConfigRegsLd,
+         ConfigRegsSt   => TriggerConfigRegsSt,
+      
+         NextBlock      => NextBlockBus(i),
+         TriggerOut     => TriggerOut(i),
+         CompDone       => CompDone(i)
+      );
+      a: if (i=0) generate
+         InterNextBlock(0) <= NextBlockBus(0) or NextBlockBus(1);
+      end generate;
+      b: if (i>0 and i<NumOfTriggerElements-1) generate
+         InterNextBlock(i) <= InterNextBlock(i-1) or NextBlockBus(i+1);
+      end generate;
+   end generate gen_trigger;
+   OredNextBlock <= InterNextBlock(NumOfTriggerElements-2);
+
+   -- Main FSM
+   CurrBlock     <= OredNextBlock;
+   ActiveElement <= (others=>'0') when Triggered = '1' else BrlShftr(OredNextBlock);
+
+   process(CLK, RST)
+   begin
+      if (RST = '1') then
+--         ActiveElement <= (others=>'0');
+--         CurrBlock     <= (others=>'0');
+         Armed        <= '0';
+         Triggered    <= '0';
+         ResetRunStop <= '0';
+
+
+      elsif (CLK'event and CLK='1') then
+         ResetRunStop <= '0';
+         if (TriggerRunStop = '0') then
+--            ActiveElement <= (others=>'0');
+--            CurrBlock     <= (others=>'1');
+            Armed         <= '0';
+            Triggered     <= '0';
+   
+         else -- run/stop is run.
+            if (StartElements = '1') then
+               Triggered        <= '0';
+               Armed            <= '1';
+--               ActiveElement    <= (others=>'0');
+--               ActiveElement(0) <= '1';
+--               CurrBlock        <= (others=>'0');
+
+            elsif (Triggered = '0') then
+               if (CompDone /= std_logic_vector(to_unsigned(0,NumOfTriggerElements))) then
+                  if (TriggerOut /= std_logic_vector(to_unsigned(0,NumOfTriggerElements))) then
+                     Triggered <= '1';
+--                     Armed     <= '0';
+                  else
+--                     CurrBlock     <= OredNextBlock;
+--                     ActiveElement <= BrlShftr(OredNextBlock);
+                  end if;
+               end if;
+            else -- Triggered = '1'
+               if (CaptureDone = '1') then 
+                  Armed        <= '0';
+                  ResetRunStop <= '1';
+               end if;
+            end if;
+         end if;
+      end if;
+   end process;
+   
+
+   -- Trigger Elements Connect config registers
+   config_regs: for i in 1 to NumOfTriggerElements-1 generate
+      ConfigRegsInIntrCon(i-1) <= ConfigRegsOutIntrCon(i);
+   end generate;
+   ConfigRegsInIntrCon(NumOfTriggerElements-1) <= TriggerConfigRegsIn;
+   TriggerConfigRegsOut <= ConfigRegsOutIntrCon(0);
+
+   -- FSM Config Registers 
+   process (RST, CLK)
+   begin
+      if RST = '1' then
+         RegisterBank       <= (others=>(others=>'0'));
+         RegisterBankStatic <= (others=>(others=>'0'));
+
+      elsif CLK'event and CLK='1' then
+         if (ResetRunStop = '1') then
+            RegisterBank(1)(31) <= '0';
+         elsif (FSMConfigRegsSt = '1') then
+            RegisterBank <= RegisterBankStatic;
+         end if;
+         if (FSMConfigRegsLd = '1') then 
+            RegisterBankStatic <= RegisterBank;
+            RegisterBankStatic(0) <= FpgaVer & NOTrigElems & NOCapElems & NODripElems;
+            RegisterBankStatic(1)( 7 downto  0) <= CurrBlock;
+            RegisterBankStatic(1)( 9 downto  8) <= TesterState;
+            RegisterBankStatic(1)(16 downto 13) <= FifoOverflow;
+         end if;
+         if (FSMConfigRegsEn = '1') then
+            RegisterBankStatic(1) <= FSMConfigRegsIn;
+            RegisterBankStatic(0) <= RegisterBankStatic(1);
+         end if;
+      end if;
+   end process;
+   FSMConfigRegsOut <= RegisterBankStatic(0);
+   TriggerRunStop   <= RegisterBank(1)(31);
+   TriggerPosition  <= RegisterBank(1)(30 downto 28);
+   SelfGenData      <= RegisterBank(1)(12);
+   TriggerTriggered <= Triggered;
+   TriggerArmed     <= Armed;
+   TesterState      <= "00" when Armed     = '0' else
+                       "01" when Armed     = '1' and Triggered = '0' else
+                       "10" when Triggered = '1' else
+                       "11" when CaptureDone = '1';
+
+   -- Start pulse gen
+   process (RST, CLK)
+   begin
+      if (RST = '1') then 
+         dRegsSt         <= '0';
+      elsif (CLK'event and CLK='1') then
+         dRegsSt         <= FSMConfigRegsSt;
+      end if;
+   end process;
+   StartElements <= '1' when (TriggerRunStop='1' and dRegsSt='1') else '0';
+      
+end RTL;

@@ -1,0 +1,15 @@
+C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.v {1 {vlog -work work -nocovercells C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.v
+Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+-- Compiling module capture_to_memory
+
+Top level modules:
+	capture_to_memory
+
+} {} {}} C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory_tb.v {1 {vlog -work work -nocovercells C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory_tb.v
+Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+-- Compiling module capture_to_memory_tb
+
+Top level modules:
+	capture_to_memory_tb
+
+} {} {}}

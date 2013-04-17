@@ -1,0 +1,251 @@
+import string
+from xml.etree import ElementTree
+from time import sleep
+from collections import defaultdict
+
+# Import the modules QtCore (for low level Qt functions)
+# QtGui (for visual/GUI related Qt functions)
+from PyQt4 import QtCore, QtGui, Qt
+
+
+# The GUI MainWindow object from the python code generated using the .ui file
+from main_app_gui import Ui_MainWindow
+
+"""
+Created on Sat Feb 09 10:16:56 2013
+
+@author: yozturk
+"""
+class filterHeaders(QtGui.QGroupBox): 
+     deleteClickedSignal = QtCore.pyqtSignal()
+     def __init__(self,master):
+      
+        self.container = master
+        self.isEnabled = True
+        self.DrawFilterHeaders(master)
+        
+     def DrawFilterHeaders(self,master):
+        hbox = master
+        
+        dataTypeLabel = QtGui.QLabel("Stream Variable")         
+        labelFilter =QtGui.QLabel("Base Variable ")
+        labelOffset = QtGui.QLabel("Offset Variable")
+        labelRange = QtGui.QLabel("Range Variable")
+        dataTypeLabel.setFixedWidth(150)
+        labelFilter.setFixedWidth(150)
+        labelBase = QtGui.QLabel("Base Address") 
+        labelBase.setFixedWidth(75)      
+        labelStreamMin = QtGui.QLabel("Stream ID Min")
+        labelStreamMin.setFixedWidth(75)
+        labelStreamMax = QtGui.QLabel("Stream ID Max")      
+        labelStreamMax.setFixedWidth(75)
+        labelOffsetMin = QtGui.QLabel("Offset Min")        
+        labelOffsetMin.setFixedWidth(75)
+        labelOffsetMax = QtGui.QLabel("Offset Max")      
+        labelOffsetMax.setFixedWidth(75)
+        labelBits = QtGui.QLabel("Bit Range")      
+        labelBits.setFixedWidth(75)
+        labelDecimation = QtGui.QLabel("Decimation Factor") 
+        labelDecimation.setFixedWidth(75)
+        hbox.addWidget(dataTypeLabel,0,0)        
+        hbox.addWidget(labelFilter,0,1)
+        hbox.addWidget(labelOffset,0,2)
+        hbox.addWidget(labelRange,0,3)    
+        hbox.addWidget(labelBase,0,4)
+        hbox.addWidget(labelStreamMin,0,5)
+        hbox.addWidget(labelStreamMax,0,6)
+        hbox.addWidget(labelOffsetMin,0,7)
+        hbox.addWidget(labelOffsetMax,0,8)
+        hbox.addWidget(labelBits,0,9)
+        hbox.addWidget(labelDecimation,0,10)
+                
+          
+        #self.groupBox.setLayout(hbox)
+        #master.addWidget(self.groupBox)
+
+
+class filterItem(QtGui.QGroupBox): 
+     deleteClickedSignal = QtCore.pyqtSignal()
+     def __init__(self,master,baseVarList,filterindex):
+      
+        self.container = master
+        self.isEnabled = True
+        self.baseVarList =baseVarList
+        self.addFilterElement(master)
+        self.index = filterindex
+        self.DrawFilterElement(master)
+    
+
+     def addFilterElement(self,master):
+         
+        self.dataVar = QtGui.QComboBox()
+        self.dataVar.setFixedWidth(125)
+        self.dataVar.NoInsert
+        self.dataVar.setEditable(True) 
+         
+        self.baseVar = QtGui.QComboBox()
+        self.baseVar.setFixedWidth(125)
+        self.baseVar.NoInsert
+        self.baseVar.setEditable(True) 
+       
+      
+        
+        self.OffsetVar = QtGui.QComboBox()
+        self.OffsetVar.setFixedWidth(125)
+        self.OffsetVar.setEditable(True)
+        self.OffsetVar.NoInsert
+
+        self.rangeVar = QtGui.QComboBox()
+        self.rangeVar.setFixedWidth(125)
+        self.rangeVar.setEditable(True)
+        self.rangeVar.NoInsert
+                
+        self.baseAddres = QtGui.QLineEdit()
+        self.baseAddres.setFixedWidth(75)
+        
+        self.streamIDMin = QtGui.QLineEdit()
+        self.streamIDMin.setFixedWidth(75)
+
+        self.streamIDMax = QtGui.QLineEdit()
+        self.streamIDMax.setFixedWidth(75)
+       
+        self.offsetMin = QtGui.QLineEdit()
+        self.offsetMin.setFixedWidth(75)
+
+        self.offsetMax = QtGui.QLineEdit()
+        self.offsetMax.setFixedWidth(75)
+      
+        self.bitRange = QtGui.QLineEdit()
+        self.bitRange.setFixedWidth(75)
+     
+        self.decimation = QtGui.QLineEdit()
+        self.decimation.setFixedWidth(75)
+        self.enableButton = QtGui.QCheckBox("Enable")
+        self.checkBox = QtGui.QCheckBox("Select")
+ 
+        for baseElement in self.baseVarList:
+            self.dataVar.addItem(baseElement) 
+        self.enableButton.setChecked(True)
+    
+    
+        self.proxy3 = Qt.QSortFilterProxyModel(self.dataVar)
+        self.proxy3.setSourceModel(self.dataVar.model())
+        self.dataVar.model().setParent(self.proxy3)
+        self.dataVar.setModel(self.proxy3)
+        self.dataVar.model().sort(0)
+        
+        self.proxy = Qt.QSortFilterProxyModel(self.baseVar)
+        self.proxy.setSourceModel(self.baseVar.model())
+        self.baseVar.model().setParent(self.proxy)
+        self.baseVar.setModel(self.proxy)
+        self.baseVar.model().sort(0)
+        
+        self.proxy1 = Qt.QSortFilterProxyModel(self.OffsetVar)
+        self.proxy1.setSourceModel(self.OffsetVar.model())
+        self.OffsetVar.model().setParent(self.proxy1)
+        self.OffsetVar.setModel(self.proxy1)
+        self.OffsetVar.model().sort(0)
+
+        self.proxy2 = Qt.QSortFilterProxyModel(self.rangeVar)
+        self.proxy2.setSourceModel(self.rangeVar.model())
+        self.rangeVar.model().setParent(self.proxy2)
+        self.rangeVar.setModel(self.proxy2)
+        self.rangeVar.model().sort(0)
+        
+        #self.baseVar.model().setFilterFixedString("TxCs")
+        
+        
+        self.baseVar.setCurrentIndex(0)
+        self.baseAddres.setText(Qt.QString("%1") .arg(0x0))
+        self.streamIDMin.setText(Qt.QString("%1") .arg(0))
+        self.streamIDMax.setText(Qt.QString("%1") .arg(255))                       
+        self.offsetMin.setText(Qt.QString("%1") .arg(0))
+        self.offsetMax.setText(Qt.QString("%1") .arg(0xFFFF))                        
+        self.bitRange.setText(Qt.QString("%1") .arg(0))
+        self.decimation.setText(Qt.QString("%1") .arg(0))
+    
+
+
+     def DrawFilterElement(self,master):
+        hbox = master           
+        hbox.addWidget(self.dataVar,self.index,0)
+      
+        hbox.addWidget(self.baseVar,self.index,1)
+        hbox.addWidget(self.OffsetVar,self.index,2)
+        hbox.addWidget(self.rangeVar,self.index,3)
+        
+        
+        #hbox.addWidget(labelBase,0,1)
+        hbox.addWidget(self.baseAddres,self.index,4)
+        #hbox.addWidget(labelStreamMin,0,2)
+        hbox.addWidget(self.streamIDMin,self.index,5)
+
+        #hbox.addWidget(labelStreamMax,0,3)
+        hbox.addWidget(self.streamIDMax,self.index,6)
+
+        #hbox.addWidget(labelOffsetMin,0,4)
+        hbox.addWidget(self.offsetMin,self.index,7)
+
+        #hbox.addWidget(labelOffsetMax,0,5)
+        hbox.addWidget(self.offsetMax,self.index,8)
+
+        #hbox.addWidget(labelBits,0,6)
+        hbox.addWidget(self.bitRange,self.index,9)
+        
+        #hbox.addWidget(labelDecimation,0,7)
+        hbox.addWidget(self.decimation,self.index,10)
+        hbox.addWidget(self.enableButton,self.index,11)
+        hbox.addWidget(self.checkBox,self.index,12)
+                
+          
+        #self.groupBox.setLayout(hbox)
+        #master.addWidget(self.groupBox)
+
+
+        #self.buttonDelete.clicked.connect(self.deleteButtonClicked)
+     def deleteFilter(self,master):
+        self.dataVar.deleteLater()
+        self.baseVar.deleteLater()
+        self.OffsetVar.deleteLater()
+        self.rangeVar.deleteLater()        
+        self.baseAddres.deleteLater()
+        self.streamIDMin.deleteLater()
+        self.streamIDMax.deleteLater()
+        self.offsetMax.deleteLater()
+        self.offsetMin.deleteLater()
+        self.bitRange.deleteLater()
+        self.decimation.deleteLater()
+        self.checkBox.deleteLater()
+        self.enableButton.deleteLater()
+        master.update()
+        del(self)
+     
+     def copyFilter(self,inputfilter):
+        self.dataVar.setCurrentIndex(inputfilter.dataVar.currentIndex())                      
+        self.baseVar.setCurrentIndex(inputfilter.baseVar.currentIndex())             
+        self.OffsetVar.setCurrentIndex(inputfilter.OffsetVar.currentIndex())                     
+        self.rangeVar.setCurrentIndex(inputfilter.rangeVar.currentIndex())                     
+ 
+        self.baseAddres.setText(inputfilter.baseAddres.text()) 
+        self.streamIDMin.setText(inputfilter.streamIDMin.text()) 
+        self.streamIDMax.setText(inputfilter.streamIDMax.text()) 
+        
+        self.offsetMin.setText(inputfilter.offsetMin.text())
+        self.offsetMax.setText(inputfilter.offsetMax.text())
+                
+        self.bitRange.setText(inputfilter.bitRange.text()) 
+        self.decimation.setText(inputfilter.decimation.text()) 
+        self.enableButton.setChecked(inputfilter.enableButton.isChecked())
+        self.checkBox.setChecked(inputfilter.checkBox.isChecked()) 
+    
+     def compareFilter(self,inputfilter):
+        returnvalue = 0
+        if (self.baseAddres.text() == inputfilter.baseAddres.text()): 
+            if (self.streamIDMin.text() == inputfilter.streamIDMin.text()): 
+                if (self.streamIDMax.text() == inputfilter.streamIDMax.text()):
+                    if (self.offsetMin.text() == inputfilter.offsetMin.text()):
+                        if (self.offsetMax.text() == inputfilter.offsetMax.text()):                
+                            if (self.bitRange.text() == inputfilter.bitRange.text()): 
+                                returnvalue = 1
+        return(returnvalue)
+        

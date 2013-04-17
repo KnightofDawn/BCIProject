@@ -1,0 +1,81 @@
+7.22.05 jowaxman
+
+__init__.py
+  - added ('Annotation data'), 13 to Associated Files
+
+eegview.py
+  - update mouse position on motion
+  - highlight a selected area in eegPlot
+  - lock electrode checkbutton
+  - annotation a dialog box
+  - changed some deprecated code from pygtk2.4
+  - added support for annotation file, *.ann.csv
+  - highlight areas from *.ann.csv
+  - annotation browser
+
+data.py
+  - warn if old-style CSV file found
+  - name of annotation file should be <eeg file base>.ann.csv
+
+
+7.25.05 jowaxman
+
+eegview.py
+  - Delete annotations
+  - When you move to an annotation using the annotation browser, center
+    it in the axes
+  - also adjust limits to display annotation larger than current limits
+
+data.py
+  - starting to add support for saving files
+
+7.28.05 jowaxman
+
+- ann browser now uses annman
+- set zorder of new rects to 3 and matched color of highlight and its rect
+- added show/hide buttons to ann browser
+- added annotations menu
+- added turn on/off horiz/vert cursor; save in .rc
+- un/select annotations using either left or right mouse button
+
+7.29.05 jowaxman
+- added hide/show in ann browser
+- renamed eegPlot to eegplot everywhere (there were some mismatches in 
+  named params)
+- resizing of annotations
+
+8.1.05 jowaxman
+- resizing of annotations
+- commented out all pygtk.require('2.0')
+- save ann file after changes (edit, delete, resize)
+- turn off selection if starting a highlight from within an annotation
+- now you can add a new annotation by selecting 'Create New' when 
+  nothing is selected
+
+8.4.05 jowaxman
+- Added setting default filename to associated files (eeg_fileroot.ext)
+- xxx user can move selected while edit annotate box is open.  either 
+prevent or update dialog when select moves
+- xxx combo entry boxes are editable; could all new entries to lists 
+(new codes and states to registry...)
+
+8.5.04 jowaxman
+- xxx load eoi files into eoi list in annotate dialog
+- load/save annotation eois in annotation file
+- xxx cancle hides annotate box --> multiple button clicked connected
+- xxx 3 annotations with eoiname1, 1 eoi with eoiname2; change name of 
+  eoiname1 to eoiname2.  What happens?
+
+8.7.04 jowaxman
+- started adding support for highlighting EOIs
+
+8.9.05 jowaxman
+- fixed bugs with annotate EOIs
+- updated annotatrion browser
+
+8.20.05 jowaxman
+- Button press selects annotation only within a rect.
+- Redraw annotations when eoi is changed.
+
+11.10.05 jowaxman
+- Added dialog boxes for phase synchrony

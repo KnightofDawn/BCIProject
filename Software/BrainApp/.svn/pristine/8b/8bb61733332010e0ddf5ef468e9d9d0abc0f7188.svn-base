@@ -1,0 +1,328 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+
+
+entity TesterFpgaPFT is
+   generic (
+      FpgaVersion                : integer; --:= 0;
+      NumOfTriggerElements       : integer; --:= 25;
+      NumOfCaptureFilterElements : integer; --:= 17;
+      NumOfDripFilterElements    : integer  --:= 19
+   );
+   port( 
+      RST : in std_logic;
+      CLK : in std_logic;
+
+      -- Data from DUT
+      DutData   : in std_logic_vector(35 downto 0);
+      DutDataEn : in std_logic;
+
+      -- Drip filter configuration registers
+      DripFilterConfigRegsIn : in std_logic_vector(31 downto 0);
+      DripFilterConfigRegsOut: out std_logic_vector(31 downto 0);
+      DripFilterConfigRegsEn : in std_logic;
+      DripFilterConfigRegsLd : in std_logic;
+      DripFilterConfigRegsSt : in std_logic;
+      -- Drip filter data out
+      DripFilterDataOut   : out std_logic_vector(31 downto 0);
+      DripFilterHdrOut    : out std_logic_vector( 3 downto 0);
+      DripFilterOffsetOut : out std_logic_vector(15 downto 0);
+      DripFilterOutEn     : out std_logic;
+
+      -- Capture filter configuration registers
+      CaptureFilterConfigRegsIn : in std_logic_vector(31 downto 0);
+      CaptureFilterConfigRegsOut: out std_logic_vector(31 downto 0);
+      CaptureFilterConfigRegsEn : in std_logic;
+      CaptureFilterConfigRegsLd : in std_logic;
+      CaptureFilterConfigRegsSt : in std_logic;
+      -- Capture Filter data out
+      CaptureFilterDataOut   : out std_logic_vector(31 downto 0);
+      CaptureFilterHdrOut    : out std_logic_vector( 3 downto 0);
+      CaptureFilterOffsetOut : out std_logic_vector(15 downto 0);
+      CaptureFilterOutEn     : out std_logic;
+      
+      -- Trigger Module configuration registers
+      -- Trigger Elements
+      TriggerConfigRegsIn : in std_logic_vector(31 downto 0);
+      TriggerConfigRegsOut: out std_logic_vector(31 downto 0);
+      TriggerConfigRegsEn : in std_logic;
+      TriggerConfigRegsLd : in std_logic;
+      TriggerConfigRegsSt : in std_logic;
+      -- Trigger FSM
+      FSMConfigRegsIn  : in  std_logic_vector(31 downto 0);
+      FSMConfigRegsOut : out std_logic_vector(31 downto 0);
+      FSMConfigRegsEn  : in  std_logic;
+      FSMConfigRegsSt  : in  std_logic;
+      FSMConfigRegsLd  : in  std_logic;
+
+      -- Parallel Trigger 
+      PrllTrggrConfigRegsIn  : in  std_logic_vector(31 downto 0);
+      PrllTrggrConfigRegsOut : out std_logic_vector(31 downto 0);
+      PrllTrggrConfigRegsEn  : in  std_logic;
+      PrllTrggrConfigRegsLd  : in  std_logic;
+      PrllTrggrConfigRegsSt  : in  std_logic;
+      
+      TriggerPosition  : out std_logic_vector(2 downto 0);
+
+      ExtTriggerSource : in  std_logic;
+      TriggerArmed     : out std_logic;  -- Tester is armed and looking for a trigger.
+      TriggerTriggered : out std_logic;  -- Trigger event has occured. 
+      SelfGenData      : out std_logic;  -- Reg1[13] - when '1' generate debug internally
+      CaptureDone      : in  std_logic;
+      FifoOverflow     : in  std_logic_vector(3 downto 0) := (others=>'0')
+   );
+end TesterFpgaPFT;
+
+architecture RTL of TesterFpgaPFT is
+
+   signal sigTriggerArmed : std_logic;
+
+   -- Parser
+   component TesterFpgaParser 
+      port (
+         RST       : in std_logic;
+         CLK       : in std_logic;
+   
+         Reset     : in std_logic;
+
+         DutData   : in std_logic_vector(35 downto 0);
+         DutDataEn : in std_logic;
+
+         DataOut   : out std_logic_vector(31 downto 0);
+         HdrOut    : out std_logic_vector( 3 downto 0);
+         PktTypeOut: out std_logic_vector( 3 downto 0);
+         OffsetOut : out std_logic_vector(15 downto 0);
+         DataOutEn : out std_logic
+      );
+   end component;
+
+   signal ParserReset     : std_logic := '0';
+   signal ParserDataOut   : std_logic_vector(31 downto 0);
+   signal ParserHdrOut    : std_logic_vector( 3 downto 0);
+   signal ParserOffsetOut : std_logic_vector(15 downto 0);
+   signal ParserPktTypeOut: std_logic_vector( 3 downto 0);
+   signal ParserDataOutEn : std_logic;
+   
+   -- Data Filters
+   component TesterFpgaFilter
+      generic ( NumOfFilterElements : integer );
+      port (
+         RST       : in std_logic;
+         CLK       : in std_logic;
+
+         DataIn    : in std_logic_vector(31 downto 0);
+         HdrIn     : in std_logic_vector( 3 downto 0);
+         OffsetIn  : in std_logic_vector(15 downto 0);
+         PktTypeIn : in std_logic_vector( 3 downto 0);
+         DataInEn  : in std_logic;
+
+         DataOut   : out std_logic_vector(31 downto 0);
+         HdrOut    : out std_logic_vector( 3 downto 0);
+         OffsetOut : out std_logic_vector(15 downto 0);
+         DataOutEn : out std_logic;
+         
+         ConfigRegsIn   : in std_logic_vector(31 downto 0);
+         ConfigRegsOut  : out std_logic_vector(31 downto 0);
+         ConfigRegsEn   : in std_logic;
+         ConfigRegsLd   : in std_logic;
+         ConfigRegsSt   : in std_logic
+      ); 
+   end component;
+   
+   component TesterFpgaTriggerModule
+   generic ( 
+      FpgaVersion                : integer;
+      NumOfTriggerElements       : integer;
+      NumOfCaptureFilterElements : integer;
+      NumOfDripFilterElements    : integer
+   );
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      DataIn    : in std_logic_vector(31 downto 0);
+      HdrIn     : in std_logic_vector( 3 downto 0);
+      OffsetIn  : in std_logic_vector(15 downto 0);
+      PktTypeIn : in std_logic_vector( 3 downto 0);
+      DataInEn  : in std_logic;
+
+      TriggerConfigRegsIn : in std_logic_vector(31 downto 0);
+      TriggerConfigRegsOut: out std_logic_vector(31 downto 0);
+      TriggerConfigRegsEn : in std_logic;
+      TriggerConfigRegsLd : in std_logic;
+      TriggerConfigRegsSt : in std_logic;
+
+      FSMConfigRegsIn  : in  std_logic_vector(31 downto 0);
+      FSMConfigRegsOut : out std_logic_vector(31 downto 0);
+      FSMConfigRegsEn  : in  std_logic;
+      FSMConfigRegsSt  : in  std_logic;
+      FSMConfigRegsLd  : in  std_logic;
+      
+      TriggerPosition  : out std_logic_vector(2 downto 0);
+      ExtTriggerSource : in  std_logic;
+      ParallelTriggerTriggered : in std_logic;
+      SelfGenData      : out std_logic;  -- Reg1[13] - when '1' generate debug internally
+      TriggerArmed     : out std_logic;
+      TriggerTriggered : out std_logic;
+      CaptureDone      : in  std_logic;
+      FifoOverflow     : in  std_logic_vector(3 downto 0) := (others=>'0')
+      );
+   end component;
+   
+   component TesterFpgaParallelTrigger
+      port (
+         RST       : in std_logic;
+         CLK       : in std_logic;
+
+         DataIn    : in std_logic_vector(31 downto 0);
+         HdrIn     : in std_logic_vector( 3 downto 0);
+         OffsetIn  : in std_logic_vector(15 downto 0);
+         PktTypeIn : in std_logic_vector( 3 downto 0);
+         DataInEn  : in std_logic;
+
+         ConfigRegsIn : in  std_logic_vector(31 downto 0);
+         ConfigRegsOut: out std_logic_vector(31 downto 0);
+         ConfigRegsEn : in  std_logic;
+         ConfigRegsLd : in  std_logic;
+         ConfigRegsSt : in  std_logic;
+
+         TriggerArmed     : in  std_logic;
+         TriggerTriggered : out std_logic
+      );
+   end component;
+   signal ParallelTriggerTriggered : std_logic;
+
+begin
+
+   MainParser : TesterFpgaParser port map (
+      RST => RST,
+      CLK => CLK,
+
+      Reset     => ParserReset,
+
+      DutData   => DutData,
+      DutDataEn => DutDataEn,
+      
+      DataOut    => ParserDataOut,
+      HdrOut     => ParserHdrOut,
+      OffsetOut  => ParserOffsetOut,
+      PktTypeOut => ParserPktTypeOut,
+      DataOutEn  => ParserDataOutEn
+   );
+
+   DripFilter : TesterFpgaFilter 
+   generic map (
+     NumOfFilterElements => NumOfDripFilterElements
+   )
+   port map (
+      RST => RST,
+      CLK => CLK,
+
+      DataIn    => ParserDataOut,
+      HdrIn     => ParserHdrOut,
+      OffsetIn  => ParserOffsetOut,
+      PktTypeIn => ParserPktTypeOut,
+      DataInEn  => ParserDataOutEn,
+
+      DataOut   => DripFilterDataOut,
+      HdrOut    => DripFilterHdrOut,
+      OffsetOut => DripFilterOffsetOut,
+      DataOutEn => DripFilterOutEn,
+         
+      ConfigRegsIn   => DripFilterConfigRegsIn,
+      ConfigRegsOut  => DripFilterConfigRegsOut,
+      ConfigRegsEn   => DripFilterConfigRegsEn,
+      ConfigRegsLd   => DripFilterConfigRegsLd,
+      ConfigRegsSt   => DripFilterConfigRegsSt
+   ); 
+   
+   CaptureFilter : TesterFpgaFilter 
+   generic map (
+      NumOfFilterElements => NumOfCaptureFilterElements
+   )
+   port map (
+      RST => RST,
+      CLK => CLK,
+
+      DataIn    => ParserDataOut,
+      HdrIn     => ParserHdrOut,
+      OffsetIn  => ParserOffsetOut,
+      PktTypeIn => ParserPktTypeOut,
+      DataInEn  => ParserDataOutEn,
+
+      DataOut   => CaptureFilterDataOut,
+      HdrOut    => CaptureFilterHdrOut,
+      OffsetOut => CaptureFilterOffsetOut,
+      DataOutEn => CaptureFilterOutEn,
+         
+      ConfigRegsIn   => CaptureFilterConfigRegsIn,
+      ConfigRegsOut  => CaptureFilterConfigRegsOut,
+      ConfigRegsEn   => CaptureFilterConfigRegsEn,
+      ConfigRegsLd   => CaptureFilterConfigRegsLd,
+      ConfigRegsSt   => CaptureFilterConfigRegsSt
+   ); 
+   
+   TriggerModule : TesterFpgaTriggerModule 
+   generic map (
+      NumOfTriggerElements       => NumOfTriggerElements,
+      FpgaVersion                => FpgaVersion,
+      NumOfCaptureFilterElements => NumOfCaptureFilterElements,
+      NumOfDripFilterElements    => NumOfDripFilterElements
+   ) 
+   port map (
+      RST => RST,
+      CLK => CLK,
+
+      DataIn    => ParserDataOut,
+      HdrIn     => ParserHdrOut,
+      OffsetIn  => ParserOffsetOut,
+      PktTypeIn => ParserPktTypeOut,
+      DataInEn  => ParserDataOutEn,
+
+      TriggerConfigRegsIn  => TriggerConfigRegsIn,
+      TriggerConfigRegsOut => TriggerConfigRegsOut,
+      TriggerConfigRegsEn  => TriggerConfigRegsEn,
+      TriggerConfigRegsLd  => TriggerConfigRegsLd,
+      TriggerConfigRegsSt  => TriggerConfigRegsSt,
+
+      FSMConfigRegsIn  => FSMConfigRegsIn,
+      FSMConfigRegsOut => FSMConfigRegsOut,
+      FSMConfigRegsEn  => FSMConfigRegsEn,
+      FSMConfigRegsSt  => FSMConfigRegsSt,
+      FSMConfigRegsLd  => FSMConfigRegsLd,
+      
+      TriggerPosition  => TriggerPosition,
+      ExtTriggerSource => ExtTriggerSource,
+      ParallelTriggerTriggered => ParallelTriggerTriggered,
+      TriggerArmed     => sigTriggerArmed,
+      TriggerTriggered => TriggerTriggered,
+      SelfGenData      => SelfGenData,
+      CaptureDone      => CaptureDone,
+      FifoOverflow     => FifoOverflow
+   );
+   
+   
+   ParallelTriggerModule : TesterFpgaParallelTrigger 
+   port map (
+      RST => RST,
+      CLK => CLK,
+
+      DataIn    => ParserDataOut,
+      HdrIn     => ParserHdrOut,
+      OffsetIn  => ParserOffsetOut,
+      PktTypeIn => ParserPktTypeOut,
+      DataInEn  => ParserDataOutEn,
+
+      ConfigRegsIn   => PrllTrggrConfigRegsIn,
+      ConfigRegsOut  => PrllTrggrConfigRegsOut,
+      ConfigRegsEn   => PrllTrggrConfigRegsEn,
+      ConfigRegsLd   => PrllTrggrConfigRegsLd,
+      ConfigRegsSt   => PrllTrggrConfigRegsSt,
+
+      TriggerArmed     => sigTriggerArmed,
+      TriggerTriggered => ParallelTriggerTriggered
+   );
+   
+   TriggerArmed <= sigTriggerArmed;
+
+end RTL;
