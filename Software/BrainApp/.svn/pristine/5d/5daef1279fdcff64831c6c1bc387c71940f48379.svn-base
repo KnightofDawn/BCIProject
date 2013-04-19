@@ -1,0 +1,440 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 21 22:42:36 2013
+
+@author: yozturk
+"""
+from UtilityClasses import *
+
+class Gate(QtGui.QGroupBox): 
+     def __init__(self,master,i):       
+        self.container = master
+        self.addGate(master,i)
+        self.GateInputs = []
+        self.OutputConnection=[]
+      
+       
+     def addGate(self,master,i):
+        if (i < 9):
+             self.groupBox = QtGui.QGroupBox(Qt.QString("Gate %1") .arg(i))
+        else:
+             self.groupBox = QtGui.QGroupBox(Qt.QString("Final Output"))
+             
+        self.groupBox.setFixedHeight(110)
+        #self.groupBox.setFixedWidth(170)
+        
+        if i in [1,3,5,7] :
+            self.groupBox.setStyleSheet("background-color: lightGray")
+        else:
+            self.groupBox.setStyleSheet("background-color: yellow")
+
+        if (i == 9):
+            self.groupBox.setStyleSheet("background-color: cyan")
+        
+           
+        self.hbox = Qt.QGridLayout(self.groupBox)
+        self.groupBox.setLayout(self.hbox)
+        self.gateType = QtGui.QComboBox()
+        self.gateType.addItem("AND")
+        self.gateType.addItem("OR")
+        self.hbox.addWidget(self.gateType)
+        self.label = QtGui.QLabel("Inputs :")
+        self.hbox.addWidget(self.label)
+        self.gateInputs = QtGui.QLineEdit()   
+        
+        
+        #self.gateID.setStyleSheet('color: red')
+        # self.groupBox.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        #                             "border:1px solid rgb(255, 170, 255);")
+      
+        self.hbox.addWidget(self.gateInputs)
+    
+#        button = PicButton(QPixmap("andGate.png"))
+#        self.hbox.addWidget(button)
+        
+        
+       
+        
+        master.addWidget(self.groupBox)
+
+     def deleteGate(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)
+        
+     def  convertToList(self):
+        self.listRep = [self.gateType.currentIndex(),\
+                        str(self.gateInputs.text())]
+        return(self.listRep)
+        
+
+
+class Counter(QtGui.QGroupBox): 
+     def __init__(self,master,i):       
+        self.container = master
+        self.addCounter(master,i)
+        self.CounterInputs = []
+        self.OutputConnection=[]
+       
+     def addCounter(self,master,i):
+        self.groupBox = QtGui.QGroupBox(Qt.QString("Counter %1") .arg(i))
+        self.groupBox.setFixedHeight(110)
+        self.label1 = QtGui.QLabel(self.groupBox)
+        self.label1.setGeometry(QtCore.QRect(10, 20, 71, 16))
+        self.label1.setText("InitCounter")
+        self.label2 = QtGui.QLabel(self.groupBox)
+        self.label2.setGeometry(QtCore.QRect(140, 20, 91, 16))
+        self.label2.setText("Current Counter")
+        self.initCounter = QtGui.QSpinBox(self.groupBox)
+        self.initCounter.setGeometry(QtCore.QRect(10, 40, 111, 22))
+        self.currentCounter = QtGui.QSpinBox(self.groupBox)
+        self.currentCounter.setGeometry(QtCore.QRect(140, 40, 101, 22))
+        self.label_21 = QtGui.QLabel(self.groupBox)
+        self.label_21.setGeometry(QtCore.QRect(250, 20, 81, 16))
+        self.label_21.setText("Dependent on")
+        self.cntReset = QtGui.QLineEdit(self.groupBox)
+        self.cntReset.setGeometry(QtCore.QRect(257, 81, 110, 20))
+        self.label_22 = QtGui.QLabel(self.groupBox)
+        self.label_22.setGeometry(QtCore.QRect(13, 64, 91, 16))
+        self.label_22.setText("UpCountSignals")
+        self.cntDownCount = QtGui.QLineEdit(self.groupBox)
+        self.cntDownCount.setGeometry(QtCore.QRect(10, 81, 111, 20))
+        self.cntUpCount = QtGui.QLineEdit(self.groupBox)
+        self.cntUpCount.setGeometry(QtCore.QRect(135, 81, 110, 20))
+        self.label_24 = QtGui.QLabel(self.groupBox)
+        self.label_24.setGeometry(QtCore.QRect(260, 66, 101, 10))
+        self.label_24.setText("ResetCountSignals")
+        self.cntDependOn = QtGui.QLineEdit(self.groupBox)
+        self.cntDependOn.setGeometry(QtCore.QRect(250, 40, 110, 20))
+        self.label_29 = QtGui.QLabel(self.groupBox)
+        self.label_29.setGeometry(QtCore.QRect(136, 66, 101, 16))
+        self.label_29.setText("DownCountSignals")
+        
+        self.initCounter.setValue(1)
+        master.addWidget(self.groupBox)
+
+     def deleteCounter(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)
+        
+     def  convertToList(self):
+        self.listRep = [str(self.initCounter.text()),\
+                        str(self.currentCounter.text()),\
+                        str(self.cntReset.text()),\
+                        str(self.cntDownCount.text()),\
+                        str(self.cntUpCount.text()),\
+                        str(self.cntDependOn.text())]
+                       
+        return(self.listRep)
+
+
+class Condition(QtGui.QGroupBox): 
+     def __init__(self,master,filterList,i):       
+        self.container = master
+        self.filterList =filterList     
+        self.addCondition(master,i)
+        self.OutputConnection=[]
+    
+     def addCondition(self,master,i):     
+        self.BufGroup = QtGui.QGroupBox(Qt.QString("Comparison Group  %1") .arg(i))
+        self.BufGroup.setFixedHeight(110)
+        self.BufGroup.setCheckable(True)   
+        self.BufGroup.setChecked(False)
+        
+        
+        
+        self.bufCombo1 = ExtendedComboBox(self.BufGroup)
+        self.bufCombo1.setGeometry(QtCore.QRect(10, 16, 300, 22)) 
+        self.bufCombo1.setEditable(True)
+        
+        self.bufCombo2 = ExtendedComboBox(self.BufGroup)
+        self.bufCombo2.setGeometry(QtCore.QRect(10, 53, 300, 23))
+        self.bufCombo2.setEditable(True)
+
+        self.bufCmp = QtGui.QComboBox(self.BufGroup)
+        self.bufCmp.setGeometry(QtCore.QRect(330, 16, 41, 81))
+        self.BufEdit = QtGui.QLineEdit(self.BufGroup)
+        self.BufEdit.setGeometry(QtCore.QRect(80, 80, 230, 21))
+        self.bufAndPlus = QtGui.QComboBox(self.BufGroup)
+        self.bufAndPlus.setGeometry(QtCore.QRect(10, 80, 61, 21))
+#        
+        self.bufCombo1.addItem("Please Select")
+        self.bufCombo2.addItem("Please Select")   
+        
+        for filterElement in self.filterList:
+            if "PhyDl" in filterElement[0] or \
+                "PhyRfic" in filterElement[0] or \
+                "PhyTd" in filterElement[0] or \
+                "PhyFd" in filterElement[0]:
+                self.bufCombo1.addItem(filterElement[0])
+                self.bufCombo2.addItem(filterElement[0])      
+#        
+        self.bufAndPlus.addItems(['&','+'])
+        self.bufCmp.addItems(['>', '<', '==', '!='])
+
+        self.proxy1 = Qt.QSortFilterProxyModel(self.bufCombo1)
+        self.proxy1.setSourceModel(self.bufCombo1.model())
+        self.bufCombo1.model().setParent(self.proxy1)
+        self.bufCombo1.setModel(self.proxy1)
+#        self.bufCombo1.model().sort(0)
+        
+        self.proxy2 = Qt.QSortFilterProxyModel(self.bufCombo2)
+        self.proxy2.setSourceModel(self.bufCombo1.model())
+        self.bufCombo2.model().setParent(self.proxy2)
+        self.bufCombo2.setModel(self.proxy2)
+#        self.bufCombo2.model().sort(0)
+        
+    
+        master.addWidget(self.BufGroup)
+       
+     def deleteCondition(self,master):
+        self.BufGroup.deleteLater()
+        master.update()
+        del(self)
+        
+     def  convertToList(self):
+         self.listRep = [self.bufCombo1.currentIndex(),\
+                        self.bufCombo2.currentIndex(),\
+                        self.bufAndPlus.currentIndex(),\
+                        self.bufCmp.currentIndex(),\
+                        str(self.BufEdit.text()),\
+                        self.BufGroup.isChecked()]
+         return(self.listRep)   
+    
+    
+       
+class triggerHeaders(QtGui.QGroupBox): 
+     deleteClickedSignal = QtCore.pyqtSignal()
+     def __init__(self,master):   
+        self.container = master
+        self.isEnabled = True
+        self.DrawTriggerHeaders(master)
+        
+     def DrawTriggerHeaders(self,master):
+        hbox = master
+        triggerID1 = QtGui.QLabel("ID")
+        triggerID2 = QtGui.QLabel("ID")
+        triggerID3 = QtGui.QLabel("ID")
+            
+        dataTypeLabel = QtGui.QLabel("StreamVar")         
+        labelFilter =QtGui.QLabel("BaseVar ")
+        labelOffset = QtGui.QLabel("OffsetVar")
+        labelRange = QtGui.QLabel("RangeVar")
+        dataTypeLabel.setFixedWidth(75)
+        labelFilter.setFixedWidth(75)
+        labelBase = QtGui.QLabel("BaseAddr") 
+        labelBase.setFixedWidth(50)      
+        labelEnable=QtGui.QLabel("LoadCounter")
+        self.SelectAll=QtGui.QPushButton("Select")    
+        labelvalue = QtGui.QLabel("Value")
+        countvalue = QtGui.QLabel("Counter")
+                
+        hbox.addWidget(triggerID1,0,0)                
+        hbox.addWidget(dataTypeLabel,0,2)        
+        hbox.addWidget(labelFilter,0,3)
+        hbox.addWidget(labelOffset,0,4)
+        hbox.addWidget(labelRange,0,5)    
+        hbox.addWidget(labelEnable,0,15)
+        hbox.addWidget(self.SelectAll,0,16)
+        hbox.addWidget(labelvalue,0,7)
+        hbox.addWidget(countvalue,0,8)
+        hbox.addWidget(triggerID2,0,11)                
+        hbox.addWidget(triggerID3,0,14)                
+        
+                
+                
+          
+        #self.groupBox.setLayout(hbox)
+        #master.addWidget(self.groupBox)
+
+
+
+class triggerItem(QtGui.QGroupBox): 
+     def __init__(self,master,baseVarList,Line):    
+        self.hbox = master
+        self.numLines = Line
+        self.container = master
+        self.baseVarList =baseVarList
+        self.addTrigger()
+      
+         
+     def addTrigger(self):
+        
+        self.lineEdit1 = QtGui.QLineEdit()
+        self.lineEdit1.setFixedWidth(50)
+        
+        self.labelIF = QtGui.QLabel("IF")
+       
+        self.dataVar = QtGui.QComboBox()
+        self.dataVar.setFixedWidth(80)
+        self.dataVar.NoInsert
+        self.dataVar.setEditable(True) 
+         
+         
+        self.baseVar = QtGui.QComboBox()
+        self.baseVar.setFixedWidth(80)
+        self.baseVar.NoInsert
+        self.baseVar.setEditable(True) 
+       
+        self.OffsetVar = QtGui.QComboBox()
+        self.OffsetVar.setFixedWidth(150)
+        self.OffsetVar.setEditable(True)
+        self.OffsetVar.NoInsert
+
+        self.rangeVar = QtGui.QComboBox()
+        self.rangeVar.setFixedWidth(150)
+        self.rangeVar.setEditable(True)
+        self.rangeVar.NoInsert
+        
+        for baseElement in self.baseVarList:
+            self.dataVar.addItem(baseElement) 
+            
+       
+    
+        self.proxy3 = Qt.QSortFilterProxyModel(self.dataVar)
+        self.proxy3.setSourceModel(self.dataVar.model())
+        self.dataVar.model().setParent(self.proxy3)
+        self.dataVar.setModel(self.proxy3)
+        self.dataVar.model().sort(0)
+        
+        self.proxy = Qt.QSortFilterProxyModel(self.baseVar)
+        self.proxy.setSourceModel(self.baseVar.model())
+        self.baseVar.model().setParent(self.proxy)
+        self.baseVar.setModel(self.proxy)
+        self.baseVar.model().sort(0)
+        
+        self.proxy1 = Qt.QSortFilterProxyModel(self.OffsetVar)
+        self.proxy1.setSourceModel(self.OffsetVar.model())
+        self.OffsetVar.model().setParent(self.proxy1)
+        self.OffsetVar.setModel(self.proxy1)
+        self.OffsetVar.model().sort(0)
+
+        self.proxy2 = Qt.QSortFilterProxyModel(self.rangeVar)
+        self.proxy2.setSourceModel(self.rangeVar.model())
+        self.rangeVar.model().setParent(self.proxy2)
+        self.rangeVar.setModel(self.proxy2)
+        self.rangeVar.model().sort(0)        
+        
+        #self.combo1 = QtGui.QComboBox()
+        #self.combo1.setFixedWidth(300)
+        
+        self.combo2 = QtGui.QComboBox()
+        self.combo2.setFixedWidth(50)
+        self.combo2.addItems(["==","!=",">","<"])
+
+        self.combo3 = QtGui.QComboBox()
+        self.combo3.setFixedWidth(50)
+        self.combo3.addItems(["goto","trigger"])
+        
+
+        self.combo4 = QtGui.QComboBox()
+        self.combo4.setFixedWidth(50)
+        self.combo4.addItems(["goto","trigger"])
+
+        
+        self.lineEdit2 = QtGui.QLineEdit()
+        self.lineEdit2.setFixedWidth(50)
+        self.lineEdit2.setToolTip("The value")
+        self.lineEdit2.setText("0")
+
+        self.lineEdit3 = QtGui.QLineEdit()
+        self.lineEdit3.setFixedWidth(50)
+        self.lineEdit3.setText("0")
+
+        self.labeltimes = QtGui.QLabel("times. then")
+       
+        self.lineEdit4 = QtGui.QLineEdit()
+        self.lineEdit4.setFixedWidth(50)   
+        self.lineEdit4.setText("0")
+
+        self.lineEdit4.setToolTip("The ID of the Trigger to be connected")
+       
+       # self.combo3 = QtGui.QComboBox()
+        #self.combo3.setFixedWidth(75)
+
+        self.labelelse = QtGui.QLabel("else")
+
+        self.lineEdit5 = QtGui.QLineEdit()
+        self.lineEdit5.setFixedWidth(50)
+        self.lineEdit5.setText("0")
+        self.lineEdit5.setToolTip("The ID of the Trigger to be connected")
+        #self.combo4 = QtGui.QComboBox()
+        #self.combo4.setFixedWidth(75)    
+   
+        self.checkBox = QtGui.QCheckBox("")
+        self.loadCounter = QtGui.QCheckBox("")
+        
+        self.hbox.addWidget(self.lineEdit1, self.numLines,0)
+        self.hbox.addWidget(self.labelIF, self.numLines,1)
+        self.hbox.addWidget(self.dataVar, self.numLines,2)
+        self.hbox.addWidget(self.baseVar, self.numLines,3)
+        self.hbox.addWidget(self.OffsetVar, self.numLines,4)
+        self.hbox.addWidget(self.rangeVar, self.numLines,5)
+
+#        self.hbox.addWidget(self.combo1, self.numLines,2)
+        self.hbox.addWidget(self.combo2, self.numLines,6)
+        self.hbox.addWidget(self.lineEdit2, self.numLines,7)
+        self.hbox.addWidget(self.lineEdit3, self.numLines,8)
+       
+        self.hbox.addWidget(self.labeltimes, self.numLines,9)
+
+        self.hbox.addWidget(self.combo3, self.numLines,10)
+        
+        #self.hbox.addWidget(self.combo3)
+        self.hbox.addWidget(self.lineEdit4, self.numLines,11)
+               
+        self.hbox.addWidget(self.labelelse, self.numLines,12)
+        self.hbox.addWidget(self.combo4, self.numLines,13)
+        #self.hbox.addWidget(self.combo4)
+        self.hbox.addWidget(self.lineEdit5, self.numLines,14)
+       
+        self.hbox.addWidget(self.loadCounter, self.numLines,15)                
+           
+        self.hbox.addWidget(self.checkBox, self.numLines,16)    
+               
+        #self.groupBox.setLayout(self.hbox)
+        #for filterElement in self.filterList:
+        #    self.combo1.addItem(filterElement[0]) 
+       
+        self.numLines = self.numLines + 1
+   #     master.addWidget(self.groupBox)
+
+     def deleteTrigger(self,master):
+        self.lineEdit1.deleteLater()
+        self.lineEdit2.deleteLater()
+        self.lineEdit3.deleteLater()
+        self.lineEdit4.deleteLater()
+        self.lineEdit5.deleteLater()
+        self.dataVar.deleteLater()
+        self.baseVar.deleteLater()
+        self.OffsetVar.deleteLater()
+        self.rangeVar.deleteLater()        
+ #       self.combo1.deleteLater()
+        self.combo2.deleteLater()
+        self.combo3.deleteLater()
+        self.combo4.deleteLater()
+        self.checkBox.deleteLater()
+        self.labelIF.deleteLater()
+        self.labeltimes.deleteLater()
+        self.labelelse.deleteLater()
+        self.loadCounter.deleteLater()
+        master.update()
+        del(self)
+
+     def  convertToList(self):
+        self.listRep = [str(self.lineEdit1.text()),\
+                        str(self.lineEdit2.text()),\
+                        str(self.lineEdit3.text()),\
+                        str(self.lineEdit4.text()),\
+                        str(self.lineEdit5.text()),\
+                        self.dataVar.currentIndex(),\
+                        self.baseVar.currentIndex(),\
+                        self.OffsetVar.currentIndex(),\
+                        self.rangeVar.currentIndex(),\
+                        self.combo2.currentIndex(),\
+                        self.combo3.currentIndex(),\
+                        self.combo4.currentIndex(),\
+                        str(self.loadCounter.isChecked()),\
+                        str(self.checkBox.isChecked())] 
+        return(self.listRep)

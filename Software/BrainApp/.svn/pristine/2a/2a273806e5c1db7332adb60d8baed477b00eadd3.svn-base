@@ -1,0 +1,88 @@
+module self_generate_data_stream
+  (
+   input 	 clk166,
+   input 	 reset,
+   output [35:0] data_36_out,
+   output reg 	 data_36_valid
+   );
+   
+   
+`define CLK_DIVISOR 32'h15
+   reg [31:0] 	clk_divisor_cnt; 	
+   reg 		clk_divisor_pulse;
+
+
+   //create a clock divider pulse
+   always @ (posedge clk166 or posedge reset)
+     begin
+	if(reset)
+	  begin
+	     clk_divisor_cnt <= 32'd0;
+	     clk_divisor_pulse <= 1'd0;
+	  end
+	else
+	  begin
+	     clk_divisor_cnt <= clk_divisor_cnt + 32'd1;
+	     clk_divisor_pulse <= 1'd0;
+	     
+	     if(clk_divisor_cnt >= `CLK_DIVISOR)
+	       begin
+		  clk_divisor_pulse <= 1'd1;
+		  clk_divisor_cnt <= 32'd0;
+	       end	     
+	  end
+     end
+
+   
+   
+   reg [12:0] mem_addr;
+   
+   
+   //loop through the memory
+   always @ (posedge clk166 or posedge reset)
+     begin
+	if(reset)
+	  begin
+	     mem_addr <= 13'h0;
+	  end
+	else
+	  begin
+	     if(clk_divisor_pulse == 1'd1)
+	       begin
+		  mem_addr <= mem_addr + 13'h1;
+	       end
+	  end
+     end
+   
+   self_generate_data_stream_mem36 self_generate_data_stream_mem36_inst 
+     (
+      .address(mem_addr),
+      .clock(clk166),
+      .q(data_36_out)
+      );
+
+   
+   //creat a data 36 valid strobe that is a 2 clock delay of clk_divisor_pulse.  Since there is a latency of
+   //two clock cycles to get valid data out of the memory.  The memory has registers on the address input and
+   //registers on the q output hence the two cycle delay
+
+   reg delay_1;
+   reg delay_2;
+   
+   always @ (posedge clk166 or posedge reset)
+     begin
+	if(reset)
+	  begin
+	     delay_1 <= 1'b0;
+	     delay_2 <= 1'b0;
+	     data_36_valid <= 1'b0;
+	  end
+	else
+	  begin
+	     delay_1 <= clk_divisor_pulse;
+	     delay_2 <= delay_1;
+	     data_36_valid <= delay_2;
+	  end
+     end
+
+endmodule

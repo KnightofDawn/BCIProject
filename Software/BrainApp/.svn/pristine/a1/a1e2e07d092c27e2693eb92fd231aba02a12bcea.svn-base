@@ -1,0 +1,24 @@
+library verilog;
+use verilog.vl_types.all;
+entity capture_to_memory is
+    port(
+        clk166          : in     vl_logic;
+        reset           : in     vl_logic;
+        capture_data32  : in     vl_logic_vector(31 downto 0);
+        capture_hdr4    : in     vl_logic_vector(3 downto 0);
+        capture_ofst16  : in     vl_logic_vector(15 downto 0);
+        capture_en      : in     vl_logic;
+        avl_addr        : out    vl_logic_vector(31 downto 0);
+        avl_size        : out    vl_logic_vector(2 downto 0);
+        avl_be          : out    vl_logic_vector(15 downto 0);
+        avl_ready       : in     vl_logic;
+        avl_wdata       : out    vl_logic_vector(127 downto 0);
+        avl_write_req   : out    vl_logic;
+        arm             : in     vl_logic;
+        trigger         : in     vl_logic;
+        trigger_position: in     vl_logic_vector(2 downto 0);
+        oldest_sample_addr: out    vl_logic_vector(31 downto 0);
+        newest_sample_addr: out    vl_logic_vector(31 downto 0);
+        capture_done    : out    vl_logic
+    );
+end capture_to_memory;

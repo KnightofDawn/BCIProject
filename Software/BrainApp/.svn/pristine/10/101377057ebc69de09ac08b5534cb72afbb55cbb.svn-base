@@ -1,0 +1,829 @@
+<system desc="based on: Hand edited and generated back to PHY_Interface.doc" dl_ldpc_regs_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 35)" fd_tables_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 20)" name="reg_htm_parse" td_tables_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 20)">
+  <block name="PhyTd" offset="0xcc158000">
+    <regfile absolute_addr="0xcc159080" desc="PhyTd Rx Csbuff Status (dynamic status register)" name="RxCsbSts" offset="0x1080">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="RxTdEntryStatus" offset="0x00">
+        <field access="rw" desc="Alias - see TxTdEntryControl register description." name="ControlEmpty" offset="0" reset="1" width="1" />
+        <field access="rw" desc="Set to '0' by hardware to indicate the entry has valid status. Writing a '1' indicates the entry is transferred to hardware for reuse." name="Empty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Alias - see RxTdEntryControl register description." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxTdControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxTdStatusLost" offset="5" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxTdStatusOverflow" offset="6" reset="0" width="1" />
+        <field access="ru" desc="0: Normal mode. ...1: register mode." name="buff_mode" offset="7" reset="0" width="1" />
+        <field access="ru" desc="csbuff control read pointer" name="CtrlRdPtr" offset="8" reset="0" width="4" />
+        <field access="ru" desc="csbuff status read pointer" name="StatusWrPtr" offset="12" reset="0" width="4" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxRfIfcStatus" offset="0x04">
+        <field access="ru" desc="Estimated DC bias in the Q channel. S&lt;8,-2&gt; format." name="EstDcBiasQ" offset="0" reset="x" width="10" />
+        <field access="ru" desc="Estimated DC bias in the I channel. S&lt;8,-2&gt; format." name="EstDcBiasI" offset="10" reset="x" width="10" />
+        <field access="ru" desc="bit[0]   : &quot;pkt_err_bit&quot;
+ ... 0 : normal
+ ... 1 : packet bad ( see &quot;pkt_err_src&quot; )
+
+  ... bit[1]   : &quot;req_err&quot;
+  ... 0 : normal
+ ... 1 : &quot;dout_req&quot; or &quot;stat_req&quot; error
+
+  ... bit[3:2] : &quot;pkt_err_src&quot; ( assuming that &quot;pkt_err_bit&quot; is 1 )
+  ... 0 : failed to get OFDM after AcqFinished. also end of receive window while still receiving data.
+ ... 1 : large TTG when getting the packet descriptor
+ ... 2 : end of the detection gate
+ ... 3 : no AcqFinished after BurstDetect
+
+  ... bit[4] : mClear      during the detection gate
+ ... bit[5] : mReset      during the detection gate
+ ... bit[6] : PeakDetect  during the detection gate
+            ... bit[7] : BurstDetect during the detection gate
+" name="PktErr" offset="20" reset="x" width="8" />
+        <field access="ru" desc="0:module_saturation ... bit[0] : rf_ifc    saturation
+ ... bit[1] : resampler saturation
+ ... bit[2]   : notch     saturation
+ ... bit[3]   : dig_gain  saturation
+
+             ... 1 : ... bit[1:0] : pkt_ok_cnt  - a 2 bit counter of good packets ( wraps around from 3 to 0 )
+  ... bit[3:2] : pkt_bad_cnt - a 2 bit counter of bad  packets ( wraps around from 3 to 0 )
+
+ ... 2 : ... bit[0]   : extra detection in the first  bin of the extra detection gate
+ ... bit[1]   : extra detection in the middle bin of the extra detection gate
+ ... bit[2]   : extra detection in the last   bin of the extra detection gate
+ ... bit[3]   : no extra detection within the detection window
+
+" name="PktSat" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxAgcStatus_0" offset="0x08">
+        <field access="ru" desc="(before final AGC adjustment.) U&lt;15,8&gt; format?." name="FinalAnalogEnergy" offset="0" reset="x" width="15" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="17" />
+      </reg>
+      <reg name="RxAgcStatus_1" offset="0x0c">
+        <field access="ru" desc="U&lt;15,8&gt; format?." name="FinalDigitalEnergy" offset="0" reset="x" width="15" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="17" />
+      </reg>
+      <reg name="RxAgcStatus_2" offset="0x10">
+        <field access="ru" desc="Number of Sat2 saturations detected." name="AgcSatDetect4Rd" offset="0" reset="x" width="2" />
+        <field access="ru" name="LargeDetectCnt" offset="2" reset="x" width="2" />
+        <field access="ru" name="SseqDetectCnt" offset="4" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="26" />
+      </reg>
+      <reg name="RxLongTermAgcStatus_0" offset="0x14">
+        <field access="ru" desc="Total energy of 1024 200 MHz samples. U&lt;16,8&gt; format." name="AnalogEnergy" offset="0" reset="x" width="16" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxLongTermAgcStatus_1" offset="0x18">
+        <field access="ru" desc="Total energy of 512 100 MHz samples. U&lt;16,7&gt; format." name="DigitalEnergy" offset="0" reset="x" width="16" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxBurstAcqStatus_0" offset="0x1c">
+        <field access="ru" name="MeanStartTime" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="24" />
+      </reg>
+      <reg name="RxBurstAcqStatus_2" offset="0x20">
+        <field access="ru" desc="the status depends on the value of the static parameter &quot;RxCtrlDetectCtcCya&quot;
+             0 : the delay from gate start to BurstDetect in units of 50Mhz
+             1 : the absolute value of CTC_TIMER at BurstDetect in units of 100Mhz
+
+" name="RxCtrlBurstDetectCtc4Rd" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxFreqOffsetEstStatus" offset="0x24">
+        <field access="ru" name="FreqOffsetEstimate" offset="0" reset="x" width="17" />
+        <field access="ru" name="RESERVED" offset="17" reset="x" width="15" />
+      </reg>
+      <reg name="RxCtrl" offset="0x28">
+        <field access="ru" desc="Estimated frequency offset.               S&lt;17,-5&gt;format." name="DigitalGain4Rd" offset="0" reset="x" width="9" />
+        <field access="ru" name="AnalogGain4Rd" offset="9" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxCtrlSynStatus" offset="0x2c">
+        <field access="ru" desc="TBD" name="FramingCpFreqOffset_4rd" offset="0" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="20" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc159800" desc="PhyTd Rx Long Sequence Reference Table" name="RxLongSeqRefTbls" offset="0x1800">
+      <mult name="0" num="4" offset="0x40" />
+      <reg name="RxLongSeqRefReg" offset="0x0">
+        <field access="rw" desc="This array defines a time-domain sequence to cross correlate with the received c.LINK+ long-sequence symbols. (MoCA 1.x time-domain sequences are hardwired.) Each array element encodes the I and Q components of the sample as follows: Ele[3:2] ... 0: I = 0 ... 1: I = 1 ... 3: I = -1 Ele[1:0] ... 0: Q = 0 ... 1: Q = 1 ... 3: Q = -1" name="RxLongSeqRef_0" offset="0" reset="x" width="4" />
+        <field access="rw" name="RxLongSeqRef_1" offset="4" reset="x" width="4" />
+        <field access="rw" name="RxLongSeqRef_2" offset="8" reset="x" width="4" />
+        <field access="rw" name="RxLongSeqRef_3" offset="12" reset="x" width="4" />
+        <field access="rw" name="RxLongSeqRef_4" offset="16" reset="x" width="4" />
+        <field access="rw" name="RxLongSeqRef_5" offset="20" reset="x" width="4" />
+        <field access="rw" name="RxLongSeqRef_6" offset="24" reset="x" width="4" />
+        <field access="rw" name="RxLongSeqRef_7" offset="28" reset="x" width="4" />
+        <mult name="0" num="16" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc159900" desc="PhyTd Rx Allowed Final Gain Adjust Table" name="RxAllowFinalGainAdj" offset="0x1900">
+      <mult name="0" num="1" offset="0x0" />
+      <reg name="RxAllowFinalGainAdj" offset="0x0">
+        <field access="rw" desc="This array indicates whether gain changes of +1, +2, -1 and -2 dB are allowed during final gain adjust from the specified(by index) gain level." name="AdiEn_0" offset="0" reset="x" width="4" />
+        <field access="rw" name="AdiEn_1" offset="4" reset="x" width="4" />
+        <field access="rw" name="AdiEn_2" offset="8" reset="x" width="4" />
+        <field access="rw" name="AdiEn_3" offset="12" reset="x" width="4" />
+        <field access="rw" name="AdiEn_4" offset="16" reset="x" width="4" />
+        <field access="rw" name="AdiEn_5" offset="20" reset="x" width="4" />
+        <field access="rw" name="AdiEn_6" offset="24" reset="x" width="4" />
+        <field access="rw" name="AdiEn_7" offset="28" reset="x" width="4" />
+        <mult name="0" num="12" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile desc="PhyTd Tx Csr (static control register)" name="TxCsr" offset="0x0000">
+      <reg name="PhyTxTdCtrl" offset="0x004">
+        <field access="rw" desc="0: Tx TD reset 1: Tx TD enabled." name="Enable" offset="0" reset="0" width="1" />
+        <field access="rw" desc="0: &quot;circular queue&quot; mode 1: &quot;register&quot; mode ... Normal operation uses &quot;circular queue&quot; mode. Repetitive and continuous operation use &quot;register&quot; mode." name="DynCtrlMode" offset="1" reset="x" width="1" />
+        <field access="rw" desc="0: normal operation 1: loopback Tx TD to Rx TDNote this bit controls both Tx and Rx." name="LoopbackToRx" offset="2" reset="x" width="2" />
+        <field access="rw" desc="SPARE TXCSR" name="TxCsrSpare" offset="4" reset="x" width="8" />
+        <field access="ru" desc="TX CSR STATUS" name="TxCsrSpareStatus" offset="12" reset="x" width="8" />
+        <field access="rw" desc="special status mode." name="DynStatusMode" offset="20" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="21" reset="x" width="11" />
+      </reg>
+      <reg name="TxIfft" offset="0x008">
+        <field access="rw" desc="the length of short sequence." name="SsLen" offset="0" reset="x" width="9" />
+        <field access="rw" desc="the length of long sequence." name="LsLen" offset="9" reset="x" width="9" />
+        <field access="rw" desc="bit 0 for disable SS smoothing, bit 1 for disable LS smoothing, bit 2 for disable CE smoothing." name="TxWinCtrlCya" offset="18" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="21" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="9" />
+      </reg>
+      <reg name="TxEppPream" offset="0x00c">
+        <field access="rw" desc="1 for conteneous mode, 0 for 1280 samples only." name="Cont" offset="0" reset="x" width="1" />
+        <field access="rw" desc="0 for pi/4 offset BPSK modulation. 1 for normal BPSK modulation." name="BpskCya" offset="1" reset="x" width="1" />
+        <field access="rw" desc="1 for stopping contineous EPP on packet switch, 0 for endless." name="ContStopCya" offset="2" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="13" />
+        <field access="rw" desc="Scale factor for Moca 1.x Preamble short and long sequences and EPP Probe generator. U&lt;12,0&gt; format." name="Scale" offset="16" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="TxPcktGate_0" offset="0x10">
+        <field access="rw" desc="window size in which time to start should fall in." name="WinSize" offset="0" reset="x" width="31" />
+        <field access="ru" name="RESERVED" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="TxPcktGate_1" offset="0x14">
+        <field access="rw" desc="Set to 0 for normal mode and every packet would be gated by a PktStartTime. If set to 1, the first packet would use PktStartTime and after that, every packets is gate by a CTC value of RepeatIfg." name="RepeatMode" offset="0" reset="x" width="1" />
+        <field access="rw" desc="This ignored in non RepeatMode. This defines the size of the IFG (from packet end to next packet start) in RepeatMode . This field is in 200 Mhz precision." name="RepeatIfg" offset="1" reset="x" width="16" />
+        <field access="rw" desc="zeros at packet end ... 0: no zeros ... 1: no zeros ... 2: no zeros ... 3: 16 zeros. (need only bit 18)" name="EndingZerosCya" offset="17" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="19" reset="x" width="13" />
+      </reg>
+      <reg name="TxTdPream" offset="0x18">
+        <field access="rw" desc="Scale factor for short and long seq." name="Scale" offset="0" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="20" />
+      </reg>
+      <reg name="TdTestMuxCtrl" offset="0x1c">
+        <field access="rw" desc="Setting this field to 1 would disable any datapath throttling by the test mux logic. Only set to 1 if errors result from throttling. In RevA silicon, this should be set to 1 when using QAM512 or QAM1024" name="TdTxDisable100MThrottle" offset="0" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="1" reset="x" width="31" />
+      </reg>
+      <reg name="TxEventLogger_0" offset="0x20">
+        <field access="rw" desc="the threshold of which time between arrival and transmit is compared to." name="TxPcktGatePcktLateThld" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="TxDigMixer_0" offset="0x24">
+        <field access="rw" desc="Fusion2 new add : square waves test outputs (saturated sin/cos)" name="TxDigMixerSatMode" offset="0" reset="x" width="1" />
+        <field access="rw" desc="Fusion2 new add : there are 4 main modes" name="TxDigMixerMainMode" offset="1" reset="x" width="2" />
+        <field access="rw" desc="Fusion2 new add : there are 8 sub modes" name="TxDigMixerSubMode" offset="3" reset="x" width="3" />
+        <field access="rw" desc="Fusion2 new add : tone2 freq or msb's of sweep_freq" name="TxDigMixerFreq2" offset="6" reset="x" width="20" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="TxDigMixer_1" offset="0x28">
+        <field access="rw" desc="Fusion2 new add : bit[3]==0 Joe's implementation, bit[2]==0 discontinuity chirp, bits[1:0] chirp boundries 100M 50M 25M " name="TxDigMixerChirpCya" offset="0" reset="x" width="1" />
+        <field access="rw" desc="Fusion2 new add :  test modes are done in a burst mode (using dummy input data)" name="TxDigMixerTestCya" offset="1" reset="x" width="1" />
+        <field access="rw" desc="Fusion2 new add :  the gain used for the cos table output" name="TxDigMixerFreq1Gain" offset="2" reset="x" width="13" />
+        <field access="rw" desc="Fusion2 new add :  the gain used for the sin table output" name="TxDigMixerFreq2Gain" offset="15" reset="x" width="13" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="TxAnalogIfc" offset="0x2c">
+        <field access="rw" desc="Fusion2 new add :  disable bias remvoal on non zero data" name="TxAnalogIfcSatCya" offset="0" reset="x" width="1" />
+        <field access="rw" desc="Fusion2 new add :  DAC representation 1: 2's complement, 0 unsigned" name="TxAnalogIfcD2aIs2c" offset="1" reset="x" width="1" />
+        <field access="rw" desc="Fusion2 new add :   6 bits I dc bias" name="TxAnalogIfcIDcBias" offset="2" reset="x" width="6" />
+        <field access="rw" desc="Fusion2 new add :   6 bits Q dc bias" name="TxAnalogIfcQDcBias" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="17" />
+      </reg>
+      <reg name="TxDacOut" offset="0x30">
+        <field access="rw" desc="Fusion2 new add :  when asserted dac_out latched to  dac_out_latch_i/q " name="TxDacOutLatchEn" offset="0" reset="x" width="1" />
+        <field access="rw" desc="Fusion2 new add :   dac real part latch value" name="TxDacOutLatchI" offset="1" reset="x" width="10" />
+        <field access="rw" desc="Fusion2 new add :   dac imag part latch value " name="TxDacOutLatchQ" offset="11" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="21" reset="x" width="11" />
+      </reg>
+      <reg name="PhyTdStaticStatus">
+        <field access="ru" desc=" Fusion2 new add : the number of saturated I/Q data" name="TxAnalogIfcSatCnt" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="24" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc158800" desc="PhyTd Tx Csbuff (dynamic control register)" name="TxCsbCtl" offset="0x0800">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="TxTdEntryControl" offset="0x00">
+        <field access="rw" desc="Writing a '0' transfers this entry to hardware for processing. Writing a '1' transfers this entry to software for reuse." name="Empty" offset="0" reset="1" width="1" />
+        <field access="ru" desc="State of corresponding status entry - see TxTdEntryStatus register description." name="StatusEmpty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="0: not processed 1: processed Indicates this entry has been processed (but status not necessarily available)." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" desc="How does this happen?." name="ControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="Lost" offset="5" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="Overflow" offset="6" reset="0" width="1" />
+        <field access="ru" desc="0: Normal mode. ...1: register mode." name="buff_mode" offset="7" reset="0" width="1" />
+        <field access="ru" desc="csbuff control read pointer" name="CtrlRdPtr" offset="8" reset="0" width="4" />
+        <field access="ru" desc="csbuff status read pointer" name="StatusWrPtr" offset="12" reset="0" width="4" />
+        <field access="rw" desc="Extracted top 16 bits for debug" name="TdTxSwPktType" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="TxTdControl" offset="0x04">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="28" />
+        <field access="rw" desc="0: normal operation, output I/Q equal to input I/Q ... 1: 12 bits output bits [31:20] for I and bits [15:4] for Q ... 2: 8 bits output bits [31:24] for I and bits [23:16] for Q ... 3: 8 bits output bits [15:8] for I and bits [7:0] for Q ... In bypass modes (TxTdControlMode = 1-3), I/Q outputs are sliced from 32 bits BYPASS input. In those cases, data from FD (assumed as 100Msps rate) is directly output to ASPEN without any processing in this chip. TD transmit section mode. In 10-bit bypass mode 32-bit input data contains a single pair of up to 12-bit I and Q DAC samples. The samples are transferred directly to ASPEN: no processing blocks are active in this chip. 8-bit bypass mode is similar except each 32-bit input data contains two pairs of 8-bit I and Q DAC samples." name="Mode" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxIfft_0" offset="0x08">
+        <field access="rw" desc="mode to define window size.0-9 for 2,3,4,6,8,12,16,24,48 correspondingly" name="TxWindowMode" offset="0" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="12" />
+        <field access="rw" desc="Number of Channel Estimation symbols to output. A value of 0 indicates there is no Channel Estimation input to IFFT. Note the receiver supports at most two CE symbols." name="NumChanEstSyms" offset="16" reset="x" width="4" />
+        <field access="rw" desc="Number of Long Sequence segments to output. A value of 0 indicates there is no Long Sequence input to IFFT." name="NumLongSeqSeg" offset="20" reset="x" width="4" />
+        <field access="rw" desc="Number of Short Sequence segments to output. A value of 0 indicates there is no Short Sequence input to IFFT." name="NumShortSeqSeg" offset="24" reset="x" width="4" />
+        <field access="rw" desc="0: 256-point (MoCA 1.x) 1: 512-point (c.LINK+)." name="Mode" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxIfft_1" offset="0x0c">
+        <field access="rw" desc="Gain applied to the long sequence symbol's IFFT output. U&lt;12,1&gt; format." name="LongSeqGain" offset="0" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="4" />
+        <field access="rw" desc="Gain applied to the short sequence symbol's IFFT output. U&lt;12,1&gt; format." name="ShortSeqGain" offset="16" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="TxIfft_2" offset="0x10">
+        <field access="rw" desc="Gain applied to each data symbols' IFFT output. U&lt;12,1&gt; format." name="DataGain" offset="0" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="4" />
+        <field access="rw" desc="Gain applied to the channel estimation symbol's IFFT output. U&lt;12,1&gt; format." name="ChanEstGain" offset="16" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="TxIfft_3" offset="0x14">
+        <field access="rw" desc="Length in samples of the cyclic prefix for data symbols.[jm71] A value of 255 indicates a cplength of 512. In RevA silicon. This is restricted to at least 0x40" name="DataCpLength" offset="0" reset="x" width="8" />
+        <field access="rw" desc="Length in samples of the cyclic prefix for channel estimation symbols." name="ChanEstCpLength" offset="8" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="TxTdPream" offset="0x18">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="24" />
+        <field access="rw" desc="0: don't invert second half 1: invert second half." name="LongSeqInv" offset="24" reset="x" width="1" />
+        <field access="rw" desc="0: P1 L3 ... 1: P1 L4 ... 2: P2 FD ... 3: P2 TD + EPP payload ... 4: P3 ... 5: P4 Note for P2 TD + EPP payload the input data is discarded and replaced with the canned EPP payload sequence." name="Select" offset="25" reset="x" width="3" />
+        <field access="rw" desc="0: no TD preamble 1: TD preamble enabled Note the TD preamble is only used for MoCA 1.x packets; c.LINK+ preambles are generated in the FD." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxTimingOffResamp" offset="0x1c">
+        <field access="rw" desc="Per-sample timing offset. S&lt;14,-9&gt; format." name="SamplingOffset" offset="0" reset="x" width="14" />
+        <field access="rw" desc="IQ delay normalized to 200 Mhz sample space, format is S&lt;14,0&gt;." name="IQdelay" offset="14" reset="x" width="14" />
+        <field access="rw" desc="0: timing offset resampler disabled 1: timing offset resampler enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxInterp" offset="0x20">
+        <field access="rw" desc="0: moca1x mode 1: moca2x mode. used to specify the serdes interface output rate 50M/100M accordingly" name="Mode" offset="0" reset="x" width="1" />
+        <field access="rw" desc="0: interpolator 100Mhz -&gt; 200Mhz disabled (up sampled data is equal to input sample) ... 1: interpolator 100Mhz-&gt; 200Mhz enabled " name="Interp2xEnable" offset="1" reset="x" width="1" />
+        <field access="rw" desc="if Mode == 1 this bit is ignored, else if Mode ==0, then  ... 0: interpolator 50Mhz -&gt; 100Mhz  disabled (up sampled data is equal to input sample) ... 1: interpolator 50Mhz -&gt; 100Mhz  enabled" name="Interp2xMoca1xEnable" offset="2" reset="x" width="1" />
+        <field access="rw" name="Interp400Enable" offset="3" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="28" />
+      </reg>
+      <reg name="TxDigMixer" offset="0x24">
+        <field access="rw" desc="U&lt;20,0&gt; format." name="Phase1" offset="0" reset="x" width="20" />
+        <field access="ru" name="RESERVED" offset="20" reset="x" width="8" />
+        <field access="rw" desc="0: digital mixer bypassed 1: digital mixer enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxOfdmaIqPred" offset="0x028">
+        <field access="rw" desc="Q part of compensation coefficients, format s&lt;11,-2&gt;." name="Qcoef" offset="0" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="6" />
+        <field access="rw" desc="I part of compensation coefficients, format s&lt;11, -2&gt;." name="Icoef" offset="17" reset="x" width="11" />
+        <field access="rw" name="Enable" offset="28" reset="x" width="1" />
+        <field access="rw" desc="0: no inversion, 1: spectrum inversion." name="SpecInvEn" offset="29" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxDacIfc_0" offset="0x02c">
+        <field access="rw" desc="DAC digital gain mantissa U&lt;9,1&gt; format." name="DigGainMant" offset="0" reset="x" width="9" />
+        <field access="ru" name="RESERVED" offset="9" reset="x" width="7" />
+        <field access="rw" desc="DAC digital gain exponent. U&lt;2,2&gt; format. This is actually an attenuation, 0 = no attenuation, 1 = 0.5, 2 = 0.25, 3 = 0.125." name="DigGainExp" offset="16" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="18" reset="x" width="10" />
+        <field access="rw" desc="0: no inversion 1: inversion When '1' the transmit spectrum is inverted by conjugating the transmit samples." name="InvertSpectrum" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxPktGate" offset="0x030">
+        <field access="rw" desc="This field is in 50 Mhz precision and format is u&lt;32,32&gt;." name="PktStartTime" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="TxTdMisc_0" offset="0x034">
+        <field access="rw" desc="0: Moca1x mode. 1: Moca2x mode." name="PktGate_Moca2xMode" offset="0" reset="x" width="1" />
+        <field access="rw" desc="offset to ctc_start_time in 100Msamples." name="PcktGatePktStartOffset" offset="1" reset="x" width="14" />
+        <field access="rw" desc=". 4 bits input packet ID." name="TxPcktGatePacketId" offset="15" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="19" reset="x" width="13" />
+      </reg>
+      <reg name="TxEventLogger" offset="0x038">
+        <field access="rw" name="RESERVED" offset="0" reset="x" width="4" />
+        <field access="rw" desc="1 create event logger pulses for IFFT." name="TxIfftCpiEventLogEn" offset="4" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="5" reset="x" width="27" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc158880" desc="PhyTd Tx Csbuff Status (dynamic status register)" name="TxCsbSts" offset="0x0880">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="TxTdEntryStatus" offset="0x00">
+        <field access="rw" desc="Alias - see TxFdEntryControl register description." name="ControlEmpty" offset="0" reset="1" width="1" />
+        <field access="rw" desc="Set to '0' by hardware to indicate the entry has valid status. Writing a '1' indicates the entry is transferred to hardware for reuse." name="Empty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Alias - see TxTdEntryControl register description." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" desc="How does this happen?." name="ControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="Lost" offset="5" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="Overflow" offset="6" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="25" />
+      </reg>
+      <reg name="TxPcktGateStatus" offset="0x04">
+        <field access="ru" desc="the period in 50M clocks between the first data arrival time and transmit time." name="PktStartLatency" offset="0" reset="x" width="13" />
+        <field access="ru" desc="the number of I or Q positive/negative saturations during the last packets." name="SatCnt" offset="13" reset="x" width="8" />
+        <field access="ru" desc="0 : normal ( no error detected ) ... 1 : the parameters for the  packet were ready too late ( i.e. missed the packet ) ... 2 : the packet data arrive     too close to packet        start time supplying       too few inputs in the       FIFO ... 3 : while waiting for FIFO            fill, the packet gate &quot;din_req&quot; has changed. This is a null xmt packet. ... 4 : same as 3 but some data has already been written into the FIFO. Not expecting to get such a case. ... 5 : a gap in the input data during an active packet ( might still be ok if not followed by non zero data ). ... 6 : as in 5 but the gap was followed by non-zero data. ... 7 : the parameters for the   packet were ready way      too early ( too much time to packet start )." name="XmtErr" offset="21" reset="x" width="3" />
+        <field access="ru" desc="Status[1] - xmt_fail: whenever xmt_err is not zero during the packet Status[0] - NA." name="XmtStatus" offset="24" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="TxResampleStatus" offset="0x08">
+        <field access="ru" desc="the number of samples inside real data fifo at the end of packet (up to 64)" name="TxResamplerFifoCntI" offset="0" reset="x" width="6" />
+        <field access="ru" desc="the number of samples inside real data fifo at the end of packet (up to 64)" name="TxResamplerFifoCntQ" offset="6" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="20" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc158400" desc="PhyTd Rx Csr (static control register)" name="RxCsr" offset="0x0400">
+      <reg name="PhyRxTdCtrl" offset="0x004">
+        <field access="rw" desc="0: Rx TD reset 1: Rx TD enabled." name="Enable" offset="0" reset="0" width="1" />
+        <field access="rw" desc="0: &quot;circular queue&quot; mode 1: &quot;register&quot; mode ... Normal operation uses &quot;circular queue&quot; mode. Repetitive and continuous operation use &quot;register&quot; mode." name="DynCtrlMode" offset="1" reset="x" width="1" />
+        <field access="rw" desc="special status mode." name="DynStatusMode" offset="2" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. change name . This is for testing purpose, and should be set to 0." name="RxCtrlClkGateDisCya" offset="3" reset="x" width="1" />
+        <field access="rw" desc="0: normal mode ... 1: RepeatMode ... If set to 1, the first packet ReceiveTime is defined by TD Rx Csbuff ReceiveTime parameters, and the rest packets have ReceiveTime equal to the previous packet ReceiveTime plus RxCtrlRepeatDelay." name="RxCtrlRepeatMode" offset="4" reset="x" width="1" />
+        <field access="rw" desc="This ignored in non RepeatMode. This defines the size of the IFG (from packet end to next packet start) in RepeatMode. 100Mhz units." name="RxCtrlRepeatDelay" offset="5" reset="x" width="16" />
+        <field access="rw" desc="FusionLoopbackMode. ... 0:  normal opperation ... 1:  tx to rx loopback ... 2:  tx to rx loopback but detection gate not based on CTC  " name="FusionLoopbackMode" offset="21" reset="x" width="2" />
+        <field access="rw" name="RxMoca1xMclearSimCya" offset="23" reset="x" width="1" />
+        <field access="rw" desc="option for the ctrl fsm to ignore &quot;acq_err&quot; or abort on it." name="RxCtrlAcqErrCya" offset="24" reset="x" width="2" />
+        <field access="rw" desc="option for short mReset/mClear and option to disable them on forced BurstDetect. This field needs to be set to 10 to enable data rewind in forced burst detect which is needed for Greenfield Beacons and MoCA2 MAP recovery" name="RxCtrlRstClrCya" offset="26" reset="x" width="2" />
+        <field access="rw" name="RxCtrlFullResetCya" offset="28" reset="x" width="1" />
+        <field access="rw" name="RxSimplePacketCya" offset="29" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxAdcIfc_0" offset="0x08">
+        <field access="rw" desc="If the ReceiveTime does not fall within this number of ticks following the current CTC time an invalid receive error is raised. See XXX for details. A value of 0 indicates any ReceiveTime is valid." name="ReceiveTimeValidWindowSize" offset="0" reset="x" width="31" />
+        <field access="rw" desc="RevB and beyond. Used to avoid mClear in qeq" name="RxQeqClearCya" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RxAdcIfc_1" offset="0x00c">
+        <field access="rw" desc="1 : using &quot;rx_ctrl_pkt_stop_time&quot;  0 : ignore the stop time." name="RxCtrlPktStopEnable" offset="0" reset="x" width="1" />
+        <field access="rw" desc="0 : align to packet start 1 : use as is Option for software marker transparent mode." name="RxCtrlSoftwareMarkerMode" offset="1" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. Used to avoid mClear in rotator" name="RxRotatorClearCya" offset="2" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. Used to delay the freq offset input" name="RxRotatorFreqCya" offset="3" reset="x" width="2" />
+        <field access="rw" desc="RevB and beyond. Used to load early the digital gain if no analog gain adjust is needed" name="AgcDigitalGainFastCya" offset="5" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. Option to load the relative CTC TIME at burst detect." name="RxCtrlDetectCtcCya" offset="6" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. Can calculate the CRC of the I/Q inputs" name="RxRfIfcCrcEnable" offset="7" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. Used to avoid mClear in rf_ifc" name="ClearCya" offset="8" reset="x" width="1" />
+        <field access="rw" desc="1 : use local sat detection instead of using &quot;a2d_intrp&quot; sat detection" name="AgcSatDetCya" offset="9" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="18" />
+        <field access="rw" desc="This is CYA signal 0: offset-binary 1: two's complement Specifies format of ADC and loopback inputs (whichever is selected) to Rx TD. The ADC output is offset-binary format. The loopback input format is controlled by TxRfIfc.OutputFormat." name="InputFormat" offset="28" reset="x" width="1" />
+        <field access="rw" desc="1 : enable the dc notch." name="DcNotchEnable" offset="29" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxAdcIfc_2" offset="0x010">
+        <field access="rw" desc="6 bits gain (32 is unity gain) u&lt;6,1&gt;." name="Gain" offset="0" reset="x" width="6" />
+        <field access="rw" desc="option to have 2c I/Q input to the &quot;a2d_intrp&quot; modules 0 =&gt; input is offset binary    1 =&gt; input is 2c" name="RxA2dIntrp_2cCya" offset="6" reset="x" width="1" />
+        <field access="rw" desc="option to disable the blanking of I/Q" name="RxA2dIntrpBlankCya" offset="7" reset="x" width="1" />
+        <field access="rw" desc="option to control the interpolator phase
+" name="RxA2dIntrpPhaseCya" offset="8" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="4" />
+        <field access="rw" desc=" SPAR : threshold which |I| &amp; |Q| are compared to declare I/Q sample &quot;sat&quot;" name="AgcSatLavel" offset="14" reset="x" width="9" />
+        <field access="rw" desc="dc bias loop bandwidth 0 lowerst loop bandwidth 3 highest loop bandwidth Controls integration period equal to 217-N  samples where N is this value." name="DcBiasCompGainLog2" offset="23" reset="x" width="2" />
+        <field access="rw" desc="1 : will clear the static status ( and its error flag )" name="RxCtrlStaticStatusClr" offset="25" reset="x" width="1" />
+        <field access="rw" desc=" several options for &quot;rx_a2d_gate&quot;" name="RxCtrlA2dGateCya" offset="26" reset="x" width="4" />
+        <field access="rw" desc="This is CYA signal 0: dc bias is in range -64..63 lsb's 1: dc bias is in range  -64..63 lsb's and freeze the dc_bias during blanking 2: dc bias is limited to -32..31 lsb's and freeze the dc_bias during blanking 3: dc bias is limited to -16..15 lsb's and freeze the dc_bias during blanking." name="DcBiasCompMode" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxAdcIfc_3" offset="0x014">
+        <field access="rw" desc="BlankingPeriodStart. Blanking period in 200MHz samples following start of receive window. Receiver input is forced to (0,0) during blanking. A value of 0 is no blanking." name="StartBlankWindow" offset="0" reset="x" width="10" />
+        <field access="rw" desc="10 bits size of window to blank receiver after &quot;rx_detect_full_reset&quot;." name="ResetBlankWindow" offset="10" reset="x" width="10" />
+        <field access="rw" desc="10 bits size of window to blank receiver after &quot;rx_detect_data_clear&quot;." name="ClearBlankWindow" offset="20" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxLowPassFilter" offset="0x018">
+        <field access="rw" desc="This is CYA signal disable functionality 0: low pass filter enabled1: low pass filter bypassedFor testing purposes." name="Enable" offset="0" reset="x" width="1" />
+        <field access="rw" desc="Reuse . add new simulation option to disabler mClear 0 : normal 1 : don't clear the FIR on &quot;rx_detect_data_clear&quot;." name="ClearCya" offset="1" reset="x" width="1" />
+        <field access="rw" desc=": 1:function as 50 MHz lpf, else function according to lpf_moca2x" name="RxLpfAccessMode" offset="2" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="12" />
+        <field access="rw" desc=" some options for the new freq offset algorithm
+" name="RxFreqOffset2CorrCya" offset="15" reset="x" width="2" />
+        <field access="rw" desc="the threshold used by the new algorithm for freq offset
+" name="RxFreqOffset2CorrThd" offset="17" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxAgc_0" offset="0x01c">
+        <field access="rw" desc="The threshold the absolute value of the received I or Q component must equal or exceed for this sample to count as saturated. U&lt;10,0&gt; format." name="AdcSatThreshold" offset="0" reset="x" width="9" />
+        <field access="rw" desc=" RevB and beyond. Option to disable large detection after period without any saturation" name="AgcLargeDetCya" offset="9" reset="x" width="1" />
+        <field access="rw" desc="the delay before applying an &quot;analog_gain&quot; change as of large detect." name="AgcLargeDetDelay" offset="10" reset="x" width="6" />
+        <field access="rw" desc=" RevB and beyond.   Option to change the TD_RX response to mClear ( for easier bit matching )" name="RxMclearSimCya" offset="16" reset="x" width="3" />
+        <field access="rw" desc="1 : using fixed digital gain." name="AgcFixedDigitalGainCya" offset="19" reset="x" width="1" />
+        <field access="rw" desc="the delay before applying an digital_gain&quot; change as of agc_large_detect." name="AgcDigitalGainSseqDelay" offset="20" reset="x" width="8" />
+        <field access="rw" desc="maximum number of &quot;agc_sseq_detect&quot;." name="MaxShortSeqDetect" offset="28" reset="x" width="2" />
+        <field access="rw" desc=" RevB and beyond. option to replace the &quot;rx_ctrl_pkt_sat_4rd&quot; status" name="RxCtrlStatusCya" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxAgc_1" offset="0x020">
+        <field access="rw" desc="the threshold which &quot;analog_energy&quot; is compared to, for &quot;agc_large_detect&quot; is an 8 bit value aligned with &quot;analog_energy&quot; MSB bits ..." name="LargeSigDetEnergyThreshold" offset="0" reset="x" width="8" />
+        <field access="rw" desc="max value allowed for the backend gain (0..31 dB)." name="AgcMaxBackendGain" offset="8" reset="x" width="5" />
+        <field access="rw" desc="min value allowed for the backend gain (0..31 dB)." name="AgcMinBackendGain" offset="13" reset="x" width="5" />
+        <field access="rw" desc="the special iq  level for &quot;agc_analog_energy&quot; (in log2 s&lt;10,5&gt; format)." name="AgcAnalogTargetEnergyIq" offset="18" reset="x" width="10" />
+        <field access="rw" desc="cya bits for &quot;agc_digital_gain_sseq_delay&quot; [0] : disable analog_gain  adjust on &quot;agc_sseq_detect&quot; (simulation only) [1] : enable  digital_gain adjust on &quot;agc_sseq_detect&quot; even if analog_gain is not saturated." name="AgcDigitalGainSseqCya" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxAgc_2" offset="0x024">
+        <field access="rw" desc="U&lt;16,4&gt; format." name="ACorrMin" offset="0" reset="x" width="10" />
+        <field access="rw" desc="variations for &quot;agc_force_sseq_detect&quot; mode." name="AgcForceSseqDetectCya" offset="10" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="1" />
+        <field access="rw" desc="the max number of sat and large detects combined." name="AgcSatLargeMaxCnt" offset="13" reset="x" width="3" />
+        <field access="rw" desc="this is the &quot;agc_sseq_detect&quot; threshold &quot;alpha&quot; (threshold=&quot;digital_energy&quot;*alpha + beta) U&lt;5,1&gt; format. Note this has an extra integer bit compared to the PHY spec for testing purposes." name="ACorrThreshold" offset="16" reset="x" width="4" />
+        <field access="rw" desc="the special iq level for &quot;agc_digital_energy (in log2 s&lt;10,5&gt; format)." name="AgcDigitalTargetEnergyIq" offset="20" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxAgc_3" offset="0x028">
+        <field access="rw" desc="additional timeout to &quot;agc_sat_timeout_len&quot; upon the first &quot;lseq_peak_detect&quot;." name="AgcPeakDetTimeoutLen" offset="0" reset="x" width="12" />
+        <field access="rw" desc="bit by bit matching - 2 way option to select &quot; &quot;analog_gain&quot; &quot; at 100Mhz rate." name="AgcAnalogEnergyTbCya" offset="12" reset="x" width="1" />
+        <field access="rw" desc="bit by bit matching - 2 way option to select &quot;agc_sat_detect&quot; at 100Mhz rate." name="AgcSatDetTbCya" offset="13" reset="x" width="1" />
+        <field access="rw" desc="duration of no sat/large/agc detect after sat/large detection  ( in en_100's )." name="AgcSatLargeDetDisWindow" offset="14" reset="x" width="12" />
+        <field access="rw" desc="option to latch &quot;agc_analog_energy&quot; on &quot;far&quot; peak detections." name="AgcAnalogEnergyLatchCya" offset="26" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="5" />
+      </reg>
+      <reg name="RxAgc_4" offset="0x02c">
+        <field access="rw" desc="The period in 100MHz clocks after AGC Detect to disable Saturation Detect , Large Signal Detect and Agc Detect." name="DisableSatDetPeriodOnAgcDet" offset="0" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="4" />
+        <field access="rw" desc="The period in 100MHz clocks after AGC Detect to disable Short Sequence Detect. Note this value is the period in Periodic AGC Mode." name="DisableAgcDetPeriodOnAgcDet" offset="16" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxAgc_5" offset="0x030">
+        <field access="rw" desc="duration of no agc detect after sat/large detection            ( in en_100's )." name="AgcSatLargeDetXdisWindow" offset="0" reset="x" width="12" />
+        <field access="rw" desc="The number of saturated input samples out of the last 30 that cause a sat1 detect when exceeded." name="SatCntThreshold" offset="12" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="18" reset="x" width="14" />
+      </reg>
+      <reg name="RxAgc_6" offset="0x034">
+        <field access="rw" desc="Maximum final analog gain adjust. The magnitude of a final gain adjust is limited to this maximum value (i.e. clamped to this limit). If the resulting adjustment is within +-2dB the RxAllowFinalGainAdj table controls whether the adjustment is allowed. (Larger adjustment values are implicitly allowed.) In dB." name="MaxFinalAnalogGainAdjust" offset="0" reset="x" width="5" />
+        <field access="ru" name="RESERVED" offset="5" reset="x" width="11" />
+        <field access="rw" desc="Minimum analog gain. The resulting gain from any gain adjustment is limited to this minimum value (i.e. clamped to this limit) in dB." name="MinAnalogGain" offset="16" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="1" />
+        <field access="rw" desc="Maximum analog gain. The resulting gain from any gain adjustment is limited to this maximum value (i.e. clamped to this limit) in dB. the max value allowed for &quot;analog_gain&quot; ( 0..~95 dB." name="MaxAnalogGain" offset="24" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RxAgc_7" offset="0x038">
+        <field access="rw" desc="Analog gain adjustment in dB applied on large signal detect." name="LargeSignalAnalogGainAdjust" offset="0" reset="x" width="5" />
+        <field access="rw" desc="the duration of no agc/sat/large detection after mReset." name="AgcResetDisWindow" offset="5" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="17" reset="x" width="7" />
+        <field access="rw" desc="Analog gain adjustment in dB applied on Sat  detect." name="SatAnalogGainAdjust" offset="24" reset="x" width="5" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxAgc_8" offset="0x03c">
+        <field access="rw" desc="the main target level for &quot;agc_digital_energy (in log2 s&lt;10,5&gt; format)." name="TargetDigitalEnergy" offset="0" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="4" />
+        <field access="rw" desc="The main target level for &quot;agc_analog_energy&quot; (in log2 s&lt;10,5&gt; format)." name="TargetAnalogEnergy" offset="14" reset="x" width="10" />
+        <field access="rw" desc="This is CYA signal special modes for bit by bit checking of the agc module agc_simulation_cya[0] - 1 : disable the priority order of : sat_detect &gt; large_detect &gt; sseq_detect (as far as base detection) //  agc_simulation_cya[1] - 1 : disable the blanking interval after detection //  agc_simulation_cya[2] - 1 : disable the clear of &quot;lseq_peak_found&quot; on &quot;large_detect_pend&quot; //  agc_simulation_cya[3] - 1 : disable sat and large detect in fixed gain mode." name="SimulationMode" offset="24" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxFreqOffsetRotator" offset="0x040">
+        <field access="rw" desc="option to offset &quot;rewind_time&quot;." name="RxNotchFilterOffset1Cya" offset="0" reset="x" width="4" />
+        <field access="rw" desc="option to time offset the contribution of &quot;rx_freq_offset&quot;." name="RxNotchFilterOffset2Cya" offset="4" reset="x" width="4" />
+        <field access="rw" desc="option to bypass the rotator if the freq's are zero." name="RxNotchFilterRotCya" offset="8" reset="x" width="1" />
+        <field access="rw" desc="option to invert &quot;rewind_time&quot; for &quot;rx_freq_rotator_phase&quot;." name="RxNotchFilterSignCya" offset="9" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. Reuse . rx_rf_ifc_clear_cya option to delay mClear by 1 clk." name="RxNotchFilterClearCya" offset="11" reset="x" width="1" />
+        <field access="rw" name="RESERVED" offset="12" reset="x" width="20" />
+      </reg>
+      <reg name="RxResampler" offset="0x044">
+        <field access="rw" desc="rx_resampler_buffer_cya  = rx_resampler_sim_cya[1:0]; resampler_offset_en_cya  = rx_resampler_sim_cya[3:2]; resampler_offset_dly_cya = rx_resampler_sim_cya[4];. Fusion2." name="BufferCya" offset="0" reset="x" width="8" />
+        <field access="rw" desc="RevB and beyond. Used to avoid mClear in resampler." name="ClearCya" offset="8" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="9" reset="x" width="24" />
+      </reg>
+      <reg name="RxNotchFilters_0" offset="0x048">
+        <field access="rw" desc="FS1. U&lt;14,0&gt; format." name="Notch1Coeff0_2" offset="0" reset="x" width="14" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="FS1. S&lt;16,2&gt; format." name="Notch1Coeff0_1" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxNotchFilters_1" offset="0x04c">
+        <field access="rw" desc="FS3.U&lt;14,0&gt; format." name="Notch1Coeff1_02" offset="0" reset="x" width="14" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="FS3. S&lt;16,2&gt; format." name="Notch1Coeff1_01" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxNotchFilters_2" offset="0x050">
+        <field access="rw" desc="FS2. S&lt;15,1&gt; format." name="Notch1Coeff1_11" offset="0" reset="x" width="15" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="17" />
+      </reg>
+      <reg name="RxNotchFilters_3" offset="0x054">
+        <field access="rw" desc="FS1. U&lt;14,0&gt; format." name="Notch2Coeff0_2" offset="0" reset="x" width="14" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="FS1. S&lt;16,2&gt; format." name="Notch2Coeff0_1" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxNotchFilters_4" offset="0x058">
+        <field access="rw" desc="FS3.U&lt;14,0&gt; format." name="Notch2Coeff1_02" offset="0" reset="x" width="14" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="FS3. S&lt;16,2&gt; format." name="Notch2Coeff1_01" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxNotchFilters_5" offset="0x05c">
+        <field access="rw" desc="FS2. S&lt;15,1&gt; format." name="Notch2Coeff1_11" offset="0" reset="x" width="15" />
+        <field access="rw" desc="rx csr spare" name="RxCsrSpare" offset="15" reset="x" width="8" />
+        <field access="ru" desc="Rx Csr status" name="RxCsrStatus" offset="23" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RxBurstAcq_0" offset="0x060">
+        <field access="rw" desc="several cya options for forced mode." name="LseqForceFinalDetectCya" offset="0" reset="x" width="3" />
+        <field access="rw" desc="the number of samples for packet mean time calcualtion ( &quot;M&quot; )." name="LseqMeanCalcWindow" offset="3" reset="x" width="7" />
+        <field access="rw" desc="the max value of &quot;lseq_peak_to_mean&quot;." name="LseqPeakToMeanMax" offset="10" reset="x" width="7" />
+        <field access="rw" desc="peak detection timeout after &quot;rx_detect_data_clear&quot;." name="LargeGainAdjDisableTime" offset="17" reset="x" width="8" />
+        <field access="rw" desc="option to modify the effective value of &quot;lseq_corr_gap_window&quot;. This value would be supplied by system group after further experiments." name="LseqCorrGapWindowCya" offset="25" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxDigGain" offset="0x064">
+        <field access="rw" desc="the max difference of OFDM start." name="OfdmStartThdEventp" offset="0" reset="x" width="12" />
+        <field access="rw" desc="expected OFDM start after gate open." name="OfdmExpStartEventp" offset="12" reset="x" width="12" />
+        <field access="rw" desc="enable unity gain of 32 and fixed gain of 8." name="Cya" offset="24" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="RxOfdmSymFramer" offset="0x068">
+        <field access="rw" desc="RevB and beyond. change names .  cya bits! agc_sseq_detect_cnt_clr_cya  " name="AgcSseqDetectCntClrCya" offset="0" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. change names .  cya bits!    agc_sat_large_latch_cya   " name="AgcSatLargeLatchCya" offset="1" reset="x" width="1" />
+        <field access="rw" desc="RevB and beyond. change names .   Cya bits!   agc_energy_peak_delay_cya[1:0]" name="AgcEnergyPeakDelayCya" offset="2" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="1" />
+        <field access="rw" desc="adc to FFT hardware pipeline delay (not including &quot;rot_notch&quot; pipeline delay!)." name="RxAdc2FftPipelineDelay" offset="5" reset="x" width="5" />
+        <field access="rw" desc="&quot;freq_rot&quot; to &quot;framing&quot; delay." name="RxFreqRotToFramingDelay" offset="10" reset="x" width="2" />
+        <field access="rw" name="RESERVED" offset="12" reset="x" width="3" />
+        <field access="rw" desc="enable time window for the second CE." name="RxTimeWindowCeCya" offset="15" reset="x" width="2" />
+        <field access="rw" desc="When '1' the last data symbol in the received packet is not sent to the FFT. This is used when necessary to provide time for the EPP IFFT." name="DiscardLastDataSym" offset="17" reset="x" width="4" />
+        <field access="rw" desc="enable time window for the second CE." name="RxRfIfcPacketEndCya" offset="21" reset="x" width="1" />
+        <field access="rw" desc="bias to &quot;lseq_final_mean_to_fft&quot; to be compatible with RTL." name="RxMeanToFftBiasCya" offset="22" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="RxFreqOffsetEst_0" offset="0x06c">
+        <field access="rw" desc="Ratio of sampling frequency (100 MHz) to carrier frequency. U&lt;12,1&gt; format." name="RfVal" offset="0" reset="x" width="16" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="1" />
+        <field access="rw" desc="The offset to apply to &quot;rx_ce_analog_energy_delay&quot; (for easy bit matching!) Ce_energy unit." name="RxCeAnalogOffsetCya" offset="17" reset="x" width="3" />
+        <field access="rw" desc="max value of agc analog gain adjust." name="RxAgcAdjustThdEventp" offset="20" reset="x" width="5" />
+        <field access="rw" desc="max value of final analog gain adjust." name="RxFinalAdjustThdEventp" offset="25" reset="x" width="5" />
+        <field access="rw" desc="This is CYA signal Mode[0] =1  cya option to force using the last peak when in the special &quot;invert_dummy&quot; mode. Mode[1] =1  cya option to force using the last peak all the time." name="Mode" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxFreqOffsetEst_1" offset="0x070">
+        <field access="rw" desc="Moca2x conversion constant from freq offset to time ppm offset." name="RfValMoca2" offset="0" reset="x" width="16" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxEventLog_0" offset="0x074">
+        <field access="rw" desc="target (expected) value of the freq offset." name="FreqOffsetTargetEventp" offset="0" reset="x" width="16" />
+        <field access="rw" desc="max value for the &quot;rf_ifc&quot; dc bias." name="RxMaxBiasEventp" offset="16" reset="x" width="8" />
+        <field access="rw" name="RxSatThdEventp" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxEventLog_1" offset="0x078">
+        <field access="rw" desc="the max difference to the target freq offset." name="FreqOffsetThdEventp" offset="0" reset="x" width="15" />
+        <field access="rw" desc="the threshold for the time window &quot;delta&quot; values." name="TimeWindDeltaThdEventp" offset="15" reset="x" width="13" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxEventLog_2" offset="0x07c">
+        <field access="rw" desc="the min value for the CE digital energy event." name="DigitalEnergyMinEventp" offset="0" reset="x" width="16" />
+        <field access="rw" desc="the max value for the CE digital energy event." name="DigitalEnergyMaxEventp" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxEventLog_3" offset="0x080">
+        <field access="rw" desc="the min value for the CE analog  energy event." name="AnalogEnergyMinEventp" offset="0" reset="x" width="16" />
+        <field access="rw" desc="the max value for the CE analog  energy event." name="AnalogEnergyMaxEventp" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="PhyRxCntrl_84" offset="0x084">
+        <field access="rw" desc="option to open loops for bit by bit matching" name="RxOpenLoopCya" offset="0" reset="x" width="8" />
+        <field access="rw" desc="option for bit by bit matching" name="RxBitMatchCya" offset="8" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxCtrlStatus_0">
+        <field access="ru" desc=" RevB and beyond. For debug only :the status depends on the value of the static parameter &quot;RxCtrlStatusCya&quot;[1:0] ... 0 : ... bit[6:0]   : the control fsm state ... bit[7]     : the packet ID
+ ... bit[14:8]  : analog gain
+ ... bit[15]    : repeat is on ... bit[19:16] : &quot;gnt_cnt&quot;
+ ... bit[23:20] : &quot;req_cnt&quot;
+ ... bit[25:24] : &quot;pkt_ok_cnt&quot;   ( see above )
+ ... bit[27:26] : &quot;pkt_bad_cnt&quot;  ( see above )
+ ... bit[31:28] : &quot;pkt_status&quot;   ( see above )
+
+
+ ... 1 : ... bit[6:0]   : the control fsm state
+ ... bit[7]     : packet error
+ ... bit[14:8]  : analog_gain
+ ... bit[15]    : repeat is on
+ ... bit[23:16] : digital gain
+ ... bit[25:24] : &quot;pkt_ok_cnt&quot;   ( see above )
+ ... bit[27:26] : &quot;pkt_bad_cnt&quot;  ( see above )
+ ... bit[31:28] : &quot;pkt_status&quot;   ( see above )
+
+ ... 2 : ... bit[31:0]  : ctc_timer100[32:1]
+
+ ... 3 : the following status will be latched on the first detected packet error.
+                  setting &quot;rx_ctrl_status_cya&quot; to 0 and then 3 again will trigger it again.
+
+ ... bit[0]     : dout   &quot;req&quot; error
+ ... bit[1]     : status &quot;req&quot; error
+     ... bit[3:2]   : &quot;pkt_err_src&quot; ( see above )
+ ... bit[7:4]   : &quot;pkt_status&quot;  ( see above )
+ ... bit[9:8]   : &quot;pkt_ok_cnt&quot;  ( see above )
+ ... bit[11:10] : &quot;pkt_bad_cnt&quot; ( see above )
+ ... bit[15:12] : &quot;gnt_cnt&quot;
+ ... bit[19:16] : &quot;req_cnt&quot;
+       ... bit[20]    : packet ID
+ ... bit[28:21] : analog gain
+" name="RxCtrlStaticStatus" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxCtrlStatus_1">
+        <field access="ru" desc="RevB and beyond. the 16 bits CRC result of the I/Q inputs" name="RxRfIfcCrcResult" offset="0" reset="x" width="16" />
+        <field access="ru" desc="RevB and beyond.  1 : indicate that the CRC result is ready" name="RxRfIfcCrcRdy" offset="16" reset="x" width="1" />
+        <field access="ru" desc="3 bits which indicate the FIFO lock status" name="RxA2dFifoStatus" offset="17" reset="x" width="2" />
+        <field access="ru" desc="if high, FFT state machine schedule is bad and data may be overriden in processing memory. cleared when &quot;rx_fft_status_clr&quot; is high" name="RxFftOvfErr" offset="19" reset="x" width="1" />
+        <field access="ru" desc="the number of detections has filled completely its memory ( sticky )" name="RxFreqOffset2DetOvf" offset="20" reset="x" width="1" />
+        <field access="ru" desc="number of new algorithm detections in 128*en100" name="RxFreqOffset2DetCnt" offset="21" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc159000" desc="PhyTd Rx Csbuff (dynamic control register)" name="RxCsbCtl" offset="0x1000">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="RxTdEntryControl" offset="0x00">
+        <field access="rw" desc="Writing a '0' transfers this entry to hardware for processing. Writing a '1' transfers this entry to software for reuse." name="Empty" offset="0" reset="1" width="1" />
+        <field access="ru" desc="State of corresponding status entry - see TxEntryNStatus register description." name="StatusEmpty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Indicates this entry has been processed (but status not necessarily available). 0: not processed 1: processed." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxTdControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxTdStatusLost" offset="5" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxTdStatusOverflow" offset="6" reset="0" width="1" />
+        <field access="ru" desc="0: Normal mode. ...1: register mode." name="buff_mode" offset="7" reset="0" width="1" />
+        <field access="ru" desc="csbuff control read pointer" name="CtrlRdPtr" offset="8" reset="0" width="4" />
+        <field access="ru" desc="csbuff status read pointer" name="StatusWrPtr" offset="12" reset="0" width="4" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxAdcIfc_0" offset="0x04">
+        <field access="rw" desc="CTC time at which the receive window should open. The first ADC sample is accepted when the current CTC time is equal to or greater than this time. See CTC Times for further details. This field is in 50 Mhz precision and format is u&lt;32,32&gt;." name="ReceiveTime" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxAdcIfc_1" offset="0x08">
+        <field access="rw" desc="Number of CTC ticks the receive window should remain open." name="ReceiveWindowSize" offset="0" reset="x" width="31" />
+        <field access="ru" name="RESERVED" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RxAdcIfc_2" offset="0x0c">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="5" />
+        <field access="rw" desc="used as marker for the test_mux." name="RxCtrlSoftwareMarker" offset="5" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="1" />
+        <field access="rw" desc="0: no inversion ... 1: inversion ... When '1' the receive spectrum is inverted by conjugating the received samples." name="InvertSpectrum" offset="7" reset="x" width="1" />
+        <field access="rw" name="RxCtrlPktStartOffset" offset="8" reset="x" width="14" />
+        <field access="rw" desc="0: normal mode ... 1: re-center after bias change ... 2: loop BW to 0 during OFDM ... 3: freeze during OFDM." name="DcBiasCompCya" offset="22" reset="x" width="2" />
+        <field access="rw" desc="Test only, set this field to 0." name="BlankingSatCya" offset="24" reset="x" width="2" />
+        <field access="rw" desc="0: DC bias estimation continues from current value at packet start ... 1: DC bias estimation reset at start of packet." name="DcBiasCompResetPacketStart" offset="26" reset="x" width="1" />
+        <field access="rw" desc="enable mClear." name="RxCtrlPktClearEnable" offset="27" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RxMoca1xShiftRotator" offset="0x10">
+        <field access="rw" desc="Rotation frequency, format s&lt;21,-1&gt;." name="rotFreq" offset="0" reset="x" width="21" />
+        <field access="ru" name="RESERVED" offset="21" reset="x" width="6" />
+        <field access="rw" desc="0: freqOffset not added. 1: Add freqOffset into the accumulator." name="useFreqOff" offset="27" reset="x" width="1" />
+        <field access="rw" desc="option to bypass completely this rotator (when 0) enable the moca1x rotator." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxResamplerLpf" offset="0x14">
+        <field access="rw" desc="the 2c delta delay of Q relative to I Format is s&lt;14,0&gt;." name="IqDelay" offset="0" reset="x" width="14" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="13" />
+        <field access="rw" desc="0: 25 MHz (MoCA 1.x) 1: 50 MHz (c.LINK+)." name="Mode" offset="27" reset="x" width="1" />
+        <field access="rw" desc="This is CYA signal the resampler is disabled if this field is set to 1; For normal operation, set this field to 0" name="EnableResample" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxAgc_0" offset="0x18">
+        <field access="rw" desc="the initial value for &quot;digital_gain&quot;  In dB  U&lt;8,6&gt; format." name="InitialDigitalGain" offset="0" reset="x" width="9" />
+        <field access="rw" desc="the initial value for &quot;analog_gain&quot;  In dB." name="InitialAnalogGain" offset="9" reset="x" width="7" />
+        <field access="rw" desc="0: maxAnalogGain 1: initialAnalogGain 2: unchanged (i.e. hold current gain)." name="AnalogGainSettingOnReset" offset="16" reset="x" width="2" />
+        <field access="rw" desc="When '1' the AGC is reset on ACQ Error." name="ResetOnAcqError" offset="18" reset="x" width="1" />
+        <field access="rw" desc="When '1' the AGC is reset on Saturation Timeout or False Alarm errors." name="ResetOnAgcError" offset="19" reset="x" width="1" />
+        <field access="rw" desc="1 : enable final gain adjust (for digital and possible also analog)." name="AgcFinalGainEn" offset="20" reset="x" width="1" />
+        <field access="rw" desc="1 : using  fixed analog and digital gain." name="AgcFixedGainMode" offset="21" reset="x" width="1" />
+        <field access="rw" desc="1 : enable analog  gain correction on &quot;lseq_final_detect&quot;." name="AgcAnalogGainFinalEn" offset="22" reset="x" width="1" />
+        <field access="rw" desc="1 : enable digital gain adjust on &quot;agc_sseq_detect&quot;." name="AgcDigitalGainSseqEn" offset="23" reset="x" width="1" />
+        <field access="rw" desc="1 : disable AGC sat_detect and large_detect See disableLargerGainAdjustments in PHY Functional Spec." name="AgcSatLargeDetDisable" offset="24" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="25" reset="x" width="2" />
+        <field access="rw" desc="1 : a mode in which a dummy &quot;agc_sseq_detect&quot; are generated at programmble rate." name="PeriodicMode" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: window = 120/60 (MoCA 1.x) 1: window = 128/64 (c.LINK+) Controls window sizes of analog and digital energy estimators and the short sequence correlator." name="Mode" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxAgc_1" offset="0x1c">
+        <field access="rw" desc="the duration of no more &quot;agc_sseq_detect&quot; after mReset." name="DisableAgcDetPeriodOnReset" offset="0" reset="x" width="12" />
+        <field access="rw" desc="If set then only backend gain is changed for analgoGainAdjustments." name="ChangeOnlyBackendGain" offset="12" reset="x" width="1" />
+        <field access="rw" desc="1 : select &quot;agc_xxx_target_energy_iq&quot; instead of &quot;agc_xxx_target_energy&quot;." name="AgcTargetEnergyIqSel" offset="13" reset="x" width="1" />
+        <field access="rw" desc="variations for &quot;agc_force_sseq_detect&quot; mode." name="AgcForceSseqDetect" offset="14" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="17" />
+      </reg>
+      <reg name="RxAgc_2" offset="0x20">
+        <field access="rw" desc="Maximum delay in 100MHz clocks from an AGC Detect to a Burst Detect. If this delay is exceeded a False Alarm Timeout is declared." name="FalseAlarmTimeoutPeriod" offset="0" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="4" />
+        <field access="rw" desc="Maximum delay in 100MHz clocks from a Saturation Detect to an AGC Detect or Burst Detect. If this delay is exceeded a Saturation Timeout is declared." name="SatDetectTimeoutPeriod" offset="16" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxTdIqBalComp" offset="0x24">
+        <field access="rw" desc="Q part of compensation coefficients, format s&lt;11,-2&gt;." name="Qcoef" offset="0" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="6" />
+        <field access="rw" desc="I part of compensation coefficients, format s&lt;11, -2&gt;." name="Icoef" offset="17" reset="x" width="11" />
+        <field access="rw" desc="0: IQ imbalance comp disabled ... 1: IQ imbalance comp enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="rw" desc="when 0 - disable spectral inversion, when 1   spectral inversion is done." name="SpecInv" offset="29" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxNotchFilters" offset="0x28">
+        <field access="rw" desc="Phase increment for Notch1 rotator. S&lt;12,1&gt; format." name="Notch1Freq" offset="0" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="4" />
+        <field access="rw" desc="Phase increment for Notch2 rotator. S&lt;12,1&gt; format." name="Notch2Freq" offset="16" reset="x" width="12" />
+        <field access="rw" desc="0: notch filter 1 bypassed 1: notch filter 1 enabled." name="Notch1Enable" offset="28" reset="x" width="1" />
+        <field access="rw" desc="0: notch filter 2 bypassed 1: notch filter 2 enabled." name="Notch2Enable" offset="29" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxBurstAcq_0" offset="0x2c">
+        <field access="rw" desc="the alpha coeficient of the IIR filter  U&lt;11,1&gt; format." name="EnergyEstSmoothFactor" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="18" reset="x" width="2" />
+        <field access="rw" desc="0: 1 ... 1: 2 ... 2: 4 ... 3: 8 ... Number of symbols in LongSeq1 correlation." name="CorrLongSeq1NumSyms" offset="20" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="1 means that an extra sequence should follow the long sequences." name="CorrLongSeq2Enable" offset="24" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="25" reset="x" width="3" />
+        <field access="rw" desc="0: MoCA 1.x Ln ... 1: RxLongRefSeln ... Specifies the set of sequences LongSeq1RefSel and LongSeq2RefSel select from. When '0' the set of hardwired MoCA 1.x reference sequences are used and when '1' the set of programmed sequences for c.LINK+ are used." name="CorrRefSetSel" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxBurstAcq_1" offset="0x30">
+        <field access="rw" desc="the offset base value (shifted here up by 0..7)." name="InitialEnergyOffset" offset="0" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="9" />
+        <field access="rw" desc="for checking of no update to &quot;max_cpower&quot; within this window." name="CorrPeakSearchWindowLen" offset="16" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxBurstAcq_2" offset="0x34">
+        <field access="rw" desc="the offset shift for extra sequence detection." name="LongSeq2EnergyOffset" offset="0" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="5" />
+        <field access="rw" desc="the scale  for  extra sequence detection." name="LongSeq2EnergyScale" offset="8" reset="x" width="7" />
+        <field access="rw" desc="the number of samples from the last long peak to the extra peak." name="IdealLongSeq2PeakTime" offset="15" reset="x" width="9" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxBurstAcq_3" offset="0x38">
+        <field access="rw" desc="the delay before before allowing &quot;lseq_peak_detect&quot;. This value would be supplied by system group after further experiments." name="BurstDetectDelay" offset="0" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="5" />
+        <field access="rw" desc="minimum correlaion value which will be part of packet mean time calculation." name="PeakThresholdForMeanTimeCalc" offset="16" reset="x" width="5" />
+        <field access="ru" name="RESERVED" offset="21" reset="x" width="5" />
+        <field access="rw" desc="0: normal burst detect 1: forced burst detect." name="ForceBurstDetect" offset="26" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="5" />
+      </reg>
+      <reg name="RxBurstAcq_4" offset="0x3c">
+        <field access="rw" desc="the scale  for first  long  sequence detection." name="LseqCorrThdFirstScale" offset="0" reset="x" width="7" />
+        <field access="rw" desc="the scale  for second long  sequence detection." name="LseqCorrThdSecondScale" offset="7" reset="x" width="7" />
+        <field access="rw" desc="the offset shift for long  sequence detection." name="LseqCorrThdMainOffset" offset="14" reset="x" width="3" />
+        <field access="rw" desc="1 - need peak detect confirmation." name="LseqPeakConfirmEnable" offset="17" reset="x" width="1" />
+        <field access="rw" desc="(Spar) some options for peak detect confirmation." name="LseqPeakConfirmCya" offset="18" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="21" reset="x" width="1" />
+        <field access="rw" desc="select 1 out of 4 options for the long  sequence (moca1X or moca2X)." name="LongSeqSel" offset="22" reset="x" width="2" />
+        <field access="rw" desc="select 1 out of 4 options for the extra sequence (moca1X or moca2X)." name="ExtraSeqSel" offset="24" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="RxBurstAcq_6" offset="0x44">
+        <field access="rw" desc="the ctc time to stop the receive gate ( in terms of 50Mhz clock )." name="RxCntlStopTime" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxOfdmSymFramer_0" offset="0x48">
+        <field access="rw" desc="Includes all fixed and profile adjustments to burst detect time to the first FFT input sample. This and the start time (difference between detected peak and calculated mean) are added to the burst detect time to get the time of the first FFT input sample." name="FftFirstSampleAdj" offset="0" reset="x" width="11" />
+        <field access="rw" desc="0: no window ... 1: window length 2 ... 2: window length 3 ... 3: window length 4 ... 4: window length 6 ... 5: window length 8 ... 6: window length 12 ... 7: window length 16 ... 8: window length 24 ... 9: window length 48 ... Value greater than 9 is not valid. Selects windown length." name="RxTimeWindowDataLenSel" offset="11" reset="x" width="4" />
+        <field access="rw" desc="4 bits which select the CE   window length (including 0)." name="RxTimeWindowCeLenSel" offset="15" reset="x" width="4" />
+        <field access="rw" desc="bits which specify the correlation window length" name="RxFramingCorrWindowLen" offset="19" reset="x" width="8" />
+        <field access="rw" desc="1 : invert the CE-CP accumulated correlation teta" name="RxFramingCorrPol" offset="27" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxOfdmSymFramer_1" offset="0x4c">
+        <field access="rw" desc="Number of data symbols in the received packet. This includes the last data symbol whether or not it is sent to the FFT (see DiscardLastDataSym). Must be greater than 0." name="NumDataSyms" offset="0" reset="x" width="8" />
+        <field access="rw" desc="1 : indicate the packet is a hardware EPP packet." name="RxHwEppPkt" offset="8" reset="x" width="1" />
+        <field access="rw" desc="1 : software EPP packet mode." name="RxSwEppPkt" offset="9" reset="x" width="1" />
+        <field access="rw" desc="1 : don't use &quot;lseq_peak_to_mean&quot; (assume it's 0)." name="IgnorePeakToMeanCya" offset="10" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="5" />
+        <field access="rw" desc="Length of the cyclic prefix for data symbols in 100MHz samples. A value of 255 indicates a cplength of 512." name="DataCpLength" offset="16" reset="x" width="8" />
+        <field access="rw" desc="Number of channel estimation symbols. Must be 0, 1 or 2." name="NumChanEstSyms" offset="24" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="RxFft_0" offset="0x50">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="18" />
+        <field access="rw" desc="Number of Channel Estimation symbols. Must be 0, 1 or 2." name="NumChanEstSyms" offset="18" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="20" reset="x" width="8" />
+        <field access="rw" desc="0: no EPP IFFT following last FFT ... 1: EPP IFFT following last FFT ... When '1' the EPP processor (in the FD section) will send IFFT input data to be processed after the last data symbol input. Note the last data symbol input to the FFT is the penultimate data symbol in the packet when the OFDM framer is so configured." name="EppIfftEnable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxFft_1" offset="0x54">
+        <field access="rw" desc="Gain applied to each data symbols' FFT output. This gain is also applied to the EPP IFFT output when present. U&lt;12,1&gt; format?." name="DataGain" offset="0" reset="x" width="12" />
+        <field access="rw" desc="1 indicates sw epp data on din_i and din_q and delayed bypass of FFT module." name="SwEppPkt" offset="12" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="13" reset="x" width="3" />
+        <field access="rw" desc="Gain applied to channel estimation symbols' FFT output. U&lt;12,1&gt; format?." name="ChanEstGain" offset="16" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxFreqOffsetEst_0" offset="0x58">
+        <field access="rw" desc="specifies the initial frequency offset." name="InitialPhase" offset="0" reset="x" width="17" />
+        <field access="rw" desc="1 : it's not known if the second long sequences are inverted." name="RxFreqLongInvUnknown" offset="17" reset="x" width="1" />
+        <field access="rw" desc="0 : low precision (x2) 1 : high precision (x4)." name="RxFreqFineX4Mode" offset="18" reset="x" width="1" />
+        <field access="rw" desc="1 : use just &quot;rx_freq_offset_init&quot; (ignore the correlation)." name="RxFreqOffsetInitOnly" offset="19" reset="x" width="1" />
+        <field access="rw" desc="0: second half not inverted 1: second half inverted Specifies whether second half of long sequence is inverted." name="RxFreqLongInvSecond" offset="20" reset="x" width="1" />
+        <field access="rw" desc="1 : clear &quot;rx_time_offset&quot; on iq calibration mode." name="RxTimeOffsetIqMode" offset="21" reset="x" width="1" />
+        <field access="rw" desc="select moca1x or moca2x conversion factor from freq offset to time offset." name="RxFreqMoca2xMode" offset="22" reset="x" width="1" />
+        <field access="rw" desc="the number of samples inside real data fifo at the end of packet (up to 64)" name="RxFreqOffsetMode" offset="23" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxFreqOffsetEst_1" offset="0x5c">
+        <field access="rw" desc="testing I/Q imbalance freq offset." name="RxFreqOffsetIq" offset="0" reset="x" width="22" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="10" />
+      </reg>
+      <reg name="RxFreqOffsetRotator" offset="0x60">
+        <field access="rw" desc="The frequency of notch rotation, format is s&lt;12, 1&gt;." name="NotchFreq" offset="0" reset="x" width="12" />
+        <field access="rw" desc="the rotator output phase can be inverted." name="RxRotatorPhaseSign" offset="12" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="13" reset="x" width="14" />
+        <field access="rw" desc="0: Acts normally for the whole packet. ... 1: The block goes into bypass mode after receiving pktStart, but acts normally until that point." name="IqCalEn" offset="27" reset="x" width="1" />
+        <field access="rw" desc="Set 1 to enable the moca1x rotator." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxCeAnalog" offset="0x064">
+        <field access="rw" desc="the amount of 100 samples to wait before starting analog energy accumulation." name="EnergyDelay" offset="0" reset="x" width="13" />
+        <field access="rw" desc="0 : count from &quot;rx_detect_start &quot; 1 : count from &quot;lseq_final_detect&quot;." name="EnergyMode" offset="13" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="18" />
+      </reg>
+      <reg name="RxEventLog" offset="0x068">
+        <field access="rw" desc="4 bits packet ID." name="RxCtrlPktId" offset="0" reset="x" width="4" />
+        <field access="rw" desc="enable events for the current packet." name="RxEventEnable" offset="4" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="5" reset="x" width="27" />
+      </reg>
+    </regfile>
+  </block>
+</system>

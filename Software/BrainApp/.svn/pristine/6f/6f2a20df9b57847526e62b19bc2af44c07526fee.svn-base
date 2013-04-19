@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Feb 13 02:05:02 2013
+
+@author: yozturk
+"""
+from PyQt4 import QtCore, QtGui, Qt
+from PyQt4.QtNetwork import *
+from PyQt4.QtCore import pyqtSignal 
+
+tree = QtGui.QTreeView()
+tree.setModel(model)
+tree.show()
+table = QtGui.QTableView()
+table.setModel(model)
+table.show()

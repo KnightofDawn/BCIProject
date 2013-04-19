@@ -1,0 +1,1623 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1629</width>
+    <height>1059</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>PHY System Test-Debug Interface</string>
+  </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <layout class="QHBoxLayout" name="Horizontallayout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetMinAndMaxSize</enum>
+    </property>
+    <item>
+     <widget class="QTabWidget" name="manTabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <property name="currentIndex">
+       <number>4</number>
+      </property>
+      <property name="usesScrollButtons">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="FPGAConnectTab">
+       <attribute name="title">
+        <string>FPGA Connect</string>
+       </attribute>
+       <widget class="QLabel" name="label_3">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>60</y>
+          <width>131</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Choose Host Interface :</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="HOSTComboInterface">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>60</y>
+          <width>321</width>
+          <height>22</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="HOSTComboIP">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>100</y>
+          <width>321</width>
+          <height>22</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="HOSTComboMAC">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>140</y>
+          <width>321</width>
+          <height>22</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_4">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>210</y>
+          <width>101</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Choose FPGA :</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="FPGAComboMAC">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>210</y>
+          <width>321</width>
+          <height>22</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonDiscover">
+        <property name="geometry">
+         <rect>
+          <x>610</x>
+          <y>120</y>
+          <width>131</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Discover </string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonConnect">
+        <property name="geometry">
+         <rect>
+          <x>610</x>
+          <y>60</y>
+          <width>131</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Enable Network Driver</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_5">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>330</y>
+          <width>131</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Working Directory :</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="directoryName">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>330</y>
+          <width>321</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonChooseDirectory">
+        <property name="geometry">
+         <rect>
+          <x>610</x>
+          <y>330</y>
+          <width>131</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Choose Directory</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_6">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>370</y>
+          <width>111</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Log File Name :</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="logFileName">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>360</y>
+          <width>321</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The file name specified here will be used as a root and will be extended with unique day and time.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>DefaultFileName</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_20">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>400</y>
+          <width>111</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Sesion File Name:</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="sessionFileName">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>400</y>
+          <width>321</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The file name specified here will be used as a root and will be extended with unique day and time.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>DefaultFileName</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="FPGAStatus">
+       <attribute name="title">
+        <string>FPGA Configuration</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>641</width>
+          <height>471</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Current FPGA Configuration</string>
+        </property>
+        <widget class="QLineEdit" name="fpgaVersion">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>40</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="numTrigger">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>100</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="numCaptureFilter">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>160</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="numDripFilter">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>220</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_9">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>53</y>
+           <width>121</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>FPGA Version (RO)</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_10">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>110</y>
+           <width>181</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Number of Triggering Elements(RO)</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_11">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>170</y>
+           <width>191</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Number of Capture Filter Elements (RO)</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_12">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>230</y>
+           <width>181</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Number of Drip Filter Elements (RO)</string>
+         </property>
+        </widget>
+        <widget class="QGroupBox" name="groupBox_6">
+         <property name="geometry">
+          <rect>
+           <x>440</x>
+           <y>40</y>
+           <width>141</width>
+           <height>121</height>
+          </rect>
+         </property>
+         <property name="title">
+          <string>Trigger Status </string>
+         </property>
+         <widget class="QPushButton" name="trigStatButton">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>20</y>
+            <width>111</width>
+            <height>91</height>
+           </rect>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+            <weight>75</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font:bold 18px;background-color: red</string>
+          </property>
+          <property name="text">
+           <string>IDLE</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QLabel" name="label_14">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>290</y>
+           <width>161</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>FIFO Overflow (RO)</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="fifoOverflow">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>280</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_18">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>340</y>
+           <width>161</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Triggered on Trigger  Block (RO)</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="currentTriggerBlock">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>340</y>
+           <width>201</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="buttonFSMRead">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>390</y>
+           <width>601</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Read  FPGA Configuration</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="selfGenDataStatus">
+         <property name="geometry">
+          <rect>
+           <x>420</x>
+           <y>220</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>USING SELF GENERATED TEST DATA</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="extTrigEnabStatus">
+         <property name="geometry">
+          <rect>
+           <x>420</x>
+           <y>260</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>EXTERNAL TRIGGER  ENABLED</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="extTrigPolarityStatus">
+         <property name="geometry">
+          <rect>
+           <x>420</x>
+           <y>300</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>EXTERNAL TRIGGER POLARITY HIGH</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="runStopStatus">
+         <property name="geometry">
+          <rect>
+           <x>420</x>
+           <y>180</y>
+           <width>201</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>RUNNING</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_7">
+        <property name="geometry">
+         <rect>
+          <x>670</x>
+          <y>100</y>
+          <width>441</width>
+          <height>471</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Configure Test and Debug FPGA</string>
+        </property>
+        <widget class="QLabel" name="label_16">
+         <property name="geometry">
+          <rect>
+           <x>350</x>
+           <y>333</y>
+           <width>91</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>%   before Trigger</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_13">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>330</y>
+           <width>81</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Trigger Position</string>
+         </property>
+        </widget>
+        <widget class="QSlider" name="triggerSlider">
+         <property name="geometry">
+          <rect>
+           <x>120</x>
+           <y>310</y>
+           <width>161</width>
+           <height>51</height>
+          </rect>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>4</number>
+         </property>
+         <property name="singleStep">
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>1</number>
+         </property>
+         <property name="sliderPosition">
+          <number>0</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksAbove</enum>
+         </property>
+         <property name="tickInterval">
+          <number>1</number>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="runStopButton">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>411</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>RUN</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="extTrigEnabButton">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>100</y>
+           <width>411</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ENABLE EXTERNAL TRIGGER </string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="extTrigPolarityButton">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>170</y>
+           <width>411</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>SET  EXTERNAL TRIGGER POLARITY HIGH</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="selfGenDataButton">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>240</y>
+           <width>411</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>USE SELF-GEN TEST DATA</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="buttonFSMSend">
+         <property name="geometry">
+          <rect>
+           <x>-10</x>
+           <y>380</y>
+           <width>441</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Configure FPGA</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="sliderValue">
+         <property name="geometry">
+          <rect>
+           <x>290</x>
+           <y>330</y>
+           <width>51</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <item>
+          <property name="text">
+           <string>5</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>25</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>50</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>75</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>95</string>
+          </property>
+         </item>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="RTFilterTab">
+       <attribute name="title">
+        <string>RT Filters</string>
+       </attribute>
+       <widget class="QPushButton" name="bottonRTAddFilter">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add Filter</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="bottonRTDelFilter">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>20</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete Filter</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="bottonRTCopyFilter">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Copy to Capture Filter</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonRTReadReg">
+        <property name="geometry">
+         <rect>
+          <x>560</x>
+          <y>20</y>
+          <width>141</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Read RT Filter Registers</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushRTSendFilters">
+        <property name="geometry">
+         <rect>
+          <x>720</x>
+          <y>20</y>
+          <width>211</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Send Filters</string>
+        </property>
+       </widget>
+       <widget class="QGroupBox" name="RTFilterGroup">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>70</y>
+          <width>1271</width>
+          <height>781</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>RT Filters</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="CatureFilterTab">
+       <attribute name="title">
+        <string>Capture Filters</string>
+       </attribute>
+       <widget class="QPushButton" name="bottonCaptureCopyFilter">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Copy to RT  Filter</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="bottonCaptureAddFilter">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add Filter</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="bottonCaptureDelFilter">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>20</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete Filter</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonCaptureReadReg">
+        <property name="geometry">
+         <rect>
+          <x>560</x>
+          <y>20</y>
+          <width>171</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Read Capture  Filter Registers</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushCaptureSendFilters">
+        <property name="geometry">
+         <rect>
+          <x>750</x>
+          <y>20</y>
+          <width>211</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Send Filters</string>
+        </property>
+       </widget>
+       <widget class="QGroupBox" name="captureFilterFrame">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>70</y>
+          <width>1271</width>
+          <height>771</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Capture Filter</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="CsBufTriggers">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>CsBufTriggers</string>
+       </attribute>
+       <widget class="QWidget" name="horizontalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>1651</width>
+          <height>991</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="csBufLayout">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="conditionGroup">
+           <property name="minimumSize">
+            <size>
+             <width>410</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Comparison Group</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="gateGroup1">
+           <property name="title">
+            <string>Gate Group 1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="gateGroup2">
+           <property name="title">
+            <string>Gate Group 2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="gateGroup3">
+           <property name="title">
+            <string>Gate Group 3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="counterGroup">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Counter Group</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="outputGroup">
+           <property name="title">
+            <string>Output Gate</string>
+           </property>
+           <widget class="QPushButton" name="buttonSendParallelTriggers">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>20</y>
+              <width>141</width>
+              <height>61</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Send Triggers</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="buttonReadParallelTriggers">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>90</y>
+              <width>141</width>
+              <height>61</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Read  Triggers</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="buttonClearParallelTriggers">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>160</y>
+              <width>141</width>
+              <height>61</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Clear  Triggers</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="buttonAddParallelTriggerLines">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>230</y>
+              <width>141</width>
+              <height>61</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Add   Trigger Line</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="buttonDeleteParallelTriggerLines">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>300</y>
+              <width>141</width>
+              <height>61</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Delete   Trigger Line</string>
+            </property>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="TriggerTab">
+       <attribute name="title">
+        <string>TestMuxTriggers</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>20</y>
+          <width>1251</width>
+          <height>80</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Trigger Control </string>
+        </property>
+        <widget class="QPushButton" name="buttonTriggerDelete">
+         <property name="geometry">
+          <rect>
+           <x>260</x>
+           <y>30</y>
+           <width>221</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Delete  Trigger</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="buttonTriggerSend">
+         <property name="geometry">
+          <rect>
+           <x>500</x>
+           <y>30</y>
+           <width>221</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Send  Trigger</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="buttonTriggerRead">
+         <property name="geometry">
+          <rect>
+           <x>740</x>
+           <y>30</y>
+           <width>171</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Read Triggers</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="buttonAddTriggerLine">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>30</y>
+           <width>211</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Add Trigger</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="triggerGroup">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>110</y>
+          <width>1261</width>
+          <height>771</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Triggers</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="CaptureDataDisplay">
+       <attribute name="title">
+        <string>Capture Data  Display</string>
+       </attribute>
+       <widget class="MplWidget_Single" name="testMuxGraphicsWidget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>0</y>
+          <width>1041</width>
+          <height>975</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QGroupBox" name="testMuxGroup">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>74</y>
+          <width>261</width>
+          <height>901</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <widget class="QWidget" name="verticalLayoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>261</width>
+           <height>811</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="testMuxLayout"/>
+        </widget>
+       </widget>
+       <widget class="QPushButton" name="testMuxAddVariable">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>241</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add Variable</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="RTDataDisplay">
+       <attribute name="title">
+        <string>RT  Data Display</string>
+       </attribute>
+       <widget class="MplWidget_Single" name="CsBuffGraphicsWidget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>0</y>
+          <width>1041</width>
+          <height>975</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QGroupBox" name="CsBuffGroup">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>70</y>
+          <width>261</width>
+          <height>891</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <widget class="QWidget" name="verticalLayoutWidget_2">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>261</width>
+           <height>811</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="CsBuffLayout"/>
+        </widget>
+       </widget>
+       <widget class="QPushButton" name="CsBuffAddVariable">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>241</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add Variable</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="CaptureViewTab">
+       <attribute name="title">
+        <string>Capture Buffer View</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1281</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Buffer Capture Control </string>
+        </property>
+        <widget class="QPushButton" name="buttonBufferRead">
+         <property name="geometry">
+          <rect>
+           <x>780</x>
+           <y>20</y>
+           <width>181</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Read Capture Buffer</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="memoryStart">
+         <property name="geometry">
+          <rect>
+           <x>130</x>
+           <y>29</y>
+           <width>201</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_7">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>131</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Memory Address Start</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_8">
+         <property name="geometry">
+          <rect>
+           <x>370</x>
+           <y>30</y>
+           <width>141</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Number of words  to Read </string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="memoryNumWords">
+         <property name="geometry">
+          <rect>
+           <x>510</x>
+           <y>30</y>
+           <width>201</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>80</y>
+          <width>1281</width>
+          <height>801</height>
+         </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOn</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOn</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>1262</width>
+           <height>782</height>
+          </rect>
+         </property>
+         <widget class="QTableWidget" name="tableMemoryWidget">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>1271</width>
+            <height>781</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="Status">
+       <attribute name="title">
+        <string>Configure TDPort</string>
+       </attribute>
+       <widget class="QGroupBox" name="tdPortGroup">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>1161</width>
+          <height>801</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Configure TDPort</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttontdPortDel">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>20</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttontdPortSend">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>20</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Update</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttontdPortAdd">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>20</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add </string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttontdPortRead">
+        <property name="geometry">
+         <rect>
+          <x>580</x>
+          <y>20</y>
+          <width>141</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Read</string>
+        </property>
+       </widget>
+       <widget class="QGroupBox" name="tdPortValuesGroup">
+        <property name="geometry">
+         <rect>
+          <x>1190</x>
+          <y>70</y>
+          <width>361</width>
+          <height>801</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>tdPort Configuration </string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttontdPortRestoreAll">
+        <property name="geometry">
+         <rect>
+          <x>740</x>
+          <y>20</y>
+          <width>101</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Restore All </string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttontdPortSave">
+        <property name="geometry">
+         <rect>
+          <x>860</x>
+          <y>20</y>
+          <width>111</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttontdPortLoad">
+        <property name="geometry">
+         <rect>
+          <x>990</x>
+          <y>20</y>
+          <width>91</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Load</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Status Page</string>
+       </attribute>
+       <widget class="QLineEdit" name="queuedPackets">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>60</y>
+          <width>301</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="processedPackets">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>110</y>
+          <width>301</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="seqNumber">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>160</y>
+          <width>301</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="RTOff">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>210</y>
+          <width>113</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="bufSize">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>250</y>
+          <width>113</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1629</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSave_As"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionHelp"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>Help</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionSave_As">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MplWidget_Single</class>
+   <extends>QWidget</extends>
+   <header>mplwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>10</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>10</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
+</ui>

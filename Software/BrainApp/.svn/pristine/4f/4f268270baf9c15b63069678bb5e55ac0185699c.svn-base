@@ -1,0 +1,120 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 21 22:42:36 2013
+
+@author: yozturk
+"""
+
+from PyQt4 import QtCore, QtGui, Qt
+import os
+import sys
+from PyQt4.QtGui import *
+
+
+
+class PicButton(QAbstractButton):
+    def __init__(self, pixmap, parent=None):
+        super(PicButton, self).__init__(parent)
+        self.pixmap = pixmap
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.drawPixmap(event.rect(), self.pixmap)
+
+    def sizeHint(self):
+        return self.pixmap.size()
+
+class Gate(QtGui.QGroupBox): 
+     def __init__(self,master):       
+        self.container = master
+        self.addGate(master)
+        self.GateInputs = []
+        self.OutputConnection=[]
+       
+     def addGate(self,master):
+        self.groupBox = QtGui.QGroupBox("Gate")
+        self.groupBox.setCheckable(True)
+        self.groupBox.setChecked(True)
+        self.groupBox.setFixedHeight(100)
+        self.hbox = Qt.QGridLayout(self.groupBox)
+        self.groupBox.setLayout(self.hbox)
+        self.gateType = QtGui.QComboBox()
+        self.gateType.addItem("AND")
+        self.gateType.addItem("OR")
+        #self.combo1.setFixedWidth(300)
+        self.hbox.addWidget(self.gateType)
+        self.gateID = QtGui.QLineEdit()   
+        path = os.getcwd()
+        self.gateID.setStyleSheet('color: red')
+        self.groupBox.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                    "border:1px solid rgb(255, 170, 255);")
+      
+        self.hbox.addWidget(self.gateID)
+        self.gateID.setEnabled(False)
+
+        button = PicButton(QPixmap("andGate.png"))
+        self.hbox.addWidget(button)
+        
+        
+       
+        
+        master.addWidget(self.groupBox)
+
+     def deleteGate(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)
+        
+
+class Condition(QtGui.QGroupBox): 
+     def __init__(self,master,filterList):       
+        self.container = master
+        self.filterList =filterList     
+        self.addCondition(master)
+        self.OutputConnection=[]
+                
+                
+                
+                
+     def addCondition(self,master):
+        self.groupBox = QtGui.QGroupBox("Condition")
+        self.groupBox.setCheckable(True)
+        self.groupBox.setChecked(True)
+        self.groupBox.setFixedSize(488,139)
+        self.groupBox.setFixedHeight(100)
+        self.hbox = Qt.QGridLayout(self.groupBox)
+        self.groupBox.setLayout(self.hbox)
+        self.variable1 = QtGui.QComboBox(self.groupBox)
+        self.variable1.setGeometry(QtCore.QRect(10,20,251,22))
+        self.variable2 = QtGui.QComboBox(self.groupBox)
+        self.variable2.setGeometry(QtCore.QRect(10, 60, 251, 22))
+        self.condition = QtGui.QComboBox(self.groupBox)
+        self.condition.setGeometry(QtCore.QRect(360, 20, 69, 61))
+        self.hbox.addWidget(self.variable1,0,0)
+        self.hbox.addWidget(self.variable2,1,0)
+        self.hbox.addWidget(self.condition,2,0)
+        
+        self.conditionID = QtGui.QLineEdit()
+        self.conditionID.setEnabled(False)
+        self.conditionOUT = QtGui.QLineEdit()
+        self.conditionOUT.setEnabled(False)
+        self.bias = QtGui.QLineEdit()
+                
+        self.hbox.addWidget(self.conditionID,0,1)
+        self.hbox.addWidget(self.bias,1,1)
+        self.hbox.addWidget(self.conditionOUT,2,1)
+        
+        for filterElement in self.filterList:
+            self.variable1.addItem(filterElement[0]) 
+            self.variable2.addItem(filterElement[0]) 
+                        
+        self.condition.addItems(["==",">=", "<=","!=",">","<"])        
+        master.addSpacing(0)
+
+        master.addWidget(self.groupBox)
+        master.setAlignment(self.groupBox, QtCore.Qt.AlignTop)
+
+     def deleteCondition(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)

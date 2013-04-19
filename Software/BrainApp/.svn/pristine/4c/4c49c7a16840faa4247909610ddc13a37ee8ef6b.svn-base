@@ -1,0 +1,318 @@
+#************************************************************
+# THIS IS A WIZARD-GENERATED FILE.                           
+#
+# Version 12.0 Build 263 08/02/2012 Service Pack 2 SJ Full Version
+#
+#************************************************************
+
+# Copyright (C) 1991-2012 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+
+source src/commentOutSDCFile.sdc
+
+
+# Clock constraints
+
+
+# Automatically constrain PLL and other generated clocks
+derive_pll_clocks -create_base_clocks
+
+create_clock -name "clk50" -period 20.000ns [get_ports {clk50_clk}] -waveform {0.000 10.000}
+
+
+commentOutSDCFile "nios2/synthesis/submodules/nios2_tse_mac_constraints.sdc"
+
+
+#
+# these are the generated clocks from jtag and plls that we care about
+#
+
+set enet_pll_125  { nios2_qsys|enet_pll|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk }
+set enet_pll_25   { nios2_qsys|enet_pll|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk }
+set enet_pll_2p5  { nios2_qsys|enet_pll|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk }
+
+#set enet_reset  { a5gx_starter_fpga_bup_qsys_inst|enet_pll|altera_pll_i|general[2].gpll~PLL_OUTPUT_COUNTER|divclk }
+#set enet_locked { a5gx_starter_fpga_bup_qsys_inst|enet_pll|altera_pll_i|general[2].gpll~PLL_OUTPUT_COUNTER|divclk }
+
+
+
+  
+
+
+  
+
+
+# Set the periods of the clocks used in the design
+set PERIOD_125 8.0
+set PERIOD_25 [expr 8.0 * 5]
+set PERIOD_2p5 [expr 8.0 * 50]
+
+# Create the erx_clk on the port
+create_clock \
+    -name enet_rx_clk \
+    -period $PERIOD_125 \
+    -waveform "[expr $PERIOD_125/4.0] [expr ($PERIOD_125/2.0) + ($PERIOD_125/4.0)]" \
+    [get_ports {enet_rx_clk}]
+
+# Create the external virtual PHY clock
+create_clock \
+    -name virtual_phy_clk \
+    -period $PERIOD_125
+
+# Define the clocks that can appear on the output of the TX clock mux
+# Create the 125MHz mux output
+create_generated_clock \
+    -name tx_clk_125 \
+    -source [get_pins "$enet_pll_125"] \
+    [get_pins {tx_clk_to_the_tse_mac|combout}]
+
+# Create the 25MHz mux output
+create_generated_clock \
+    -name tx_clk_25 \
+    -source [get_pins "$enet_pll_25"] \
+    -add \
+    [get_pins {tx_clk_to_the_tse_mac|combout}]
+
+# Create the 2.5MHz mux output
+create_generated_clock \
+    -name tx_clk_2p5 \
+    -source [get_pins "$enet_pll_2p5"] \
+    -add \
+    [get_pins {tx_clk_to_the_tse_mac|combout}]
+
+# All of the mux outputs are exclusive
+set_clock_groups \
+    -exclusive \
+    -group [get_clocks {tx_clk_125}] \
+    -group [get_clocks {tx_clk_25}] \
+    -group [get_clocks {tx_clk_2p5}]
+    
+# Create the 125Mhz etx_clk output
+create_generated_clock \
+  -phase 90 \
+    -name enet_gtx_clk_125 \
+    -source [get_pins {tx_clk_to_the_tse_mac|combout}] \
+    -master_clock {tx_clk_125} \
+    [get_ports {enet_gtx_clk}]
+    
+
+# Create the 25Mhz etx_clk output
+create_generated_clock \
+    -name enet_gtx_clk_25 \
+    -source [get_pins {tx_clk_to_the_tse_mac|combout}] \
+    -master_clock {tx_clk_25} \
+    -add \
+    [get_ports {enet_gtx_clk}]
+    
+# Create the 2p5Mhz etx_clk output
+create_generated_clock \
+    -name enet_gtx_clk_2p5 \
+    -source [get_pins {tx_clk_to_the_tse_mac|combout}] \
+    -master_clock {tx_clk_2p5} \
+    -add \
+    [get_ports {enet_gtx_clk}]
+
+# Cut all the unrelated clock transfers to the external clocks
+set_clock_groups -exclusive \
+    -group [get_clocks {tx_clk_125}] \
+    -group [get_clocks {enet_gtx_clk_25 enet_gtx_clk_2p5}]
+    
+set_clock_groups -exclusive \
+    -group [get_clocks {tx_clk_25}] \
+    -group [get_clocks {enet_gtx_clk_125 enet_gtx_clk_2p5}]
+    
+set_clock_groups -exclusive \
+    -group [get_clocks {tx_clk_2p5}] \
+    -group [get_clocks {enet_gtx_clk_125 enet_gtx_clk_25}]
+
+# This path does not need to be constrained
+set_false_path -to [get_ports {enet_gtx_clk}]
+
+	
+
+
+
+
+
+
+
+#**************************************************************
+# Input Delay Constraints (Center aligned, Same Edge Analysis)
+#**************************************************************
+set Tco_max 0.350
+set Tco_min -0.350
+set Td_max 1.0
+set Td_min 0.9
+set longest_src_clk 0.0
+set shortest_src_clk 0.0
+set longest_dest_clk 1.0
+set shortest_dest_clk 0.9
+
+set Tcs_largest [expr $shortest_dest_clk - $longest_src_clk]
+set Tcs_smallest [expr $longest_dest_clk - $shortest_src_clk]
+
+set IMD [expr $Td_max + $Tco_max - $Tcs_largest]
+post_message -type info "Input Max Delay = $IMD"
+set ImD [expr $Td_min + $Tco_min - $Tcs_smallest]
+post_message -type info "Input Min Delay = $ImD"
+
+# Constraint the path to the rising edge of the phy clock
+set_input_delay -add_delay -clock virtual_phy_clk -max $IMD [get_ports {enet_rx_dv enet_rx_d*}]
+set_input_delay -add_delay -clock virtual_phy_clk -min $ImD [get_ports {enet_rx_dv enet_rx_d*}]
+
+# Constraint the path to the falling edge of the phy clock
+set_input_delay -add_delay -clock virtual_phy_clk -max -clock_fall $IMD [get_ports {enet_rx_dv enet_rx_d*}]
+set_input_delay -add_delay -clock virtual_phy_clk -min -clock_fall $ImD [get_ports {enet_rx_dv enet_rx_d*}]
+
+# On a same edge capture DDR interface the paths from RISE to FALL and
+# from FALL to RISE on not valid for setup analysis
+set_false_path \
+    -setup \
+    -rise_from [get_clocks {virtual_phy_clk}] \
+    -fall_to [get_clocks {enet_rx_clk}]
+
+set_false_path \
+    -setup \
+    -fall_from [get_clocks {virtual_phy_clk}] \
+    -rise_to [get_clocks {enet_rx_clk}]
+
+# On a same edge capture DDR interface the paths from RISE to RISE and
+# FALL to FALL are not avlid for hold analysis
+set_false_path \
+    -hold \
+    -rise_from [get_clocks {virtual_phy_clk}] \
+    -rise_to [get_clocks {enet_rx_clk}]
+
+set_false_path \
+    -hold \
+    -fall_from [get_clocks {virtual_phy_clk}] \
+    -fall_to [get_clocks {enet_rx_clk}]
+		 
+
+
+
+#**************************************************************
+# Output Delay Constraints (Edge Aligned, Same Edge Capture)
+#**************************************************************
+# Create the output constraints related to the ext_clk withn 125MHz is selected
+set Tsu [expr (-1 * $PERIOD_125/4) + 0.35]
+set Th [expr ($PERIOD_125/4) + 0.35]
+set Td_max 0.0
+set Td_min 0.0
+set longest_src_clk 0.0
+set shortest_src_clk 0.0
+set longest_dest_clk 0.0
+set shortest_dest_clk 0.0
+
+set Tcs_largest [expr $shortest_dest_clk - $longest_src_clk]
+set Tcs_smallest [expr $longest_dest_clk - $shortest_src_clk]
+
+set OMD [expr $Td_max + $Tsu - $Tcs_largest]
+set OmD [expr $Td_min - $Th - $Tcs_smallest]
+
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_125] -max $OMD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_125] -min $OmD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_125] -max -clock_fall $OMD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_125] -min -clock_fall $OmD [get_ports {enet_tx_en enet_tx_d*}]
+
+# Create the output constraints related to the ext_clk withn 25MHz is selected
+set Tsu [expr (-1 * $PERIOD_25/4) + 0.35]
+set Th [expr ($PERIOD_25/4) + 0.35]
+set OMD [expr $Td_max + $Tsu - $Tcs_largest]
+set OmD [expr $Td_min - $Th - $Tcs_smallest]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_25] -max $OMD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_25] -min $OmD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_25] -max -clock_fall $OMD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_25] -min -clock_fall $OmD [get_ports {enet_tx_en enet_tx_d*}]
+
+# Create the output constraints related to the ext_clk withn 2p5MHz is selected
+set Tsu [expr (-1 * $PERIOD_2p5/4) + 0.35]
+set Th [expr ($PERIOD_2p5/4) + 0.35]
+set OMD [expr $Td_max + $Tsu - $Tcs_largest]
+set OmD [expr $Td_min - $Th - $Tcs_smallest]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_2p5] -max $OMD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_2p5] -min $OmD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_2p5] -max -clock_fall $OMD [get_ports {enet_tx_en enet_tx_d*}]
+set_output_delay -add_delay -clock [get_clocks enet_gtx_clk_2p5] -min -clock_fall $OmD [get_ports {enet_tx_en enet_tx_d*}]
+
+
+# On same edge capture DDR interface the paths from RISE to FALL and
+# from FALL to RISE on not valid for setup analysis
+set_false_path \
+    -setup \
+    -rise_from [get_clocks {tx_clk_125 tx_clk_25 tx_clk_2p5}] \
+    -fall_to [get_clocks {enet_gtx_clk_125 enet_gtx_clk_25 enet_gtx_clk_2p5}]
+
+set_false_path \
+    -setup \
+    -fall_from [get_clocks {tx_clk_125 tx_clk_25 tx_clk_2p5}] \
+    -rise_to [get_clocks {enet_gtx_clk_125 enet_gtx_clk_25 enet_gtx_clk_2p5}]
+
+# On same edge capture DDR interface the paths from RISE to RISE and
+# FALL to FALL are not valid for hold analysis
+set_false_path \
+    -hold \
+    -rise_from [get_clocks {tx_clk_125 tx_clk_25 tx_clk_2p5}] \
+    -rise_to [get_clocks {enet_gtx_clk_125 enet_gtx_clk_25 enet_gtx_clk_2p5}]
+
+set_false_path \
+    -hold \
+    -fall_from [get_clocks {tx_clk_125 tx_clk_25 tx_clk_2p5}] \
+    -fall_to [get_clocks {enet_gtx_clk_125 enet_gtx_clk_25 enet_gtx_clk_2p5}]
+
+set_multicycle_path 0 \
+    -from [get_clocks {tx_clk_125 tx_clk_25 tx_clk_2p5}] \
+    -to [get_clocks {enet_gtx_clk_125 enet_gtx_clk_25 enet_gtx_clk_2p5}] \
+    -setup \
+    -end
+set_multicycle_path -1 \
+    -from [get_clocks {tx_clk_125 tx_clk_25 tx_clk_2p5}] \
+    -to [get_clocks {enet_gtx_clk_125 enet_gtx_clk_25 enet_gtx_clk_2p5}] \
+    -hold \
+    -end
+
+
+
+
+			       
+
+#
+# some clock uncertainty is required
+#
+derive_clock_uncertainty
+
+#
+# Create false paths between clock domains that are not fully constrained by the IP that makes these paths.
+# Ideally we should not have to do this, however, these paths must be cut to meet timing and in most cases
+# the IP should be accounting for synchronization between these paths.
+# The risk of a global cut like these is that if the IP is not synchronizing properly between the two domains
+# then you have significant problems with the design.  Ideally the IP should synchronize it's clock crossing
+# paths and create constraints to cut those paths so we don't have to perform a global cut like this.
+#
+set_clock_groups \
+    -exclusive \
+    -group [get_clocks {tx_clk_125 tx_clk_25 tx_clk_2p5}] \
+    -group [get_clocks enet_rx_clk] \
+    -group [get_clocks clk50_clk]  
+
+
+set_multicycle_path -setup 5 -from [ get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|altera_tse_altsyncram_dpm_fifo:U_RTSM|altsyncram*] -to [ get_registers *]
+set_multicycle_path -setup 5 -from [ get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|altera_tse_retransmit_cntl:U_RETR|*] -to [ get_registers *]
+set_multicycle_path -setup 5 -from [ get_registers *] -to [ get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|altera_tse_retransmit_cntl:U_RETR|*]
+set_multicycle_path -hold 5 -from [ get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|altera_tse_altsyncram_dpm_fifo:U_RTSM|altsyncram*] -to [ get_registers *]
+set_multicycle_path -hold 5 -from [ get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|altera_tse_retransmit_cntl:U_RETR|*] -to [ get_registers *]
+set_multicycle_path -hold 5 -from [ get_registers *] -to [ get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|altera_tse_retransmit_cntl:U_RETR|*]
+set_max_delay 7 -from [get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|dout_reg_sft*] -to [get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_top_1geth:U_GETH|altera_tse_mac_tx:U_TX|*]
+set_max_delay 7 -from [get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|eop_sft*] -to [get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_top_1geth:U_GETH|altera_tse_mac_tx:U_TX|*]
+set_max_delay 7 -from [get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_tx_min_ff:U_TXFF|sop_reg*] -to [get_registers *|altera_tse_top_w_fifo:U_MAC|altera_tse_top_1geth:U_GETH|altera_tse_mac_tx:U_TX|*]

@@ -1,0 +1,212 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 21 22:42:36 2013
+
+@author: yozturk
+"""
+
+from PyQt4 import QtCore, QtGui, Qt
+import os
+import sys
+from PyQt4.QtGui import *
+
+
+
+class PicButton(QAbstractButton):
+    def __init__(self, pixmap, parent=None):
+        super(PicButton, self).__init__(parent)
+        self.pixmap = pixmap
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.drawPixmap(event.rect(), self.pixmap)
+
+    def sizeHint(self):
+        return self.pixmap.size()
+
+class Gate(QtGui.QGroupBox): 
+     def __init__(self,master,i):       
+        self.container = master
+        self.addGate(master,i)
+        self.GateInputs = []
+        self.OutputConnection=[]
+       
+     def addGate(self,master,i):
+        if (i < 9):
+             self.groupBox = QtGui.QGroupBox(Qt.QString("Gate %1") .arg(i))
+        else:
+             self.groupBox = QtGui.QGroupBox(Qt.QString("Final Output"))
+             
+        self.groupBox.setFixedHeight(100)
+        if i in [1,3,5,7] :
+            self.groupBox.setStyleSheet("background-color: lightGray")
+        else:
+            self.groupBox.setStyleSheet("background-color: yellow")
+
+        if (i == 9):
+            self.groupBox.setStyleSheet("background-color: cyan")
+            
+            
+        self.hbox = Qt.QGridLayout(self.groupBox)
+        self.groupBox.setLayout(self.hbox)
+        self.gateType = QtGui.QComboBox()
+        self.gateType.addItem("AND")
+        self.gateType.addItem("OR")
+        self.hbox.addWidget(self.gateType)
+        self.label = QtGui.QLabel("Inputs :")
+        self.hbox.addWidget(self.label)
+        self.gateInputs = QtGui.QLineEdit()   
+        #self.gateID.setStyleSheet('color: red')
+        # self.groupBox.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        #                             "border:1px solid rgb(255, 170, 255);")
+      
+        self.hbox.addWidget(self.gateInputs)
+    
+#        button = PicButton(QPixmap("andGate.png"))
+#        self.hbox.addWidget(button)
+        
+        
+       
+        
+        master.addWidget(self.groupBox)
+
+     def deleteGate(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)
+        
+
+
+class Counter(QtGui.QGroupBox): 
+     def __init__(self,master,i):       
+        self.container = master
+        self.addCounter(master,i)
+        self.CounterInputs = []
+        self.OutputConnection=[]
+       
+     def addCounter(self,master,i):
+        self.groupBox = QtGui.QGroupBox(Qt.QString("Counter  %1") .arg(i))
+        if i in [1,3,5,7] :
+            self.groupBox.setStyleSheet("background-color: lightGray")
+        else:
+            self.groupBox.setStyleSheet("background-color: yellow")
+            
+        self.hbox = Qt.QGridLayout(self.groupBox)
+        self.groupBox.setLayout(self.hbox)
+        self.counterType = QtGui.QSpinBox()
+        self.counterType.setMaximum(512)
+        self.counterType.setMinimum(0)
+        self.label1 = QtGui.QLabel("InitValue:")
+        self.label2 = QtGui.QLabel("CountUP")
+        self.label3 = QtGui.QLabel("CountDown")
+        self.label4 = QtGui.QLabel("CountInit")
+
+        self.hbox.addWidget(self.label1,0,0)
+        self.hbox.addWidget(self.label2,1,0)
+        self.hbox.addWidget(self.label3,2,0)
+        self.hbox.addWidget(self.label4,3,0)
+        
+        self.countUpInp = QtGui.QLineEdit()   
+        self.countDownInp = QtGui.QLineEdit()   
+        self.countInitInp = QtGui.QLineEdit()   
+        #self.gateID.setStyleSheet('color: red')
+        # self.groupBox.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        #                             "border:1px solid rgb(255, 170, 255);")
+
+        self.hbox.addWidget(self.counterType,0,1)  
+        self.hbox.addWidget(self.countUpInp,1,1)
+        self.hbox.addWidget(self.countDownInp,2,1)
+        self.hbox.addWidget(self.countInitInp,3,1)
+
+#        button = PicButton(QPixmap("andGate.png"))
+#        self.hbox.addWidget(button)
+        
+        master.addWidget(self.groupBox)
+
+     def deleteCounter(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)
+
+
+class CounterDependency(QtGui.QGroupBox): 
+     def __init__(self,master,i):       
+        self.container = master
+        self.addDependencyElement(master,i)
+        self.counterDependent = []
+       
+     def addDependencyElement(self,master,i):
+        self.groupBox = QtGui.QGroupBox(Qt.QString("Counter  %1") .arg(i))
+        if i in [1,3,5,7] :
+            self.groupBox.setStyleSheet("background-color: lightGray")
+        else:
+            self.groupBox.setStyleSheet("background-color: yellow")
+            
+        self.groupBox.setMaximumHeight(70)
+        self.hbox = Qt.QGridLayout(self.groupBox)
+        self.groupBox.setLayout(self.hbox)
+        self.label1 = QtGui.QLabel("Dependent on:")
+        
+        self.hbox.addWidget(self.label1,0,0)    
+        self.dependency = QtGui.QLineEdit()   
+
+        self.hbox.addWidget(self.dependency,1,0)  
+
+        
+        master.addWidget(self.groupBox)
+
+
+
+class Condition(QtGui.QGroupBox): 
+     def __init__(self,master,filterList,i):       
+        self.container = master
+        self.filterList =filterList     
+        self.addCondition(master,i)
+        self.OutputConnection=[]
+               
+     def addCondition(self,master,i):
+        self.groupBox = QtGui.QGroupBox(Qt.QString("Condition %1") .arg(i))
+        self.grp1 = QtGui.QGroupBox()
+        self.grp2 = QtGui.QGroupBox()
+        #self.grp1.setFlat(True)
+        #self.grp2.setFlat(True)
+        
+        
+                
+        self.h1box = Qt.QHBoxLayout()
+        self.v1box = Qt.QVBoxLayout()
+        self.v2box = Qt.QVBoxLayout()
+                
+        self.groupBox.setLayout(self.h1box)
+        self.grp1.setLayout(self.v1box)
+        self.grp2.setLayout(self.v2box)
+                
+        self.h1box.addWidget(self.grp1)     
+        self.h1box.addWidget(self.grp2)     
+        
+        self.variable1 = QtGui.QComboBox()
+        self.variable2 = QtGui.QComboBox()
+        self.condition = QtGui.QComboBox()
+        self.plusAnd = QtGui.QComboBox()
+        self.v1box.addWidget(self.variable1)
+        self.v1box.addWidget(self.variable2)
+        
+        self.v2box.addWidget(self.condition)
+        
+        self.bias = QtGui.QLineEdit()
+        
+        self.v2box.addWidget(self.plusAnd)        
+        self.v1box.addWidget(self.bias)
+        
+        for filterElement in self.filterList:
+            self.variable1.addItem(filterElement[0]) 
+            self.variable2.addItem(filterElement[0]) 
+                        
+        self.condition.addItems(["==","!=",">","<"]) 
+        self.condition.setFixedHeight(40)
+        self.plusAnd.addItems(["&","+"])
+     
+
+        master.addWidget(self.groupBox)
+        master.setAlignment(self.groupBox, QtCore.Qt.AlignTop)
+    

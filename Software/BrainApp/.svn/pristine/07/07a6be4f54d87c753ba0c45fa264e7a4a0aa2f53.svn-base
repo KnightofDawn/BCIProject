@@ -1,0 +1,43 @@
+m255
+K3
+13
+cModel Technology
+Z0 dC:\Users\bspaugh\Desktop
+vcapture_to_memory
+Z1 IDKN:8H8kfgHh:]3bhO;XD0
+Z2 VnfhQ<F>D2:idR:kdcALh22
+Z3 dC:\projects\Entropic_Designs\nios2\entropic_ip\capture_to_memory
+Z4 w1358192552
+Z5 8C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.v
+Z6 FC:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.v
+L0 4
+Z7 OV;L;10.0d;49
+r1
+31
+Z8 !s90 -reportprogress|300|-work|work|-nocovercells|C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.v|
+Z9 !s102 -nocovercells
+Z10 o-work work -nocovercells -O0
+Z11 !s100 hz;S9;d;a[KRzFfFdK0Kh2
+!s85 0
+Z12 !s108 1358192587.995000
+Z13 !s107 C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.v|
+!s101 -O0
+vcapture_to_memory_tb
+Z14 !s100 Ah3_UIDcf9A`gH]9][1=B2
+Z15 IW;Z6zEOAhe8RZP7IDUfX]1
+Z16 VNngA6ZQEP63RD3g?6n;ZZ3
+R3
+Z17 w1358192309
+Z18 8C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory_tb.v
+Z19 FC:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory_tb.v
+L0 1
+R7
+r1
+!s85 0
+31
+!s108 1358192588.149000
+!s107 C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory_tb.v|
+Z20 !s90 -reportprogress|300|-work|work|-nocovercells|C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory_tb.v|
+!s101 -O0
+R9
+R10

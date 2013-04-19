@@ -1,0 +1,82 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+entity TesterFpgaCompareElement is
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      DataIn0   : in  std_logic_vector(31 downto 0);
+      DataIn1   : in  std_logic_vector(31 downto 0);
+      CmpOut    : out std_logic;
+
+      ConfigRegsIn   : in std_logic_vector(31 downto 0);
+      ConfigRegsOut  : out std_logic_vector(31 downto 0);
+      ConfigRegsEn   : in std_logic;
+      ConfigRegsLd   : in std_logic;
+      ConfigRegsSt   : in std_logic
+   );
+end TesterFpgaCompareElement;
+
+architecture RTL of TesterFpgaCompareElement is
+   -- Reg 0 - Find Data in stream
+   -- | [4]  |  [3]  |  [2]  |   [1]   |   [0]  |
+   -- |  2's |  not  | equal | smaller | bigger |
+   -- | comp | equal |       |  than   |  than  |
+   type   RegisterBank_t is array (0 to 0) of std_logic_vector(31 downto 0);
+   signal RegisterBank       : RegisterBank_t;
+   signal RegisterBankStatic : RegisterBank_t;
+   
+   signal BiggerThan  : std_logic;
+   signal SmallerThan : std_logic;
+   signal EqualTo     : std_logic;
+   signal NotEqualTo  : std_logic;
+   signal TwosComp    : std_logic;
+   signal DIn0Twos    : std_logic_vector(31 downto 0);
+   signal DIn1Twos    : std_logic_vector(31 downto 0);
+
+begin
+   DIn0Twos(31) <= not DataIn0(31) when TwosComp='1' else DataIn0(31);
+   DIn0Twos(30 downto 0) <= DataIn0(30 downto 0);
+   
+   DIn1Twos(31) <= not DataIn1(31) when TwosComp='1' else DataIn1(31);
+   DIn1Twos(30 downto 0) <= DataIn1(30 downto 0);
+
+   CmpOut <= '1' when BiggerThan  = '1' and DIn0Twos >  DIn1Twos else
+             '1' when SmallerThan = '1' and DIn0Twos <  DIn1Twos else
+             '1' when EqualTo     = '1' and DataIn0  =  DataIn1  else
+             '1' when NotEqualTo  = '1' and DataIn0 /=  DataIn1  else
+             '0';
+
+   -- Config Registers 
+   process (RST, CLK)
+   begin
+      if RST = '1' then
+         RegisterBank       <= (others=>(others=>'0'));
+         RegisterBankStatic <= (others=>(others=>'0'));
+      elsif CLK'event and CLK='1' then
+         if (ConfigRegsSt = '1') then
+            RegisterBank <= RegisterBankStatic;
+         end if;
+         if (ConfigRegsLd = '1') then 
+            RegisterBankStatic <= RegisterBank;
+         end if;
+         if (ConfigRegsEn = '1') then
+            RegisterBankStatic(RegisterBankStatic'high) <= ConfigRegsIn;
+            for i in 0 to RegisterBankStatic'high-1 loop
+               RegisterBankStatic(i) <= RegisterBankStatic(i+1);
+            end loop;
+         end if;
+      end if;
+   end process;
+   BiggerThan  <= RegisterBank(0)(0);
+   SmallerThan <= RegisterBank(0)(1);
+   EqualTo     <= RegisterBank(0)(2);
+   NotEqualTo  <= RegisterBank(0)(3);
+   TwosComp    <= RegisterBank(0)(4);
+   ConfigRegsOut <= RegisterBankStatic(0);
+
+end RTL;

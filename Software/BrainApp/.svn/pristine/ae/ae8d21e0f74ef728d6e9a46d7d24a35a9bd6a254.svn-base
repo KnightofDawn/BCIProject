@@ -1,0 +1,232 @@
+//an embedded ROM will be used to store addr, value, and sleep values.  reg 0 will be addres
+//reg 1 will be value, and reg 2 will be sleep time in units of milliseconds.  This will repeat.
+
+module tse_config
+  (
+   input 	     clk166,
+   input 	     reset, 
+   output reg 	     write,
+   output reg [31:0] address,
+   output reg [31:0] writedata,
+   input 	     waitrequest,
+
+   output 	     tse_sleeping	     
+   );
+
+
+`define TSE_BASE 32'h10105000
+   
+`define REQ_ROM_ADDR_STATE 3'b000   
+`define REQ_ROM_VAL_STATE 3'b001
+`define READ_ROM_ADDR_REQ_ROM_SLEEP_STATE 3'b010
+`define READ_ROM_VAL_STATE 3'b011
+`define READ_ROM_SLEEP_STATE 3'b100
+`define HOLD_STATE 3'b101
+`define SLEEP_STATE 3'b110
+   reg [2:0] 	 state;
+   assign tse_sleeping = (state == `SLEEP_STATE);
+   
+   reg [5:0] 	 rom_addr;
+   wire [31:0]	 rom_q;
+ 
+   tse_config_rom tse_config_rom_inst
+     (
+      .address(rom_addr),
+      .clock(clk166),
+      .q(rom_q)
+      );
+
+
+   //need to count to 166000 to get a ms timer
+   reg [17:0] ms_cnt; 
+   reg 	      ms_tick;
+   //make a 1ms tick
+   always @ (posedge clk166 or posedge reset)
+     begin
+	if(reset)
+	  begin
+	     ms_cnt <= 18'd0;
+	     ms_tick <= 1'b0;
+	  end
+	else
+	  begin
+	     ms_cnt <= ms_cnt + 18'd1;
+	     ms_tick <= 1'b0;
+	     
+	     if(ms_cnt >= 18'd165999)
+	       begin
+		  ms_cnt <= 18'd0;
+		  ms_tick <= 1'b1;
+	       end
+	  end
+     end
+
+   
+
+   reg [31:0] 	 ms_tick_cnt;
+   
+   always @ (posedge clk166 or posedge reset)
+     begin
+	if(reset)
+	  begin
+	     write     <= 1'b0;
+	     address   <= `TSE_BASE;
+	     writedata <= 32'd0;
+	     state <= `REQ_ROM_ADDR_STATE;
+	     rom_addr <= 6'd0;
+	     ms_tick_cnt <= 32'd0;
+	  end
+	else
+	  begin
+	     write     <= 1'b0;
+	     
+	     if(ms_tick_cnt) 
+	       begin
+		  if(ms_tick)
+		    begin
+		       ms_tick_cnt <= ms_tick_cnt - 32'd1;
+		    end
+	       end
+	     
+	     case(state)
+	       `REQ_ROM_ADDR_STATE:
+		 begin
+		    if(rom_addr >= 6'd54)
+		      begin
+			 state <= state;
+		      end
+		    else
+		      begin
+			 rom_addr <= rom_addr + 6'd1;
+			 state <= `REQ_ROM_VAL_STATE;
+		      end
+		 end // case: `REQ_ROM_ADDR_STATE
+	       `REQ_ROM_VAL_STATE:
+		 begin
+		    rom_addr <= rom_addr + 6'd1;
+		    state <= `READ_ROM_ADDR_REQ_ROM_SLEEP_STATE;
+		 end
+	       `READ_ROM_ADDR_REQ_ROM_SLEEP_STATE:
+		 begin
+		    address <= (rom_q << 2) | `TSE_BASE;
+		    rom_addr <= rom_addr + 6'd1;
+		    state <= `READ_ROM_VAL_STATE;
+		 end
+	       `READ_ROM_VAL_STATE:
+		 begin
+		    writedata <= rom_q;
+		    state <= `READ_ROM_SLEEP_STATE;
+		 end
+	       `READ_ROM_SLEEP_STATE:
+		 begin
+		    write <= 1'b1;
+		    ms_tick_cnt <= rom_q;
+		    state <= `HOLD_STATE;
+		 end
+	       `HOLD_STATE:
+		 begin
+		    if(waitrequest)
+		      begin
+			 write <= 1'b1;
+			 state <= state;
+		      end
+		    else
+		      begin
+			 state <= `SLEEP_STATE;
+		      end
+		 end
+	       `SLEEP_STATE:
+		 begin
+		    if(ms_tick_cnt == 32'd0)
+		      begin
+			 state <= `REQ_ROM_ADDR_STATE;	 
+		      end
+		 end
+	     endcase
+	  end
+     end
+
+
+
+
+   
+/*
+ void ethernet_init()
+ {
+ //set the Marvel PHY address to 0, this maps reg 0x80-0x9F in the TSE core to reg 0-31 on PHY device 0.
+ tse_mac[0xf] = 0;
+ 
+ //set TX_ENA and RX_ENA bits to 0 in command config register in the TSE
+ tse_mac[0x2] = 0x00802038;
+ usleep(1000000);
+ tse_mac[0x2] = 0x00800038;
+ 
+ 
+ //write tx_section_empty = (FIFO depth - 16)
+ tse_mac[0x9] = (4196 - 16);
+ 
+ //write tx_almost_full = 3
+ tse_mac[0xE] = 3;
+ 
+ //Tx_almost_empty = 8
+ tse_mac[0xD] = 8;
+ 
+ //Rx_section_empty = Max FIFO size - 16
+ tse_mac[0x7] = (4196 - 16);
+ 
+ //Rx_almost_full = 8
+ tse_mac[0xc] = 8;
+ 
+ //Rx_almost_empty = 8
+ tse_mac[0xb] = 8;
+ 
+ //Cut Through Mode, Set this Threshold to 0 to enable Store and Forward Mode Tx_section_full = 16
+ tse_mac[0xa] = 0;
+ 
+ //Cut Through Mode, Set this Threshold to 0 to enable Store and Forward Mode Rx_section_full = 16
+ tse_mac[0x8] = 0;
+ 
+ //c. MAC address configuration
+ //MAC address is 00-1C-23-17-4A-CB
+ tse_mac[0x3] = 0x17231C00;
+ tse_mac[0x4] = 0x0000CB4A;
+ 
+ tse_mac[0x3] = 0x17231C00;
+ tse_mac[0x4] = 0x0000CB4A;
+ 
+ //d. MAC function configuration
+ //Maximum Frame Length is 1518 bytes
+ tse_mac[0x5]= 1518;
+ //Minimum Inter Packet Gap is 12 bytes
+ tse_mac[0x17] = 12;
+ 
+ //Maximum Pause Quanta Value for Flow Control
+ tse_mac[0x6] = 0xFFFF;
+ 
+ //Set the MAC with the following option:
+ // 100Mbps, User can get this information from the PHY status/PCS status
+ //Full Duplex, User can get this information from the PHY status/PCS status
+ //Padding Removal on Receive
+ //CRC Removal
+ //TX MAC Address Insertion on Transmit Packet
+ //Select mac_0 and mac_1 as the source MAC Address
+ // tse_mac[0x2] = 0x0080222B;
+ tse_mac[0x3A]= 0x0;
+ 
+ usleep(1000);
+ tse_mac[0x2] = 0x0080002b;
+ 
+ //enable a 90 phase shift in the rx clock generatred by the PHY
+ tse_mac[0x94] = tse_mac[0x94] | 0x80;
+ 
+ //do a soft reset on the PHY to enable the 90 phase shift in the rx clock
+ tse_mac[0x80] = tse_mac[0x80] | 0x8000;
+ 
+ usleep(1000000);
+ 
+ */
+ 
+   
+   
+
+endmodule

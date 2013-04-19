@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Feb 09 10:37:09 2013
+
+@author: yozturk
+"""
+from ctypes import *
+# Basic structures and data definitions for AF_INET family
+#
+class S_un_b(Structure):
+    _fields_ = [("s_b1",c_ubyte),
+                ("s_b2",c_ubyte),
+                ("s_b3",c_ubyte),
+                ("s_b4",c_ubyte)]
+
+class S_un_w(Structure):
+    _fields_ = [("s_wl",c_ushort),
+                ("s_w2",c_ushort)]
+
+class S_un(Union):
+    _fields_ = [("S_un_b",S_un_b),
+                ("S_un_w",S_un_w),
+                ("S_addr",c_ulong)]
+
+class in_addr(Structure):
+    _fields_ = [("S_un",S_un)]
+
+
+
+class sockaddr_in(Structure):
+    _fields_ = [("sin_family", c_ushort),
+                ("sin_port", c_ushort),
+                ("sin_addr", in_addr),
+                ("sin_zero", c_char * 8)]
+
+class LP_bpf_program(Structure):
+    _fields_ = [("bf_len", c_int),("bf_insns", c_void_p)]
+
+
+    
+class RawPacket(object):
+
+    """ Represents an Ethernet packet and its functions. """
+
+    def __init__(self, param, header, pkt_data, timestamp):
+
+        # Class Variables
+
+        self.param = param
+        self.header = header
+        self.pkt_data = pkt_data
+        self.timestamp = timestamp
+        

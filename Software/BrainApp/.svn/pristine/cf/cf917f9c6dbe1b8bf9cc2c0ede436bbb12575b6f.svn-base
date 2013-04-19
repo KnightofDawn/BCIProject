@@ -1,0 +1,110 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+entity TesterFpgaFilterElement is
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      DataIn    : in std_logic_vector(31 downto 0);
+      HdrIn     : in std_logic_vector( 3 downto 0);
+      OffsetIn  : in std_logic_vector(15 downto 0);
+      PktTypeIn : in std_logic_vector( 3 downto 0);
+      DataInEn  : in std_logic;
+         
+      FilterOut : out std_logic;
+
+      ConfigRegsIn   : in std_logic_vector(31 downto 0);
+      ConfigRegsOut  : out std_logic_vector(31 downto 0);
+      ConfigRegsEn   : in std_logic;
+      ConfigRegsLd   : in std_logic;
+      ConfigRegsSt   : in std_logic
+   );
+end TesterFpgaFilterElement;
+
+architecture RTL of TesterFpgaFilterElement is
+   type RegisterBank_t is array (0 to 1) of std_logic_vector(31 downto 0);
+
+   -- Reg 0
+   -- | 31:24 | 23:16  |  15:12  |   11:8  |   7:4  |   3:0  |
+   -- | Curr  | Initial| PktType | PktType | HdrMax | HdrMin |
+   -- | Dcmit | Dcimt  |   Max   |   Min   |        |        |
+   -- Reg 1
+   -- | 31:16          |      15:0       |
+   -- | OfstMax        |     OfstMin     |
+   signal RegisterBank           : RegisterBank_t;
+   signal RegisterBankStatic     : RegisterBank_t;
+   signal DecDecimationCntr      : std_logic;
+   signal HdrMax, HdrMin         : std_logic_vector( 3 downto 0);
+   signal OffsetMax, OffsetMin   : std_logic_vector(15 downto 0);
+   signal PktTypeMax, PktTypeMin : std_logic_vector( 3 downto 0);
+   signal CurDecimCntr           : std_logic_vector( 7 downto 0);
+   
+begin
+   CurDecimCntr <= RegisterBank(0)(31 downto 24);
+   PktTypeMax   <= RegisterBank(0)(15 downto 12);
+   PktTypeMin   <= RegisterBank(0)(11 downto  8);
+   HdrMax       <= RegisterBank(0)( 7 downto  4);
+   HdrMin       <= RegisterBank(0)( 3 downto  0);
+   OffsetMax    <= RegisterBank(1)(31 downto 16);
+   OffsetMin    <= RegisterBank(1)(15 downto  0);
+   
+   -- Filter
+   process(CLK, RST)
+   begin
+      if RST = '1' then
+         DecDecimationCntr <= '0';
+         FilterOut         <= '0';
+
+      elsif CLK'event and CLK = '1' then
+         DecDecimationCntr <= '0';
+         FilterOut         <= '0';
+         
+         if (HdrIn <= HdrMax) and (HdrIn >= HdrMin) and 
+            (OffsetIn <= OffsetMax) and (OffsetIn >= OffsetMin) then
+            if (CurDecimCntr = std_logic_vector(to_unsigned(0,8))) then 
+               if (HdrIn = std_logic_vector(to_unsigned(6,4)) or HdrIn = std_logic_vector(to_unsigned(7,4))) then
+                  if (PktTypeIn <= PktTypeMax) and (PktTypeIn >= PktTypeMin) then
+                     FilterOut <= '1';
+                  end if;
+               else
+                  FilterOut <= '1';
+               end if;
+            else
+              DecDecimationCntr <= '1';
+            end if;
+         end if;
+      end if;
+   end process;
+
+   -- Config Registers 
+   process (RST, CLK)
+   begin
+      if RST = '1' then
+         RegisterBank       <= (others=>(others=>'1'));
+         RegisterBankStatic <= (others=>(others=>'1'));
+      elsif CLK'event and CLK='1' then
+         if (ConfigRegsSt = '1') then
+            RegisterBank <= RegisterBankStatic;
+         elsif (DecDecimationCntr = '1') then
+            if (RegisterBank(0)(31 downto 24) = std_logic_vector(to_unsigned(0,8))) then
+              RegisterBank(0)(31 downto 24) <= RegisterBank(0)(23 downto 16);
+            else
+              RegisterBank(0)(31 downto 24) <= RegisterBank(0)(31 downto 24) - 1;
+            end if;
+         end if;
+         if (ConfigRegsLd = '1') then 
+            RegisterBankStatic <= RegisterBank;
+         end if;
+         if (ConfigRegsEn = '1') then
+            RegisterBankStatic(1) <= ConfigRegsIn;
+            RegisterBankStatic(0) <= RegisterBankStatic(1);
+         end if;
+      end if;
+   end process;
+   ConfigRegsOut <= RegisterBankStatic(0);
+   
+end RTL;
