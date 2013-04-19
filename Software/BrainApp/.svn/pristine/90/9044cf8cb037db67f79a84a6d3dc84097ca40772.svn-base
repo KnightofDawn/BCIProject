@@ -1,0 +1,23 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Feb 09 15:17:33 2013
+
+@author: yozturk
+"""
+from xml.etree import ElementTree
+with open('testMux.xml', 'rt') as eventfile:
+    print (eventfile)            
+    eventtree = ElementTree.parse(eventfile)
+for eventnode in eventtree.iter('mode'):       
+    eventname = eventnode.attrib.get('name')       
+    eventID = eventnode.get('id') 
+    for rfile in eventnode.iter('primary'):
+        rname = rfile.attrib.get('name')
+        for bfile in rfile.iter('data'):
+            bname = bfile.attrib.get('name')
+            print (eventname,eventID, rname,bname) 
+    for rfile in eventnode.iter('secondary'):
+        rname = rfile.attrib.get('name')
+        for bfile in rfile.iter('data'):
+            bname = bfile.attrib.get('name')
+            print (eventname,eventID, rname,bname)

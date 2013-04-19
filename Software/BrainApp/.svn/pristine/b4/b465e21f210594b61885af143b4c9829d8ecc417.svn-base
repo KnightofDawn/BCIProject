@@ -1,0 +1,271 @@
+<system desc="based on: Hand edited and generated back to PHY_Interface.doc" dl_ldpc_regs_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 35)" fd_tables_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 20)" name="reg_htm_parse" td_tables_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 20)">
+  <block name="PhyRfic" offset="0xcc15c000">
+    <regfile absolute_addr="0xcc15c880" desc="PhyRfic Csbuff Status (dynamic status register)" name="CsbSts" offset="0x0880">
+      <mult name="0" num="8" offset="0x100" />
+      <reg name="RficEntryStatus" offset="0x00">
+        <field access="rw" desc="Alias - see TxFdEntryControl register description." name="ControlEmpty" offset="0" reset="1" width="1" />
+        <field access="rw" desc="Set to '0' by hardware to indicate the entry has valid status. Writing a '1' indicates the entry is transferred to hardware for reuse." name="Empty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Alias - see TxFdEntryControl register description." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" desc="How does this happen?." name="ControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="Lost" offset="5" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="Overflow" offset="6" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="25" />
+      </reg>
+      <reg name="RficAfeStatus_1" offset="0x04">
+        <field access="ru" desc="1  bad timetoprocess
+" name="TimeToProcessInvalid" offset="0" reset="1" width="1" />
+        <field access="ru" desc="number of fast agc messages sent in the corresponded packet" name="FastAgcInPktCnt" offset="1" reset="1" width="3" />
+        <field access="ru" desc="high if descriptors flushed due to bad arriving time" name="DescDumpErr" offset="4" reset="1" width="1" />
+        <field access="ru" desc=" high if descriptors out of ctc_invalid_win, low if descriptors out of start_window" name="DescDumpType" offset="5" reset="1" width="1" />
+        <field access="ru" desc=" high if descriptors flushed due to no TX activity event" name="NoTxDataErr" offset="6" reset="1" width="1" />
+        <field access="ru" desc="high if tx packet was identified and processed" name="TxPktProcessed" offset="7" reset="1" width="1" />
+        <field access="ru" desc="high if rx packet was identified and processed" name="RxPktProcessed" offset="8" reset="1" width="1" />
+        <field access="ru" desc="the last sent log_gain. if all ones means that gain was initialized from table only without fast updates" name="LastLogGain" offset="9" reset="1" width="7" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc15d800" desc="PhyRfic LogGain Table" name="AnalogGain" offset="0x1800">
+      <mult name="0" num="1" offset="0x0" />
+      <reg name="LogGain" offset="0x0">
+        <field access="rw" desc="RFIC Rx_Rfg field sent through the SIO during FastAGC message" name="rx_rfg" offset="0" reset="x" width="5" />
+        <field access="rw" desc="AFE VGA gain parameters for FastAGC message" name="VGA" offset="5" reset="x" width="4" />
+        <mult name="0" num="128" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc15c400" desc="PhyRf Csr (static control register)" name="Csr" offset="0">
+      <reg name="PhyRficCtrl" offset="0x004">
+        <field access="rw" desc="0: TRfic reset 1: Rfic enabled." name="Enable" offset="0" reset="0" width="1" />
+        <field access="rw" desc="0: &quot;circular queue&quot; mode 1: &quot;register&quot; mode ... Normal operation uses &quot;circular queue&quot; mode. Repetitive and continuous operation use &quot;register&quot; mode." name="DynCtrlMode" offset="1" reset="x" width="1" />
+        <field access="ru" desc="Revision number of module." name="Revision" offset="2" reset="0" width="8" />
+        <field access="ru" desc="Indicates module type. PHY = TBS." name="ModuleID" offset="10" reset="0" width="16" />
+        <field access="rw" desc="special status mode ." name="DynStatusMode" offset="26" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="5" />
+      </reg>
+      <reg name="RficCtrl_0" offset="0x008" width="1">
+        <field access="rw" desc="Front-end fixed current control bits ... &lt;00&gt;=25uA ... &lt;01&gt;=37.5uA ... &lt;10&gt;=50uA... &lt;11&gt;=62.5uA " name="RxAfeIvga" offset="0" reset="10" width="2" />
+        <field access="rw" desc="Controls the AAF cut-off frequency" name="RxAfeFtuneIn" offset="2" reset="10000" width="5" />
+        <field access="rw" desc="ADC fixed current control bits. ... 00 25uA ... 01 37.5uA ... 10 50uA ... 11 62.5uA" name="RxAfeIadc" offset="7" reset="10" width="2" />
+        <field access="rw" desc="Enable digital loopback from ADC output to DAC input. In this mode, the DAC clock is switched to the 160MHz ADC Clock." name="RxAfeEnAdcDacLpbk" offset="9" reset="0" width="1" />
+        <field access="rw" desc="3 bits controlling the loopbacks paths inside the Receiver I Channel: (All loopbacks should be considered exclusive) lpbk_rxicntl&lt;0&gt; ‘0’: High RF Mode: no loopbacks, High RF inputs can be forced through the pads. ‘1’: High RF inputs forced through loopback from the Q Channel test Amplifier outputs. 010: I Channel VGA outputs loopback enabled to the Q Channel Test Amplifier Inputs. 100: I Channel RX Inputs loopback enabled to the I Channel Test Amplifier Inputs. " name="RxAfeLpbkRxicntl" offset="10" reset="0" width="3" />
+        <field access="rw" desc="3 bits controlling the loopbacks paths inside the Receiver Q Channel: (All loopbacks should be considered exclusive) lpbk_rxqcntl&lt;0&gt; ‘0’: High RF Mode: no loopbacks, High RF inputs can be forced through the pads. ‘1’: High RF inputs forced through loopback from the I Channel Test Amplifier outputs. 010: Q Channel VGA outputs loopback enabled to the I Channel Test Amplifier Inputs. 100: Q Channel RX inputs loopback enabled to the Q Channel Test Amplifier Inputs. " name="RxAfeLpbkRxqcntl" offset="13" reset="0" width="3" />
+        <field access="rw" desc="Powers down ADC References when =0" name="RxAfeEnAdcRef" offset="16" reset="0" width="1" />
+        <field access="rw" desc="Powers down ADC Regulator when =0" name="RxAfeEnAdcReg" offset="17" reset="0" width="1" />
+        <field access="rw" desc="2 bits to control the non-overlap clocks of the ADC clock generator." name="RxAfeAdcNoverCntl" offset="18" reset="11" width="2" />
+        <field access="rw" desc="3 bits controlling the DC Mux selection. Selected Voltage to be sent to the caladc output pad 000: DC Test Mux in HiZ 001: caladc_in 010: vtunedc 011: vrefp 100: vagnd 101: vrefm 110: vporh 111: vporl " name="RxAfeDcMuxSel" offset="20" reset="0" width="3" />
+        <field access="rw" desc="AAF BW selection bit 0: Moca 1 configuration 1: Moca 2 configuration " name="RxAfeBwsel" offset="23" reset="1" width="1" />
+        <field access="rw" desc="0: 80MHz (for Moca1 configuration) 1: 160MHz (for Moca2 configuration)" name="AdcClksel" offset="24" reset="1" width="1" />
+        <field access="rw" desc="Powers down I Channel Test Amplifier. ‘1’ enable, ‘0’ power down. It puts the Test Amplifier Output in HiZ mode." name="TxAfeEnTai" offset="25" reset="0" width="1" />
+        <field access="rw" desc="Powers down Q Channel Test Amplifier. ‘1’ enable, ‘0’ power down. It puts the Test Amplifier Output in HiZ mode." name="TxAfeEnTaq" offset="26" reset="0" width="1" />
+        <field access="rw" desc="TBD." name="RxAfeEnTuning" offset="27" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RficCtrl_1" offset="0x00c">
+        <field access="rw" desc="Test Amplifiers I&amp;Q fixed current control bits. &lt;00&gt;=25uA &lt;01&gt;=37.5uA &lt;10&gt;=50uA &lt;11&gt;=62.5uA " name="TxAfeIta" offset="0" reset="10" width="2" />
+        <field access="rw" desc="1 bit controlling the loopback path from the TX I channel side to the RX I channel side: 0: no loopback 1: I Channel Test Amplifier loopback enabled" name="TxAfeLpbkTxiRxiCntl" offset="2" reset="0" width="1" />
+        <field access="rw" desc="2 bits controlling the analog multiplexer at the input of the line driver: 00: reference voltage selected. 01: I Channel RX Inputs selected 10: Q Channel VGA outputs selected 11: I Channel Test Amplifier to Q Channel Test Amplifier Calibration Loopback. " name="TxAfeLpbkTxicntl" offset="3" reset="0" width="2" />
+        <field access="rw" desc="1 bit controlling the direction of the pads ta_outp_i/ta_outm_i: 0: ta_outp_i/ta_outm_i are outputs of the Test Amplifier. 1: ta_outp_i/ta_outm_i are inputs and could be used to feed signals through the test amplifier input analog multiplexer controlled by lpbk_txicntl&lt;1:0&gt; to its inputs. " name="TxAfeLpbkTxicntl_2" offset="5" reset="x" width="1" />
+        <field access="rw" desc="1 bit controlling the loopback path from the TX Q channel side to the RX Q channel side: 0: no loopback 1: Q Channel Test Amplifier loopback enabled " name="TxAfeLpbkTxqRxqCntl" offset="6" reset="0" width="1" />
+        <field access="rw" desc="2 bits controlling the analog multiplexer at the input of the test amplifier: 00: reference voltage selected. 01: Q Channel RX inputs selected 10: I Channel VGA outputs selected 11: I Channel Test Amplifier to Q Channel Test Amplifier Calibration Loopback." name="TxAfeLpbkTxqcntl" offset="7" reset="x" width="2" />
+        <field access="rw" desc="1 bit controlling the direction of the pads ta_outp_q/ta_outm_q: 0: ta_outp_q/ta_outm_q are outputs of the test amplifier. 1: ta_outp_q/ta_outm_q are inputs and could be used to feed signals through the test amplifier input analog multiplexer controlled by lpbk_txqcntl&lt;1:0&gt; to its inputs. " name="TxAfeLpbkTxqcntl_2" offset="9" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="22" />
+      </reg>
+      <reg name="RficCtrl_2" offset="0x0010">
+        <field access="rw" desc="Select cal adc input source. Refer to AFE document for specific select values. Field may be written at the same time that CalAdcEn field is written to 1." name="CalAdcSel" offset="0" reset="001" width="3" />
+        <field access="rw" desc="Desired cal adc measure count: number of cal cycles to accumulate measurements over, 1-&gt;255, 0=continuous conversions which never asserts sts_done_pulse to shut down cal adc logic" name="CalAdcMeasCnt" offset="3" reset="0" width="8" />
+        <field access="rw" desc="Enable cal adc references in AFE. Must be asserted 1 millisecond prior to CalAdcEn assertion" name="CalAdcRefEn" offset="11" reset="0" width="1" />
+        <field access="rw" desc="Enable cal adc digital and AFE circuits. When 0, cal adc is held in reset, cal adc clocks are gated off, and RficCalAdcSta status registers are also reset. Writing a 0, followed by writing a 1 starts cal cycles" name="CalAdcEn" offset="12" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="13" reset="x" width="19" />
+      </reg>
+      <reg name="RficFreq_0" offset="0x014">
+        <field access="rw" desc="SPAR: Bits 47:32 of freq_word_0" name="FreqWord_0Upper" offset="0" reset="0" width="16" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RficFreq_1" offset="0x018">
+        <field access="rw" desc="Bits 31:0 of freq_word_0." name="FreqWord_0Lower" offset="0" reset="0" width="32" />
+      </reg>
+      <reg name="RficFreq_2" offset="0x01c">
+        <field access="rw" desc="SPAR: Bits 47:32 of freq_word_1" name="FreqWord_1Upper" offset="0" reset="0" width="16" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RficFreq_3" offset="0x020">
+        <field access="rw" desc="Bits 31:0 of freq_word_1." name="FreqWord_1Lower" offset="0" reset="0" width="32" />
+      </reg>
+      <reg name="RficDesc_0" offset="0x024">
+        <field access="rw" desc="the window before pre load time in which descriptors should be ready  and processed" name="DescInvalidPreWin" offset="0" reset="0" width="32" />
+      </reg>
+      <reg name="RficDesc_1" offset="0x0028">
+        <field access="rw" desc="the window after pre load time in which descriptors will still be processed" name="DescInvalidPostWin" offset="0" reset="0" width="11" />
+        <field access="rw" desc="If no Tx transmission occurs during the period from TimeToProcess to TimeTo_process + TxActiveWin the status NoTxDataErr is asserted." name="TxActiveValidWin" offset="11" reset="0" width="11" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="10" />
+      </reg>
+      <reg name="RficDesc_2" offset="0x002c">
+        <field access="rw" desc="Override enables for en_adci, en_adcq, en_dcblk, en_vgai, en_vgaq, hp_pole, en_daci, en_dacq (correspondingly)" name="AfeDescOverriedsEn" offset="0" reset="0" width="8" />
+        <field access="rw" desc="Override values for en_adci, en_adcq, en_dcblk,  en_vgai, en_vgaq, hp_pole[1:0], en_daci, en_dacq (correspondingly)" name="AfeDescOverrieds" offset="8" reset="0" width="9" />
+        <field access="rw" desc="when high fast agc messages are not sent" name="FastAgcDis" offset="17" reset="0" width="1" />
+        <field access="rw" desc="when high clears latched static statuses" name="DescStatusClr" offset="18" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="19" reset="x" width="13" />
+      </reg>
+      <reg name="RficCtrls_0" offset="0x0030">
+        <field access="rw" desc="TX DAC Speed Control: 0: 200MHz 1: 400MHz " name="TxAfeDacSpeed400Cntl" offset="0" reset="1" width="1" />
+        <field access="rw" desc="if high, packet end time occurs in time_to_process _ packet_length otherwise detected using PHY_TD signals" name="SwPacketEndMode" offset="1" reset="0" width="1" />
+        <field access="rw" desc="Expansion mode for pre-packet Eldora message length. if high, send 18 bits length (bits 17:16 are prepkt_exp[1:0]) otherwise send 16 bits" name="PrePktExpMode" offset="2" reset="0" width="1" />
+        <field access="rw" desc="if high dummy_packet DPAR is enabled" name="EnDummyPacket" offset="3" reset="0" width="1" />
+        <field access="rw" desc="When '0' (default) tx_packet_end occure in time_to_process_packet_length. When '1' occurs on TD_TX packet end." name="TxPacketEndCya" offset="4" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="5" reset="x" width="27" />
+      </reg>
+      <reg name="RficCtrls_1" offset="0x034">
+        <field access="rw" desc="LSB's for indirect message to Eldora" name="RficDataLow" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RficCtrls_2" offset="0x038">
+        <field access="rw" desc="MSB's for indirect message to Eldora" name="RficDataHigh" offset="0" reset="0" width="16" />
+        <field access="rw" desc="If high issues Eldora message. SW should de-assert when done" name="RficIndirectRun" offset="16" reset="x" width="1" />
+        <field access="rw" desc="Specify the Eldora's message type: '100' for pre-packet, '110' for fast AGC, '111' for fast TX/Rx, '011' for indirect message" name="RficIndirectAddr" offset="17" reset="0" width="3" />
+        <field access="rw" desc="0 for indirect messages read, 1 for indirect messages write" name="RficIndirectRdWr" offset="20" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="21" reset="x" width="12" />
+      </reg>
+      <reg name="RficCtrls_3" offset="0x03c">
+        <field access="rw" desc="1: repeat mode enable. 0: repeat mode disable" name="RepeatModeEn" offset="0" reset="0" width="1" />
+        <field access="rw" desc="if high HW uses TD_TX packet end otherwise TD_RX packet end" name="TxRepeatMode" offset="1" reset="0" width="1" />
+        <field access="rw" desc="In repeat mode, the time between packet end to new packet start" name="RepeatDly" offset="2" reset="x" width="16" />
+        <field access="ru" name="RESERVED" offset="18" reset="x" width="14" />
+      </reg>
+      <reg name="RficCtrls_4" offset="0x040">
+        <field access="rw" desc="5 Spare bits that can be WRITTEN into the AFE from the SOC section. " name="AfeWrSpare" offset="0" reset="0" width="5" />
+        <field access="rw" desc="afe test mode uses register settings (instead of forced values" name="AfeModeUsesRegs" offset="5" reset="0" width="1" />
+        <field access="rw" desc="enable SIO write transactions" name="SioWrEn" offset="6" reset="0" width="1" />
+        <field access="rw" desc=" GPIO[3:0]==phy_rfic_gpio_ovrd_value[3:0] in case phy_rfic_gpio_ovrd_en[3:0]==1 correspondingly" name="PhyRficGpioOvrdValue" offset="7" reset="0" width="4" />
+        <field access="rw" desc="for each gpio, select phy_rfic gpio (1) or system resource GPIO (0)" name="PhyRficGpioSel" offset="11" reset="0" width="4" />
+        <field access="rw" desc="if high, override dynamic GPIO[3:0] with phy_rfic_gpio_ovrd_value[3:0]" name="PhyRficGpioOvrdEn" offset="15" reset="0" width="4" />
+        <field access="rw" desc="sio_reset" name="EldoraReset" offset="19" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="20" reset="x" width="12" />
+      </reg>
+      <reg name="RficStaticStatus_0">
+        <field access="ru" desc="the rfic descriptors state machine" name="RficDescFsm" offset="0" reset="x" width="3" />
+        <field access="ru" desc="number of bad/discarded RFIC packets count - wrap" name="BadPcktsCnt" offset="3" reset="x" width="4" />
+        <field access="ru" desc="number of pre messages sent count - wrap" name="PreMsgCnt" offset="7" reset="x" width="4" />
+        <field access="ru" desc="number of TX/RX power messages sent count - wrap" name="TxRxPwrMsgCnt" offset="11" reset="x" width="4" />
+        <field access="ru" desc="number of total AGC messages sent count including inits and fast - wrap" name="AgcMsgCnt" offset="15" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="9" />
+      </reg>
+      <reg name="RficStatus_1">
+        <field access="ru" desc="Total accumulated sum (unsigned 16b) of cal_data over the currently completed CalAdcStsAccmCnt number of cal cycles. Field will continue to update each cal cycle along with CalAdcStsAccmCnt until CalAdcMeasCnt cycles have been reached. In continuous mode, this register continuously updates and represents each sample instead of an accumulated value." name="CalAdcStsAccm" offset="0" reset="x" width="16" />
+        <field access="ru" desc="Number of cal cycles currently completed and accumulated over, 0-&gt;255. Field will continue to update each cal cycle along with CalAdcStsAccm until CalAdcMeasCnt cycles have been reached. Use this field to confirm that all cal adc cycles are done. In continuous mode, cycles will run continuously and this count will be 1 for every cycle completed." name="CalAdcStsAccmCnt" offset="16" reset="x" width="8" />
+        <field access="ru" desc=" 5 Spare bits that can be READ from the AFE by the SOC" name="AfeRSpare" offset="24" reset="1" width="5" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="2" />
+        <field access="ru" desc="Asserted when any status is ready after each cal cycle. Does not indicate all cycles are done since status continues to update until CalAdcMeasCnt number of cal cycles have completed." name="CalAdcStsRdy" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RficStatus_2">
+        <field access="ru" desc="High when indirect read transaction finished. Cleared when DescStatusClr high " name="RficDataReadRdy" offset="0" reset="1" width="1" />
+        <field access="ru" desc="TBD " name="SioBusy" offset="1" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="2" reset="x" width="30" />
+      </reg>
+      <reg name="RficStatus_3">
+        <field access="ru" desc="indirect read from Eldora" name="RficDataRead" offset="0" reset="1" width="32" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc15c800" desc="PhyRfic csbuff (dynamic control register)" name="CsbCtl" offset="0x0800">
+      <mult name="0" num="8" offset="0x100" />
+      <reg name="RfEntryControl" offset="0x00">
+        <field access="rw" desc="Writing a '0' transfers this entry to hardware for processing. Writing a '1' transfers this entry to software for reuse." name="Empty" offset="0" reset="1" width="1" />
+        <field access="ru" desc="State of corresponding status entry - see TxEntryNStatus register description." name="StatusEmpty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Indicates this entry has been processed (but status not necessarily available). 0: not processed 1: processed." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" name="ControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" name="Lost" offset="5" reset="0" width="1" />
+        <field access="ru" name="Overflow" offset="6" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="25" />
+      </reg>
+      <reg name="RficDctrl_0" offset="0x04">
+        <field access="rw" desc="reference CTC time for various actions" name="TimeToProcess" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RficDctrl_1" offset="0x08">
+        <field access="rw" desc="Packet lengtn.If sw_packet_end_mode=1, specifies the time from time_to_process in which SW packet end is occurs. In HW packet mode, specifies the maximum time from time_to_process in which RX packet should end. " name="PacketLength" offset="0" reset="x" width="20" />
+        <field access="ru" name="RESERVED" offset="20" reset="x" width="12" />
+      </reg>
+      <reg name="RficDctrl_2" offset="0x0c">
+        <field access="rw" desc="time prior to time_to_process for sending Prepacket message to RFIC" name="PrepktPreOffset" offset="0" reset="x" width="12" />
+        <field access="rw" desc="time prior to time_to_process to send prior-to-packet Fast Power message" name="FpPreOffset" offset="12" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RficDctrl_3" offset="0x010">
+        <field access="rw" desc="delay after packet_end for sending post-packet Fast Power message to RFIC " name="FpPostOffset" offset="0" reset="x" width="10" />
+        <field access="rw" desc="time prior to time_to_process for sending Indirect frequency message to RFIC" name="HopPreOffset" offset="10" reset="x" width="12" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="10" />
+      </reg>
+      <reg name="RficDctrl_4" offset="0x014">
+        <field access="rw" desc="time prior to time_to_process for changing gpio[3:0] to rf_gpio_pre_value[3:0]" name="RfGpioPreOffset" offset="0" reset="x" width="12" />
+        <field access="rw" desc="delay after packet_end for changing gpio[3:0] to rf_gpio_post_value[3:0]" name="RfGpioPostOffset" offset="12" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="10" />
+      </reg>
+      <reg name="RficDctrl_5" offset="0x018">
+        <field access="rw" desc="time prior to time_to_process for enabling En_dac_i, en_dac_q" name="AfeTxPreOffset" offset="0" reset="x" width="12" />
+        <field access="rw" desc="delay after packet_end for disabling En_dac_i, en_dac_q" name="AfeTxPostOffset" offset="12" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="10" />
+      </reg>
+      <reg name="RficDctrl_6" offset="0x01c">
+        <field access="rw" desc="time prior to time_to_process for enabling En_adc_i, en_adc_q, En_vga_i, en_vga_q and for updating En_dcblk, En_tuning, afe_hp_pole[1:0]" name="AfeRxPreOffset" offset="0" reset="x" width="12" />
+        <field access="rw" desc="delay after packet_end for disabling En_adc_i, en_adc_q, En_vga_i, en_vga_q" name="AfeRxPostOffset" offset="12" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="10" />
+      </reg>
+      <reg name="RficDctrl_7" offset="0x020">
+        <field access="rw" desc="enable/disable Prepacket message" name="EnPrepktPreOffset" offset="0" reset="x" width="1" />
+        <field access="rw" desc="enable/disable prior-to-packet Fast Power message" name="EnFpPreOffset" offset="1" reset="x" width="1" />
+        <field access="rw" desc="enable/disable post-packet Fast Power message" name="EnFpPostOffset" offset="2" reset="x" width="1" />
+        <field access="rw" desc="enable/disable post-packet Fast Power message" name="EnHopPreOffset" offset="3" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="28" />
+      </reg>
+      <reg name="RficDctrl_8" offset="0x024">
+        <field access="rw" desc="When 0: preserve the previous values of en_daci and en_dacq
+When 1:  en_daci and en_dacq asserted at afe_tx_pre_offset time only
+When 2:  en_daci and en_dacq de-asserted at afe_tx_pre_offset time only
+When 3: en_daci and en_dacq asserted at afe_tx_pre_offset time and de-asserted at afe_tx_post_offset time. 
+" name="AfeTxEnDacMode" offset="0" reset="x" width="2" />
+        <field access="rw" desc="When 0: preserve the previous values of En_adc_i, en_adc_q, En_vga_i, en_vga_q
+When 1:  En_adc_i, en_adc_q, En_vga_i, en_vga_q asserted at afe_rx_pre_offset time only
+When 2:  En_adc_i, en_adc_q, En_vga_i, en_vga_q de-asserted at afe_rx_pre_offset time only
+When 3:  En_adc_i, en_adc_q, En_vga_i, en_vga_q asserted at afe_rx_pre_offset time and de-asserted at afe_rx_post_offset time. 
+" name="AfeRxEnAdcVgaMode" offset="2" reset="x" width="2" />
+        <field access="rw" desc="When 0: preserve the previous value of en_dcblk
+When 1: en_dcblk loaded with afe_en_dcblk (descriptor parameter) at afe_rx_pre_offset time. 
+" name="AfeEnDcblkMode" offset="4" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="5" reset="x" width="1" />
+        <field access="rw" desc="When 0: preserve the previous value of hp_pole[1:0]
+When 1: hp_pole[1:0] loaded with  Afe_hp_pole[1:0] (descriptor parameter) at afe_rx_pre_offset time.
+" name="AfeHpPoleMode" offset="6" reset="x" width="1" />
+        <field access="rw" desc="When 0: preserve the previous value of vga[3:0]
+When 1: vga[3:0] loaded with  prepkt_pre_vga[3:0]  (descriptor parameter) at afe_rx_pre_offset time if gain_from_table=0 or with gain table output if gain_from_table=1
+" name="AfeVgaMode" offset="7" reset="x" width="1" />
+        <field access="rw" desc="Value to load into the AFE signal en_dcblk if Afe_en_dcblk_mode=1" name="AfeEnDcblk" offset="8" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="9" reset="x" width="1" />
+        <field access="rw" desc="Value to load into the AFE signal hp_pole[1:0] if afe_hp_pole_mode=1" name="AfeHpPole" offset="10" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="12" reset="x" width="20" />
+      </reg>
+      <reg name="RficDctrl_9" offset="0x028">
+        <field access="rw" desc="drop into bits [17:16] of Prepacket message if in prepacket message expansion mode, otherwise ignore" name="PrepktSpare" offset="0" reset="x" width="2" />
+        <field access="rw" desc="drop into bits [15:12] of Prepacket message" name="TxGain" offset="2" reset="x" width="4" />
+        <field access="rw" desc="drops into bit [11] of Prepacket message" name="BwSelDynam" offset="6" reset="x" width="1" />
+        <field access="rw" desc="rops into bit [10] of Prepacket message" name="XoPullDynam" offset="7" reset="x" width="1" />
+        <field access="rw" desc="drop into bits [9:5] of Prepacket message only if CSR gain_from_table=0, otherwise these bits not used and output of loggain table fills Prepacket[9:5]" name="RxRfg" offset="8" reset="x" width="5" />
+        <field access="rw" desc="drop into bits [4:0] of Prepacket message" name="PktMode" offset="13" reset="x" width="5" />
+        <field access="rw" desc="drop into prior-to-packet Fast Power message " name="FpPreValue" offset="18" reset="x" width="5" />
+        <field access="rw" desc="drop post-packet Fast Power message" name="FpPostValue" offset="23" reset="x" width="5" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RficDctrl_10" offset="0x02c">
+        <field access="rw" desc="loggain table input in case gain_from_table=1. the output of loggain table fills Prepacket[9:5]" name="PrepktPreLogGain" offset="0" reset="x" width="7" />
+        <field access="rw" desc="the VGA (init) value in pre message time only if gain_from_table=0, otherwise these bits not used and output of loggain go to VGA" name="PrepktPreVga" offset="7" reset="x" width="4" />
+        <field access="rw" desc="value to set rf_gpio[3:0] to prior to the packet" name="RfGpioPreValue" offset="11" reset="x" width="4" />
+        <field access="rw" desc="value to set rf_gpio[3:0] to after the packet" name="RfGpioPostValue" offset="15" reset="x" width="4" />
+        <field access="rw" desc="if hign, the gain fields inside pre load messages comes from the gain table (input to the table comes from pre_pckt_data)" name="GainFromTable" offset="19" reset="x" width="1" />
+        <field access="rw" desc="In freq_hop message: 0 = send freq_word_0   1 = send freq_word_1 " name="FreqHopWord_0_1" offset="20" reset="x" width="1" />
+        <field access="rw" desc="0 for normal TX/RX packet, 1 for packet without TD_TX/RX activity but schedule messages are optional" name="DummyPacket" offset="21" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="9" />
+      </reg>
+      <reg name="RficDctrl_11" offset="0x030">
+        <field access="rw" desc="" name="Timetoprocessvalidwindowsize" offset="0" reset="x" width="31" />
+        <field access="ru" name="RESERVED" offset="31" reset="x" width="1" />
+      </reg>
+    </regfile>
+  </block>
+</system>

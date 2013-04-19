@@ -1,0 +1,631 @@
+<system desc="based on: Hand edited and generated back to PHY_Interface.doc" dl_ldpc_regs_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 35)" fd_tables_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 20)" name="reg_htm_parse" td_tables_merge_xml_desc="hand editted, based on: PHY_Interface.doc (REVISION 20)">
+  <block name="PhyFd" offset="0xcc154000">
+    <regfile absolute_addr="0xcc155080" desc="PhyFd Rx Csbuff Status (dynamic status register)" name="RxCsbSts" offset="0x1080">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="RxFdEntryStatus" offset="0x00">
+        <field access="rw" desc="Alias - see TxFdEntryControl register description." name="ControlEmpty" offset="0" reset="1" width="1" />
+        <field access="rw" desc="Set to '0' by hardware to indicate the entry has valid status. Writing a '1' indicates the entry is transferred to hardware for reuse." name="Empty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Alias - see RxFdEntryControl register description." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxFdControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxFdStatusLost" offset="5" reset="0" width="1" />
+        <field access="ru" desc="How does this happen?." name="RxFdStatusOverflow" offset="6" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="25" />
+      </reg>
+      <reg name="RxFreqTimeTrackStatus" offset="0x04">
+        <field access="ru" desc="The 16 MSB bits of the tracking integral value of the context selected by the IntegralStatusContextID field." name="TimeTrackingIntegral" offset="0" reset="x" width="16" />
+        <field access="ru" desc="The 16 MSB bits of the tracking integral value of the context selected by the IntegralStatusContextID field." name="FreqTrackingIntegral" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="RxEvmSaStatus" offset="0x08">
+        <field access="ru" desc="Number of carriers greater than threshold." name="NumCarrierAboveThresh" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="5" />
+        <field access="ru" desc="Max subtract min, results in 2**MaxVersusMean." name="MaxVersusMean" offset="13" reset="x" width="3" />
+        <field access="ru" desc="Bin location of peak." name="LocationOfMax" offset="16" reset="x" width="9" />
+        <field access="ru" name="RESERVED" offset="25" reset="x" width="7" />
+      </reg>
+      <reg name="RxEvmSaSlicerAgcStatus" offset="0x0c">
+        <field access="ru" desc="The likelihood of the transmitting packet is having Zip2 scaling problem. Format is s&lt;12,12&gt;." name="Zip2Accum" offset="0" reset="x" width="12" />
+        <field access="ru" desc="Mantissa  for mean value. Format is G type U&lt;11,-1&gt;." name="MeanMantissa" offset="12" reset="x" width="11" />
+        <field access="ru" desc="Exponent for mean value. Format is U&lt;5,5&gt; positive exponent." name="MeanExponent" offset="23" reset="x" width="5" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxMiscStatus" offset="0x10">
+        <field access="ru" desc="Saturation error occurred on HW EPP output interface and indicates the upper 4 bits were not simply redundant sign bits and therefore FFT gain scaling may be too high." name="InputFormatterSatErrHw" offset="0" reset="x" width="1" />
+        <field access="ru" desc="Saturation error occurred on normal output interface and indicates the upper 4 bits were not simply redundant sign bits for SW EPP probes and FFT gain scaling may be too high." name="InputFormatterSatErr" offset="1" reset="x" width="1" />
+        <field access="ru" desc="Empty packet detected." name="InputFormatterEmptyPktDetect" offset="2" reset="x" width="1" />
+        <field access="ru" desc="Symbol framing error and number of data xfer was not mod 512. This is an internal VLSI logic error." name="InputFormatterSymbFrameErr" offset="3" reset="x" width="1" />
+        <field access="ru" desc="Format U&lt;9,9&gt;, Subcarrier corresponding ot max *OVER ENTIRE PACKET*." name="NveIntfIdx" offset="4" reset="x" width="9" />
+        <field access="ru" desc="Format U&lt;5,5&gt;, Max approx log2 power different of any subcarrier *OVER ENTIRE PACKET*." name="NveIntfMax" offset="13" reset="x" width="5" />
+        <field access="ru" desc="Format U&lt;9,9&gt;, Number of subcarriers above intf threshold *IN FINAL SYMBOL*." name="NveIntfCnt" offset="18" reset="x" width="9" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="5" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc155800" desc="PhyFd Tx Bit Loading Table" name="TxBitLoadTable" offset="0x1800">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="TxBitLoadTable" offset="0x0">
+        <field access="rw" desc="The NBits array defines the bitloading and other attributes of the subcarriers comprising an OFDM symbol. See Bit-loading Table Entries for details on the encoding." name="NBits_0" offset="0" reset="x" width="4" />
+        <field access="rw" name="NBits_1" offset="4" reset="x" width="4" />
+        <field access="rw" name="NBits_2" offset="8" reset="x" width="4" />
+        <field access="rw" name="NBits_3" offset="12" reset="x" width="4" />
+        <field access="rw" name="NBits_4" offset="16" reset="x" width="4" />
+        <field access="rw" name="NBits_5" offset="20" reset="x" width="4" />
+        <field access="rw" name="NBits_6" offset="24" reset="x" width="4" />
+        <field access="rw" name="NBits_7" offset="28" reset="x" width="4" />
+        <mult name="0" num="64" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc155c00" desc="PhyFd Tx Power Load Table" name="TxPowerLoadGain" offset="0x1c00">
+      <mult name="0" num="2" offset="0x200" />
+      <reg name="TxPowerLoadGain">
+        <field access="rw" name="TxPowerLoadGain_3" offset="0" reset="x" width="8" />
+        <field access="rw" name="TxPowerLoadGain_2" offset="8" reset="x" width="8" />
+        <field access="rw" name="TxPowerLoadGain_1" offset="16" reset="x" width="8" />
+        <field access="rw" desc="The TxPowerLoadGain array specifies the additional gain per subcarrier for power loading. Each entry is added to TxPowerLoadGainBase to yield the overall gain applied to the corresponding subcarrier." name="TxPowerLoadGain_0" offset="24" reset="x" width="8" />
+        <mult name="0" num="128" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc156000" desc="PhyFd Tx Channel Estimate Reference Table" name="TxRxChanEstRef" offset="0x2000">
+      <mult name="0" num="3" offset="0x040" />
+      <reg name="TxRxChanEstRef">
+        <field access="rw" name="TxRxChanEstRef_3" offset="0" reset="x" width="8" />
+        <field access="rw" name="TxRxChanEstRef_2" offset="8" reset="x" width="8" />
+        <field access="rw" name="TxRxChanEstRef_1" offset="16" reset="x" width="8" />
+        <field access="rw" desc="The ChanEstRef array defines the bit sequence used to generate the channel estimation symbol. Each used (MoCA 1.x) or available (c.LINK+) subcarrier is BPSK modulated according to the corresponding bit in the ChanEstRef array. See Reference Data Order for information on the format." name="TxRxChanEstRef_0" offset="24" reset="x" width="8" />
+        <mult name="0" num="16" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc1560c0" desc="PhyFd Tx Long Sequence Reference Table" name="TxLongSeqRef" offset="0x20c0">
+      <mult name="0" num="4" offset="0x010" />
+      <reg name="TxLongSeqRef">
+        <field access="rw" name="TxLongSeqRef_3" offset="0" reset="x" width="8" />
+        <field access="rw" name="TxLongSeqRef_2" offset="8" reset="x" width="8" />
+        <field access="rw" name="TxLongSeqRef_1" offset="16" reset="x" width="8" />
+        <field access="rw" desc="The TxLongSeqRef array defines the bit sequence used to generate the c.LINK+ long-sequence symbol. Every fourth available subcarrier is BPSK modulated according to the corresponding bit in the TxLongSeqRef array. See Reference Data Order for information on the format." name="TxLongSeqRef_0" offset="24" reset="x" width="8" />
+        <mult name="0" num="4" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc156400" desc="PhyFd Rx Bit Loading Table" name="RxBitLoadTable" offset="0x2400">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="RxBitLoadTable">
+        <field access="rw" desc="The NBits array defines the bitloading and other aspects of the subcarriers comprising an OFDM symbol. See Bit-loading Table Entries for details on the encoding." name="NBits_0" offset="0" reset="x" width="4" />
+        <field access="rw" name="NBits_1" offset="4" reset="x" width="4" />
+        <field access="rw" name="NBits_2" offset="8" reset="x" width="4" />
+        <field access="rw" name="NBits_3" offset="12" reset="x" width="4" />
+        <field access="rw" name="NBits_4" offset="16" reset="x" width="4" />
+        <field access="rw" name="NBits_5" offset="20" reset="x" width="4" />
+        <field access="rw" name="NBits_6" offset="24" reset="x" width="4" />
+        <field access="rw" name="NBits_7" offset="28" reset="x" width="4" />
+        <mult name="0" num="64" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc156800" desc="PhyFd Rx Bin Deinterleave Table" name="RxBinDeintTable" offset="0x2800">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="RxBinDeintTable">
+        <field access="rw" desc="The ContextID of the corresponding subcarrier. Supported values are 0 through 15." name="ContextID_0" offset="0" reset="x" width="4" />
+        <field access="rw" name="ContextID_1" offset="4" reset="x" width="4" />
+        <field access="rw" name="ContextID_2" offset="8" reset="x" width="4" />
+        <field access="rw" name="ContextID_3" offset="12" reset="x" width="4" />
+        <field access="rw" name="ContextID_4" offset="16" reset="x" width="4" />
+        <field access="rw" name="ContextID_5" offset="20" reset="x" width="4" />
+        <field access="rw" name="ContextID_6" offset="24" reset="x" width="4" />
+        <field access="rw" name="ContextID_7" offset="28" reset="x" width="4" />
+        <mult name="0" num="64" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc156c00" desc="PhyFd Rx EVM Table" name="RxEvm" offset="0x2c00">
+      <mult name="0" num="4" offset="0x200" />
+      <reg name="RxEvm">
+        <field access="rw" name="Evm_0" offset="0" reset="x" width="8" />
+        <field access="rw" name="Evm_1" offset="8" reset="x" width="8" />
+        <field access="rw" name="Evm_2" offset="16" reset="x" width="8" />
+        <field access="rw" name="Evm_3" offset="24" reset="x" width="8" />
+        <mult name="0" num="128" offset="0x4" />
+      </reg>
+    </regfile>
+    <regfile desc="PhyFd Tx Csr (static control register)" name="TxCsr" offset="0x0000">
+      <reg name="PhyTxFdCtrl" offset="0x004">
+        <field access="rw" desc="0: Tx FD reset 1: Tx FD enabled." name="Enable" offset="0" reset="0" width="1" />
+        <field access="rw" desc="0: &quot;circular queue&quot; mode 1: &quot;register&quot; mode ... Normal operation uses &quot;circular queue&quot; mode. Repetitive and continuous operation use &quot;register&quot; mode." name="DynCtrlMode" offset="1" reset="x" width="1" />
+        <field access="rw" desc="0: normal operation 1: loopback Tx FD to Rx FD Note this bit controls both Tx and Rx." name="LoopbackToRx" offset="2" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="29" />
+      </reg>
+      <reg name="TxFdBerTest" offset="0x008">
+        <field access="rw" desc="The initial value of the PN-23 LFSR at packet and/or symbol boundaries as controlled by PnResetPacketStart and PnResetSymStart." name="PnSeed" offset="0" reset="x" width="23" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="4" />
+        <field access="rw" desc="When '0' and set to '1' the internal PnResetPacketStartOnce bit is set to '1'. The internal PnResetPacketStartOnce bit is identical in function to the PnResetPacketStart bit, except it is cleared to '0' following a generated packet and hence only applies to a single packet." name="SetPnResetPacketStartOnce" offset="27" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="TxRxDiversityOffset0_0" offset="0x010">
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_3" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_2" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_1" offset="16" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="The DivOffset table defines the diversity mapping from output bit position to input bit position (formula in PHY spec)." name="DivOffset_0" offset="24" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxRxDiversityOffset0_1" offset="0x014">
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_7" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_6" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_5" offset="16" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_4" offset="24" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxRxDiversityOffset0_2" offset="0x018">
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_11" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_10" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_9" offset="16" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_8" offset="24" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxRxDiversityOffset0_3" offset="0x01c">
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_15" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_14" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_13" offset="16" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_12" offset="24" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxRxDiversityOffset1_0" offset="0x020">
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_3" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_2" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_1" offset="16" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="The DivOffset table defines the diversity mapping from output bit position to input bit position (formula in PHY spec)." name="DivOffset_0" offset="24" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxRxDiversityOffset1_1" offset="0x024">
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_7" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_6" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_5" offset="16" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_4" offset="24" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxRxDiversityOffset1_2" offset="0x028">
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_11" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_10" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_9" offset="16" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_8" offset="24" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxRxDiversityOffset1_3" offset="0x02c">
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_15" offset="0" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="6" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_14" offset="8" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="14" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_13" offset="16" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="22" reset="x" width="2" />
+        <field access="rw" desc="See DivOffset[0]." name="DivOffset_12" offset="24" reset="x" width="6" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxShortSeqRef_0" offset="0x030">
+        <field access="rw" name="TxShortSeqRef_3" offset="0" reset="x" width="8" />
+        <field access="rw" name="TxShortSeqRef_2" offset="8" reset="x" width="8" />
+        <field access="rw" name="TxShortSeqRef_1" offset="16" reset="x" width="8" />
+        <field access="rw" desc="The TxShortSeqRef array defines the bit sequence used to generate the c.LINK+ short-sequence symbol. Every eighth available subcarrier is BPSK modulated according to the corresponding bit in the TxShortSeqRef array. See Reference Data Order for information on the format." name="TxShortSeqRef_0" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="TxShortSeqRef_1" offset="0x034">
+        <field access="rw" name="TxShortSeqRef_7" offset="0" reset="x" width="8" />
+        <field access="rw" name="TxShortSeqRef_6" offset="8" reset="x" width="8" />
+        <field access="rw" name="TxShortSeqRef_5" offset="16" reset="x" width="8" />
+        <field access="rw" name="TxShortSeqRef_4" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="TxPowerLoad" offset="0x038">
+        <field access="rw" desc="Base gain added to each TxPowerLoadGain1 table entry. U&lt;8,0&gt; format." name="GainBase1" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="8" />
+        <field access="rw" desc="Base gain added to each TxPowerLoadGain0 table entry. U&lt;8,0&gt; format." name="GainBase0" offset="16" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="FdTestMuxCtrl" offset="0x03c">
+        <field access="rw" desc="Currently, only the 6 lsb are used. The field control all the test mux in DLL, FD and TD." name="TestMuxSel" offset="0" reset="x" width="8" />
+        <field access="rw" desc="Setting this field to 1 would disable any datapath throttling by the test mux logic. Only set to 1 if errors result from throttling. In RevA silicon. This should be set to '1' when using QAM512 or QAM1024" name="FdTxDisable100MThrottle" offset="8" reset="0" width="1" />
+        <field access="rw" desc="This field controls the combined TD, FD and DLL testmux. ... 0: disable test mux. ... 1: normal mode (enable both Tx and Rx signal test mux). ... 2: zero pattern on primary and secondary. ... 3: ones pattern on primary and secondary. ... 4: ones pattern on primary, zeros on secondary. ... 5: up counter (24 bits) on both primary and secondary. ... 6: walking one on primary and secondary (goes from bit 0 to bit 47 continuously). ... 7: walking one on primary only, 0x555555 on secondary." name="Mode" offset="9" reset="x" width="3" />
+        <field access="rw" desc="If set, output both primary and secondary test mux signals. This field controls the combined TD, FD and DLL testmux." name="enableSecondary" offset="12" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="13" reset="x" width="19" />
+      </reg>
+      <reg name="TxFdStatusPlaceholder">
+        <field access="ru" name="Placeholder" offset="0" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="1" reset="x" width="31" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc154800" desc="PhyFd Tx Csbuff (dynamic control register)" name="TxCsbCtl" offset="0x0800">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="TxFdEntryControl" offset="0x00">
+        <field access="rw" desc="Writing a '0' transfers this entry to hardware for processing. Writing a '1' transfers this entry to software for reuse." name="Empty" offset="0" reset="1" width="1" />
+        <field access="ru" desc="State of corresponding status entry - see TxFdEntryStatus register description." name="StatusEmpty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Indicates this entry has been processed (but status not necessarily available). 0: not processed 1: processed." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="29" />
+      </reg>
+      <reg name="TxFdControl" offset="0x04">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="28" />
+        <field access="rw" desc="0: normal operation 1: 32-bit bypass FD transmit section mode. In 32-bit bypass mode 32-bit input data is transferred directly to the TD: no processing blocks are active. The implementation may drain the FD pipeline when changing modes - this will impose a minimum IFG after leaving 32-bit bypass mode." name="Mode" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="TxSymbolGen" offset="0x08">
+        <field access="rw" desc="0: TxBitLoadTable0 1: TxBitLoadTable1 2: TxBitLoadTable2 3: TxBitLoadTable3." name="BitLoadTableSel" offset="0" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="2" reset="x" width="6" />
+        <field access="rw" desc="0: TxRxChanEstRef0 1: TxRxChanEstRef1 2: TxRxChanEstRef2." name="ChanEstRefSel" offset="8" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="6" />
+        <field access="rw" desc="0: TxLongSeqRef0 1: TxLongSeqRef1 2: TxLongSeqRef2 3: TxLongSeqRef3." name="LongSeqRefSel" offset="16" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="18" reset="x" width="2" />
+        <field access="rw" desc="The number of valid bits minus one (e.g. a value of 2 indicates 3 valid bits) in the last byte in the packet. Bin assignment (both normal and diversity) discards any remaining bits when it has processed at least all of the valid bits in the last byte in the packet at the end of a symbol. A value of 0 (indicating one valid bit) can be blindly specified when the number of bits per OFDM symbol is at least eight." name="NumValidBitsLastByte" offset="20" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="1" />
+        <field access="rw" desc="0: No channel est 1: Prepend channel est When '1' a channel estimation symbol is prepended to the packet data symbols." name="ChanEst" offset="24" reset="x" width="1" />
+        <field access="rw" desc="0: No long sequence 1: Prepend long sequence." name="LongSeq" offset="25" reset="x" width="1" />
+        <field access="rw" desc="0: No short sequence 1: Prepend short sequence." name="ShortSeq" offset="26" reset="x" width="1" />
+        <field access="rw" name="RESERVED" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: Normal data ... 1: Diversity 2 bytes ... 2: Diversity 4 bytes ... 3: Diversity 8 bytes ... 4: FD BERT ... Note the receiver supports at most sixteen data repetitions in diversity mode - the number of input bytes per symbol must be at least one-sixteenth the number of active subcarriers. In FD BERT mode the input data is discarded and the test pattern output." name="Mode" offset="28" reset="x" width="3" />
+        <field access="ru" desc="0: TxRxDiversityOffset0 1: TxRxDiversityOffset1." name="DiversityOffsetSel" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="TxFdBerTest" offset="0x0c">
+        <field access="rw" desc="Number of symbols of PN-23 data to generate." name="PnNumSyms" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="17" />
+        <field access="rw" desc="0: LFSR continues at symbol start 1: LFSR set to seed at symbol start." name="PnResetSymStart" offset="25" reset="x" width="1" />
+        <field access="rw" desc="0: LFSR continues at packet start 1: LFSR set to seed at packet start." name="PnResetPacketStart" offset="26" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="5" />
+      </reg>
+      <reg name="TxBinScrambler" offset="0x10">
+        <field access="rw" desc="The initial value of the PN-15 LFSR." name="Seed" offset="0" reset="x" width="15" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="1" />
+        <field access="rw" desc="The number of symbols to skip (pass through) without scrambling at the start of a packet. Used to skip over the non-data symbols." name="SkipSymCnt" offset="16" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="18" reset="x" width="10" />
+        <field access="rw" desc="0: Bin scrambler bypassed 1: Bin scrambler enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxPowerLoad" offset="0x14">
+        <field access="rw" desc="Frequency offset in bins. For each subcarrier the index into the selected gain table is the sum (modulo 512) of this and the corresponding bin index. S9 format." name="FreqOffset" offset="0" reset="x" width="9" />
+        <field access="ru" name="RESERVED" offset="9" reset="x" width="15" />
+        <field access="rw" desc="0: TxPowerLoadGain0 / GainBase0 1: TxPowerLoadGain1 /  GainBase1." name="TableSel" offset="24" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="25" reset="x" width="3" />
+        <field access="rw" desc="0: Power load bypassed 1: Power load enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxIQBalPreDistort_0" offset="0x18">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="16" />
+        <field access="rw" desc="Number of piecewise linear elements minus 1; 0 implies 1 point, 3 implies 4 points." name="Npnts" offset="16" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="19" reset="x" width="9" />
+        <field access="rw" name="SpectralInvEn" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: IQ bal pre-distort bypassed 1: IQ bal pre-distort enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="TxIQBalPreDistort_1" offset="0x1c">
+        <field access="rw" desc="Real part of FIIQ coef." name="Icoef" offset="0" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="5" />
+        <field access="rw" desc="Imaginary part of FIIQ coef estimated by software, format is s&lt;11, -2&gt;." name="Qcoef" offset="16" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="5" />
+      </reg>
+      <reg name="TxIQBalPreDistort_2" offset="0x20">
+        <field access="rw" name="Dbins_2" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="8" />
+        <field access="rw" desc="Mismatched curve point 3 bin; maximum allowed value is 255." name="Dbins_3" offset="16" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="TxIQBalPreDistort_3" offset="0x24">
+        <field access="rw" name="Dbins_0" offset="0" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="8" reset="x" width="8" />
+        <field access="rw" name="Dbins_1" offset="16" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="TxIQBalPreDistort_4" offset="0x28">
+        <field access="rw" name="Dslope_2" offset="0" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="5" />
+        <field access="rw" desc="Mismatched slope3, format is u&lt;11, -6&gt;." name="Dslope_3" offset="16" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="5" />
+      </reg>
+      <reg name="TxIQBalPreDistort_5" offset="0x2c">
+        <field access="rw" name="Dslope_0" offset="0" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="5" />
+        <field access="rw" name="Dslope_1" offset="16" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="5" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc154880" desc="PhyFd Tx Csbuff Status (dynamic status register)" name="TxCsbSts" offset="0x0880">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="TxFdEntryStatus" offset="0x00">
+        <field access="rw" desc="Alias - see TxFdEntryControl register description." name="ControlEmpty" offset="0" reset="1" width="1" />
+        <field access="rw" desc="Set to '0' by hardware to indicate the entry has valid status. Writing a '1' indicates the entry is transferred to hardware for reuse." name="Empty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Alias - see TxFdEntryControl register description." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="1" />
+        <field access="ru" name="ControlUnderflow" offset="4" reset="0" width="1" />
+        <field access="ru" name="Lost" offset="5" reset="0" width="1" />
+        <field access="ru" name="Overflow" offset="6" reset="0" width="1" />
+        <field access="ru" desc="0: Normal mode. ...1: register mode." name="buff_mode" offset="7" reset="0" width="1" />
+        <field access="ru" desc="csbuff control read pointer" name="CtrlRdPtr" offset="8" reset="0" width="4" />
+        <field access="ru" desc="csbuff status read pointer" name="StatusWrPtr" offset="12" reset="0" width="4" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="16" />
+      </reg>
+      <reg name="TxStatusSymbolGen" offset="0x04">
+        <field access="ru" desc="Short symbol if insufficient input data to complete OFDM symbol. This bit is set by either the Diversity Assigner or the Bin Assigner, whichever is enabled by TxSymbolGenMode." name="ShortSym" offset="0" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="1" reset="x" width="31" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc154400" desc="PhyFd Rx Csr (static control register)" name="RxCsr" offset="0x0400">
+      <reg name="PhyRxFdCtrl" offset="0x004">
+        <field access="rw" desc="0: Rx FD reset 1: Rx FD enabled." name="Enable" offset="0" reset="0" width="1" />
+        <field access="rw" desc="0: &quot;circular queue&quot; mode 1: &quot;register&quot; mode ... Normal operation uses &quot;circular queue&quot; mode. Repetitive and continuous operation use &quot;register&quot; mode." name="DynCtrlMode" offset="1" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="2" reset="x" width="21" />
+        <field access="rw" desc="This field is for testing purpose and should be set to 0." name="Fpga_td_board2board_mode" offset="23" reset="x" width="4" />
+        <field access="rw" desc="This field is for testing purpose and should be set to 0." name="Fpga_td_board2board_en" offset="27" reset="x" width="1" />
+        <field access="rw" desc="This fiel dis for testing purpose and should be set to 0." name="Fpga_options" offset="28" reset="x" width="2" />
+        <field access="rw" desc="This field is for testing purpose and should be set to 0." name="Fpga_loopback_sel" offset="30" reset="x" width="1" />
+        <field access="rw" desc="This field is for testing purpose and should be set to 0." name="fpga_test_output_sel" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RxChanComp_0" offset="0x008">
+        <field access="rw" desc="0: 1 taps ... 1: 3 taps ... 2: 5 taps ... 3: 7 taps ... 4: 9 taps ... 5: 15 taps ... 6: 23 taps ... 7: 29 taps ... 8: 35 taps ... 9: 51 taps ... If the number of available taps is &lt; ChanEstSmoothMinFilter, then filter length of 1 is used. Setting this value to 0 to disable ChanEstSmoothMinFilter decision." name="ChanEstSmoothMinFilter" offset="0" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="28" />
+      </reg>
+      <reg name="RxFreqTrack" offset="0x00c">
+        <field access="rw" desc="Chooses which ContexTID the tranckingIntegral value would be returned to status queue." name="IntegralStatusContextID" offset="0" reset="x" width="3" />
+        <field access="rw" desc="Error threshold to ensure very noisy constellations do not contribute to phase error averaging. Format is u&lt;6,0&gt;. This field applied to both Freq and Time track loop." name="maxError" offset="3" reset="x" width="6" />
+        <field access="rw" desc="Phase detector control. Format is u&lt;14, 14&gt;, valid range is 0-8320 decimal." name="FcToBinBWRatio" offset="9" reset="x" width="14" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="9" />
+      </reg>
+      <reg name="RxTimeTrack" offset="0x010">
+        <field access="rw" desc="Chooses which ContexTID the tranckingIntegral value would be returned to status queue." name="IntegralStatusContextID" offset="0" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="29" />
+      </reg>
+      <reg name="RxNve_0" offset="0x014">
+        <field access="rw" desc="Format U&lt;4,4&gt;." name="NveIntfLevel3" offset="0" reset="x" width="4" />
+        <field access="rw" desc="Format U&lt;4,4&gt;." name="NveIntfLevel2" offset="4" reset="x" width="4" />
+        <field access="rw" desc="Format U&lt;4,4&gt;." name="NveIntfLevel1" offset="8" reset="x" width="4" />
+        <field access="rw" desc="Format U&lt;5,5&gt;, DATA symbol interference &gt; thresh for event detect and status." name="NveDatIntfDetThresh" offset="12" reset="x" width="5" />
+        <field access="rw" desc="Format U&lt;2,2&gt;, CE symbol interference &gt; thresh for event detect." name="NveCesIntfDetThresh" offset="17" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="19" reset="x" width="5" />
+        <field access="rw" desc="Format U&lt;4,4&gt;, see PHY Functional Spec for description." name="NveEvmMinFactor" offset="24" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxNve_1" offset="0x018">
+        <field access="rw" desc="Format U&lt;5,5&gt;." name="NveFastLoopThrNeg" offset="0" reset="x" width="5" />
+        <field access="rw" desc="Format U&lt;5,5&gt;." name="NveFastLoopThrPos" offset="5" reset="x" width="5" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="6" />
+        <field access="rw" desc="Format U&lt;3,3&gt;." name="NveSlowLoopAttNeg" offset="16" reset="x" width="3" />
+        <field access="rw" desc="Format U&lt;3,3&gt;." name="NveSlowLoopAttPos" offset="19" reset="x" width="3" />
+        <field access="rw" desc="Format U&lt;3,3&gt;." name="NveFastLoopAttNeg" offset="22" reset="x" width="3" />
+        <field access="rw" desc="Format U&lt;3,3&gt;." name="NveFastLoopAttPos" offset="25" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="28" reset="x" width="4" />
+      </reg>
+      <reg name="RxNve_2" offset="0x01c">
+        <field access="rw" desc="Format U&lt;9,5&gt;." name="NveStaticTmValue" offset="0" reset="x" width="9" />
+        <field access="rw" name="NveStaticTm" offset="9" reset="x" width="1" />
+        <field access="rw" name="NveVarEstMode" offset="10" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="21" />
+      </reg>
+      <reg name="RxFdBerTest_0" offset="0x020">
+        <field access="rw" desc="The initial value of the PN-23 LFSR at packet and/or symbol boundaries as controlled by PnResetPacketStart and PnResetSymStart." name="PnSeed" offset="0" reset="x" width="23" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="4" />
+        <field access="rw" desc="When '0' and set to '1' the internal PnResetPacketStartOnce bit is set to '1'. The internal PnResetPacketStartOnce bit is identical in function to the PnResetPacketStart bit, except it is cleared to '0' following a packet with FD Bert check enabled and hence only applies to a single packet." name="SetPnResetPacketStartOnce" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: bin 1: constellation ... 2: symbol ... 'symbol' mode collects statistics for every active (non-NULL constellation) bin over the specified data symbols in the packet. The specified symbols are those whose indices match Index under the IndexMask. Symbol indices are sequential from 0 starting from the first data symbol. Note that setting IndexMask to 0 will collect statistics over all data symbols in the packet. 'bin' mode collects statistics for the specified active (non-NULL constellation) bins over all data symbols in the packet. The specified bins are those whose indices match Index under the IndexMask. 'constellation' mode collects statistics for the specified active (non-NULL constellation) bins over all data symbols in the packet. The specified bins are those whose bitloading matches Index[3:0] under the IndexMask. In all modes statistics are only collected on bins associated with ContextID in addition to the mode-specific bin selection criteria." name="Mode" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxFdBerTest_1" offset="0x024">
+        <field access="rw" desc="Specifies bins or symbols or constellations (depending on mode) to collect statistics for. A masked comparison (see IndexMask for details) to Index is used." name="Index" offset="0" reset="x" width="9" />
+        <field access="ru" name="RESERVED" offset="9" reset="x" width="7" />
+        <field access="rw" desc="Masks bits of the difference vector (bit vector of differences) between Index and bin index or symbol index or bitloading value (depending on mode). Each '1' in IndexMask indicates the corresponding bit in the difference vector is significant and will cause a mismatch if true." name="IndexMask" offset="16" reset="x" width="9" />
+        <field access="ru" name="RESERVED" offset="25" reset="x" width="7" />
+      </reg>
+      <reg name="RxFdBerTest_2" offset="0x028">
+        <field access="rw" desc="Number of checked received packets since the last refresh (or reset) after which the status registers should be refreshed. See Refresh bit above." name="RefreshNumPkts" offset="0" reset="x" width="16" />
+        <field access="rw" desc="When '0' and set to '1' a refresh of the status registers will be performed when at least RefreshNumPkts have been received following the last refresh. If RefreshNumPkts is 0 the status registers will be refreshed immediately. If a cumulative count MSB becomes '1' before RefreshNumPkts have been received the refresh is performed at that point instead." name="Refresh" offset="16" reset="0" width="1" />
+        <field access="rw" desc="When '0' and set to '1' the StatusRefreshed bit is cleared to '0'." name="ClearStatusRefreshed" offset="17" reset="0" width="1" />
+        <field access="ru" desc="Set to '1' after the status registers have been refreshed. Refreshing the status registers copies the cumulative count values to the status registers and then clears the cumulative counts. The status registers are refreshed in response to setting the Refresh bit (see below) or when the MSB of any cumulative count becomes '1'. This bit should be cleared via the ClearStatusRefreshed bit to be able to determine when the next refresh occurs. Hardware has a two clocks latency to reflect StatusRefreshed after ClearStatusRefresh. Thus software should not read back the StatusRefreshed immediately." name="StatusRefreshed" offset="18" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="19" reset="x" width="13" />
+      </reg>
+      <reg name="RxFreqTimeRot" offset="0x02c">
+        <field access="rw" desc="Number of Symbols would be CPE rotated. If this field is set to 0xf, all symbols would be rotated." name="NumCPECorrectSym" offset="0" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="28" />
+      </reg>
+      <reg name="RxSlicerAGC" offset="0x030">
+        <field access="rw" desc="Number of symbols used to update the Zip2 detector." name="NumZip2Symbols" offset="0" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="28" />
+      </reg>
+      <reg name="RxFDEventThresh0" offset="0x034">
+        <field access="rw" desc="Event is generated for the selected OFDMA context (as indicated by statusContextID of event logger) if abs(cpeEst) is greater than or equal to cpeRangeThresh. Format is u&lt;11,0&gt;." name="cpeRangeThresh" offset="0" reset="x" width="11" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="5" />
+        <field access="rw" desc="The field selects whichof the cpeEstRange, freqTrackRange and timeTrackRange values to use to trigger the events. There are 8 sets of values each corresponding to a context ID." name="fttEventContextId" offset="16" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="19" reset="x" width="13" />
+      </reg>
+      <reg name="RxFDEventThresh1" offset="0x038">
+        <field access="rw" desc="Event is generated for the selected OFDMA context (as indicated by statusContextID of event logger) if abs(timeEst) is greater than or equal to timeEstRangeThresh. Format is u&lt;13,0&gt;." name="timeEstRangeThresh" offset="0" reset="x" width="13" />
+        <field access="ru" name="RESERVED" offset="13" reset="x" width="3" />
+        <field access="rw" desc="Event is generated for the selected OFDMA context (as indicated by statusContextID of event logger) if abs(freqEst) is greater than or equal to freqEstRangeThresh. Format is u&lt;13,0&gt;." name="freqEstRangeThresh" offset="16" reset="x" width="13" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxFDEventThresh2" offset="0x03c">
+        <field access="rw" desc="Event is generated for any packet where the bit error counter exceeds fdBertErrThresh." name="fdBertErrThresh" offset="0" reset="x" width="16" />
+        <field access="ru" name="RESERVED" offset="16" reset="x" width="8" />
+        <field access="rw" desc="Event is generated when abs(slicerAgc - 1.0) is greater than or equal to this field. The format is u&lt;8,-3&gt;." name="slicerAgcRange" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxFdBerTestStatus_0">
+        <field access="ru" desc="Cumulative number of symbols checked at the last status refresh. See the Refresh bit description for further details." name="NumSyms" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxFdBerTestStatus_1">
+        <field access="ru" desc="Cumulativer number of symbol errors (symbols with at least one bin error) at the last status refresh. See the Refresh bit description for further details." name="NumSymErrs" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxFdBerTestStatus_2">
+        <field access="ru" desc="Cumulative number of bins checked at the last status refresh. See the Refresh bit description for further details." name="NumBins" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxFdBerTestStatus_3">
+        <field access="ru" desc="Cumulativer number of bin errors (bins with at least one bit error) at the last status refresh. See the Refresh bit description for further details." name="NumBinErrs" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxFdBerTestStatus_4">
+        <field access="ru" desc="Cumulative number of bits checked at the last status refresh. See the Refresh bit description for further details." name="NumBits" offset="0" reset="x" width="32" />
+      </reg>
+      <reg name="RxFdBerTestStatus_5">
+        <field access="ru" desc="Cumulative number of bit errors at the last status refresh. See the Refresh bit description for further details." name="NumBitErrs" offset="0" reset="x" width="32" />
+      </reg>
+    </regfile>
+    <regfile absolute_addr="0xcc155000" desc="PhyFd Rx Csbuff (dynamic control register)" name="RxCsbCtl" offset="0x1000">
+      <mult name="0" num="4" offset="0x100" />
+      <reg name="RxFdEntryControl" offset="0x00">
+        <field access="rw" desc="Writing a '0' transfers this entry to hardware for processing. Writing a '1' transfers this entry to software for reuse." name="Empty" offset="0" reset="1" width="1" />
+        <field access="ru" desc="State of corresponding status entry - see TxEntryStatus register description." name="StatusEmpty" offset="1" reset="1" width="1" />
+        <field access="ru" desc="Indicates this entry has been processed (but status not necessarily available). 0: not processed 1: processed." name="Processed" offset="2" reset="0" width="1" />
+        <field access="ru" name="RESERVED" offset="3" reset="x" width="29" />
+      </reg>
+      <reg name="RxCeRot" offset="0x04">
+        <field access="rw" desc="0: disable CE rotator ... 1: Use 1/4 mode ... 3: Use 1/8 low delay mode." name="SmoothMode" offset="0" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="2" reset="x" width="6" />
+        <field access="rw" desc="This field igored if InputFormatterEmptySymbEnable set to 0. This indicates number of empty symbols to be padded. The number of samples per symbol output at the end of RX FD pipeline is controlled by the bitloading table for IQ probes and SW EPP probes.  It is always 512 samples per symbol for HW EPP probes." name="InputFormatterEmptySymbCount" offset="8" reset="x" width="8" />
+        <field access="rw" desc="Setting this field to 1 to enable mantissa exponent conversion. Setting this field to 0 for saturation. This field should be set to 1 for IQ probes." name="InputFormatterMntExpEnable" offset="16" reset="x" width="1" />
+        <field access="rw" desc="Setting to 1 to enable empty symbols padding when empty packet detected. This field should be set to 1 for IQ probes, SW EPP probes and HW EPP probes." name="InputFormatterEmptySymbEnable" offset="17" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="18" reset="x" width="14" />
+      </reg>
+      <reg name="RxFdIqBalComp_0" offset="0x08">
+        <field access="rw" desc="First Bin to be compensated. (&gt;= 6 and &lt;= LastBin)." name="FirstBin" offset="0" reset="x" width="8" />
+        <field access="rw" desc="Last Bin to be compensated. (&lt;= 250, and &lt;= LastUsedBin)." name="LastBin" offset="8" reset="x" width="8" />
+        <field access="rw" desc="Last Bin that is used to send data; (&lt;=255)." name="LastUsedBin" offset="16" reset="x" width="8" />
+        <field access="rw" desc="Number of piecewise linear elements minus 1; 0 implies 1 point, 3 implies 4 points." name="Npnts" offset="24" reset="x" width="2" />
+        <field access="rw" desc="0: RxBitLoadTable0 ... 1: RxBitLoadTable1 ... 2: RxBitLoadTable2 ... 3: RxBitLoadTable3." name="BitLoadTableSel" offset="26" reset="x" width="2" />
+        <field access="rw" desc="0: FD IQ compensation disabled 1: FD IQ compensation enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxFdIqBalComp_1" offset="0x0c">
+        <field access="rw" desc="(&gt;6 for correct hw slope initialization)." name="Dbins_0" offset="0" reset="x" width="8" />
+        <field access="rw" desc="(&gt;Dbins_0)." name="Dbins_1" offset="8" reset="x" width="8" />
+        <field access="rw" desc="(&gt;Dbins_1)." name="Dbins_2" offset="16" reset="x" width="8" />
+        <field access="rw" desc="Bin index for each entry in the vector Dslope. (&gt;Dbins_2)." name="Dbins_3" offset="24" reset="x" width="8" />
+      </reg>
+      <reg name="RxFdIqBalComp_2" offset="0x10">
+        <field access="rw" name="Dslope_2" offset="0" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="6" />
+        <field access="rw" desc="y-coordinate of breakpoints of piecewise linear curve, S&lt;10,-8&gt;." name="Dslope_3" offset="16" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="RxFdIqBalComp_3" offset="0x14">
+        <field access="rw" name="Dslope_0" offset="0" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="10" reset="x" width="6" />
+        <field access="rw" name="Dslope_1" offset="16" reset="x" width="10" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="6" />
+      </reg>
+      <reg name="RxBinDescrambler" offset="0x18">
+        <field access="rw" desc="The initial value of the PN-15 LFSR." name="Seed" offset="0" reset="x" width="15" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="9" />
+        <field access="rw" desc="Number of channel estimation symbols. Must be 0, 1 or 2. This field is used to control the entire Rx data path, not just this module." name="NumChanEstSyms" offset="24" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="26" reset="x" width="2" />
+        <field access="rw" desc="0: Bin descrambler bypassed ... 1: Bin descrambler enabled." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxChanComp_0" offset="0x1c">
+        <field access="rw" desc="0: Cross-bin smoothing disabled ... 1: Cross-bin smoothing 1/4 CP filters ... 3: Cross-bin smoothing 1/8 CP filters ... Controls cross-bin smoothing of the channel estimate." name="ChanEstSmoothMode" offset="0" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="2" reset="x" width="18" />
+        <field access="rw" desc="0: TxRxChanEstRef0 ... 1: TxRxChanEstRef1 ... 2: TxRxChanEstRef2." name="ChanEstRefSel" offset="20" reset="x" width="2" />
+        <field access="rw" desc="Select one of the 4 EVM data table; Same EVM table would be used by NVE module for current packet." name="EvmTableSel" offset="22" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="3" />
+        <field access="rw" desc="0: ID 14 used ... 1: ID 14 treated as ID 0." name="ChanEstSmoothIgnore14" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: Channel compensation bypassed 1: Channel compensation enabled Note that channel estimation is always performed. This enable controls whether channel compensation is performed." name="CompEnable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxChanComp_1" offset="0x20">
+        <field access="ru" name="RESERVED" offset="0" reset="x" width="4" />
+        <field access="rw" desc="Interference detection threshold level 1, based upon CeMagnSq for setting interference flag = 1." name="InterfDetTheshLvl1" offset="4" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="1" />
+        <field access="rw" desc="Interference detection threshold level 1, based upon CeMagnSq for setting interference flag = 2." name="InterfDetTheshLvl2" offset="8" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="11" reset="x" width="1" />
+        <field access="rw" desc="Interference detection threshold level 1, based upon CeMagnSq for setting interference flag = 3." name="InterfDetTheshLvl3" offset="12" reset="x" width="3" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="13" />
+        <field access="rw" name="InterfDetEnable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxFreqTimeTrack" offset="0x24">
+        <field access="rw" desc="0: RxBinDeintTable0 ... 1: RxBinDeintTable1 ... 2: RxBinDeintTable2 ... 3: RxBinDeintTable3." name="BinDeintTableSel" offset="0" reset="x" width="2" />
+        <field access="rw" desc="0: fixed contextID = 0 ... 1: contextID from selected table ... When '1' contextIDs are read from the table selected by BinDeintTableSel. When '0' a fixed contextID of 0 is applied to each subcarrier. This bit controls contextID generation independent of whether the rotator is enabled or not." name="BinDeintEnable" offset="2" reset="x" width="1" />
+        <field access="rw" desc="This controls the Phase Detector." name="LockedClocks" offset="3" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="4" reset="x" width="5" />
+        <field access="rw" desc="Timing Loop Bandwidth Reduction, the actual reduction is (2**timeBwReduce)." name="timeBwReduce" offset="9" reset="x" width="2" />
+        <field access="rw" desc="Freq Loop Bandwidth Reduction, the actual reduction is (2**freqBwReduce)." name="freqBwReduce" offset="11" reset="x" width="2" />
+        <field access="rw" desc="0: bypassed 1: enabled." name="EPPRotatorEnable" offset="13" reset="x" width="1" />
+        <field access="rw" desc="0: LT rotator bypassed ... 1: LT rotator enabled ... Note the rotator must be bypassed when not used (e.g. differential constellations) since it cannot rotate by an angle of 0." name="LTRotatorEnable" offset="14" reset="x" width="1" />
+        <field access="rw" desc="0: CPE rotator bypassed ... 1: CPE rotator enabled ... Note the rotator must be bypassed when not used (e.g. in OFDMA mode) since it cannot rotate by an angle of 0." name="CPERotatorEnable" offset="15" reset="x" width="1" />
+        <field access="ru" desc="0: CP Phase Offset from RxTD is not used by LT rotator ... 1: CP Phase Offset is used by LT rotator" name="CpPhaseOffsetEnable" offset="16" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="17" reset="x" width="10" />
+        <field access="rw" desc="0: Disable time tracking loop. ... 1: Enable Time tracking loop." name="TimeTrackEnable" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: Disable freq tracking loop. ... 1: Enable freq tracking loop." name="FreqTrackEnable" offset="28" reset="x" width="1" />
+        <field access="rw" desc="Use the CE symbols for a head start on the tracking loops." name="enableCEStart" offset="29" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxFreqTimeTrack_1" offset="0x28">
+        <field access="rw" desc="Initial Gain for the integral part of the loop. The actual gain is 2 to the power of this field divided by 8." name="TimeStartIntegralGain" offset="0" reset="x" width="3" />
+        <field access="rw" desc="Final Gain for the integral part of the loop. The actual gain is 2 to the power of this field divided by 8." name="TimeEndIntegralGain" offset="3" reset="x" width="3" />
+        <field access="rw" desc="Number of symbols until jumping from start gains to end gains." name="TimeGearShiftTime" offset="6" reset="x" width="4" />
+        <field access="rw" desc="Initial gain for the proportional part of the loop. The actual gain is 2 to the power of this field divided by 4." name="TimeStartGain" offset="10" reset="x" width="2" />
+        <field access="rw" desc="Final gain for the proportional part of the loop. The actual gain is 2 to the power of this field divided by 4." name="TimeEndGain" offset="12" reset="x" width="2" />
+        <field access="rw" desc="Setting to 1 would invert the input spectrum before sending to phase comparator." name="SpectrumInvert" offset="14" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="1" />
+        <field access="rw" desc="See TimeStartIntegralGain." name="FreqStartIntegralGain" offset="16" reset="x" width="3" />
+        <field access="rw" desc="See TimeEndIntegralGain." name="FreqEndIntegralGain" offset="19" reset="x" width="3" />
+        <field access="rw" desc="See TimeGearShiftTime." name="FreqGearShiftTime" offset="22" reset="x" width="4" />
+        <field access="rw" desc="See TimeStartGain." name="FreqStartGain" offset="26" reset="x" width="2" />
+        <field access="rw" desc="See TimeEndGain." name="FreqEndGain" offset="28" reset="x" width="2" />
+        <field access="ru" name="RESERVED" offset="30" reset="x" width="2" />
+      </reg>
+      <reg name="RxSlicer" offset="0x2C">
+        <field access="rw" desc="1: use Zip2 scalers. ... 0: don't use Zip2 scalers. ... This selects the offset used in Zip2 Detector scaler. See Phy Functional Spec for explanation." name="useZipScalers" offset="0" reset="x" width="1" />
+        <field access="rw" desc="Slicer AGC gain value, legal value is 0 to 14." name="slicerAgcGain" offset="1" reset="x" width="5" />
+        <field access="rw" desc="1: Slicer AGC enable. 0: disabled." name="enableSlicerAGC" offset="6" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="7" />
+        <field access="rw" desc="0: Normal (1/Kmod) scaling ... 1: Zip2 (1/Kmod) scaling ... others: reserved." name="ConstDenormUseZip2Scalers" offset="14" reset="x" width="1" />
+        <field access="rw" desc="0: Constellation denorm bypassed. ... 1: Constellation denorm enabled ... Note bypass is functionally &quot;High Precision Pass Through&quot; in the Systems PHY spec." name="ConstDenormEnable" offset="15" reset="x" width="1" />
+        <field access="rw" desc="For future expansion." name="NveFunction" offset="16" reset="x" width="2" />
+        <field access="rw" desc="0: Nve not enabled, all other NVE control registers are ignored. NVE status is invalid and forced to 0. NVE events are NOT generated. NVE accumulator/memory is disabled and not written. NVE InvVarEst output is forced to 0. ... 1: Nve enabled. All other NVE control registers are used. NVE status is valid at the end of packet. NVE events can be generated. NVE accumulator/ memory is updated. NVE InvVarEst output is computed per other control params." name="NveEnbl" offset="18" reset="x" width="1" />
+        <field access="rw" desc="0: Don't reset NVE accumulator on packet start 1: reset NVE accumulator on packet start." name="NveResetPacketStart" offset="19" reset="x" width="1" />
+        <field access="rw" desc="NVE enable interference estimation." name="NveIntfEstEnbl" offset="20" reset="x" width="1" />
+        <field access="rw" desc="NVE diversity mode right shift amount." name="NveDivShift" offset="21" reset="x" width="2" />
+        <field access="rw" desc="0: select evm-based noise variance 1: select channel estimate based noise variance." name="NveSelStatic" offset="23" reset="x" width="1" />
+        <field access="rw" desc="U3 format." name="SquelchMode" offset="24" reset="x" width="3" />
+        <field access="rw" desc="Set to 1 to enable sign extension of bypass data when in received point bypass mode to sign extend 13 bit I/Q values to 16 bit outputs. ... Set to 1 for SW EPP probes, and ADC data samples. Otherwise set to 0." name="BypassSignExtEnbl" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: Normal data ... 1: Diversity 2 bytes ... 2: Diversity 4 bytes ... 3: Diversity 8 bytes ... 4: Received point bypass ... Note the receiver supports at most sixteen data repetitions in diversity mode - the number of input bytes per symbol must be at least one-sixteenth the number of active subcarriers. In &quot;received point bypass&quot; mode the slicer outputs the received data point for each non-NULL subcarrier. The DLL must use 32-bit bypass mode to transfer these to the DMA. See Rx Probe Processing for details." name="Mode" offset="28" reset="x" width="3" />
+        <field access="ru" desc="0: TxRxDiversityOffset0 1: TxRxDiversityOffset1." name="DiversityOffsetSel" offset="31" reset="x" width="1" />
+      </reg>
+      <reg name="RxEvmSaProc" offset="0x30">
+        <field access="rw" desc="Number of first symbol to process. Data symbols are numbered starting from 0 for the first data symbol in the packet. The packet must contain at least the number of data symbols indicated by StartSym+NumSyms or the results are undefined." name="StartSym" offset="0" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="1" />
+        <field access="rw" desc="Number of data symbols to process. The packet must contain at least the number of data symbols indicated by StartSym+NumSyms or the results are undefined. Must be greater than 0." name="NumSyms" offset="8" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="1" />
+        <field access="rw" desc="Carrier with 2**Threshold times greather than mean power should be counted." name="Threshold1" offset="16" reset="x" width="3" />
+        <field access="rw" desc="This field represents (N/(N-1))-1. This is used to compensate threshold for only computing mean over N-1 symbols." name="Threshold2" offset="19" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="23" reset="x" width="3" />
+        <field access="rw" desc="0: accumulate from current values ... 1: set accumulators to 0 before processing if pauseEVM is set, reset is prevented." name="StatResetPacketStart" offset="26" reset="x" width="1" />
+        <field access="rw" desc="Set to 1 to pause the EVM accumulation for the current packet. When set, only the EVM/SA status outputs MeanMantissa and MeanExponent status outputs ofare valid EVM/SA are invalid." name="pauseEVM" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: EVM/SA processor disabled ... 1: EVM/SA processor enabled ... When enabled the EVM/SA processor results are computed and output to the DLL. EPP processor must be disabled when enabling EVM/SA. The DLL must use 32-bit bypass mode to transfer these results to the DMA. If the packet is not received (burst detect failure, etc.) the accumulators are not modified and the current accumulator contents are returned as the results. When disabled the accumulated results from prior processing are held." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxEppProc" offset="0x34">
+        <field access="rw" desc="Number of first symbol to process. Data symbols are numbered starting from 0 for the first data symbol in the packet. Note! if programmed incorrectly can hang the processing path.  See formula in NumSyms." name="StartSym" offset="0" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="7" reset="x" width="1" />
+        <field access="rw" desc="Number of data symbols to process. Must be greater than 0. Note! if programmed incorrectly, this can hang the processing path.  Formula: StartSym + NumSyms &lt;= NumSymsIntoFdRx - NumCeSyms - 1 whenever EppProc is Enabled." name="NumSyms" offset="8" reset="x" width="7" />
+        <field access="ru" name="RESERVED" offset="15" reset="x" width="13" />
+        <field access="rw" desc="0: EPP processor disabled ... 1: EPP processor enabled ... When enabled EPP processor results are computed and output to the DLL. EVM/SA processor must be disabled when EPP processor is enabled. The DLL must use 32-bit bypass mode to transfer these results to the DMA." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+      <reg name="RxFdBerTest" offset="0x38">
+        <field access="rw" desc="Setting this field to 1 enable FD Rx events logging." name="EventEnable" offset="0" reset="x" width="1" />
+        <field access="rw" desc="This field is sent along with events to the logger. Software use this tag to line up PHY events and DMA engine events." name="EventPktID" offset="1" reset="x" width="4" />
+        <field access="ru" name="RESERVED" offset="5" reset="x" width="15" />
+        <field access="rw" desc="OFDMA context to check and update the cumulative statistics with. Bit 0 enable context 0 and bit 1 enable context 1 and so on. For non OFDMA, only bit 0 should be set to 1." name="ContextIDMask" offset="16" reset="x" width="8" />
+        <field access="ru" name="RESERVED" offset="24" reset="x" width="1" />
+        <field access="rw" desc="0: LFSR continues at symbol start ... 1: LFSR set to seed at symbol start." name="PnResetSymStart" offset="25" reset="x" width="1" />
+        <field access="rw" desc="0: LFSR continues at packet start ... 1: LFSR set to seed at packet start." name="PnResetPacketStart" offset="26" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="27" reset="x" width="1" />
+        <field access="rw" desc="0: FD BERT checker disabled 1: FD BERT checker enabled When enabled the received packet is checked as specified by Mode and the cumulative statistics updated as appropriate. When disabled no checking is performed and the cumulative statistics are unchanged." name="Enable" offset="28" reset="x" width="1" />
+        <field access="ru" name="RESERVED" offset="29" reset="x" width="3" />
+      </reg>
+    </regfile>
+  </block>
+</system>

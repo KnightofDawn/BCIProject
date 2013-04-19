@@ -1,0 +1,135 @@
+library ieee;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+entity TesterFpgaCounterElement is
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+
+      CntInBus  : in  std_logic_vector(7 downto 0);
+      CntEnBus  : in  std_logic_vector(7 downto 0);
+      CountZero : out std_logic;
+      ActionEn  : in  std_logic;
+
+      ConfigRegsIn   : in std_logic_vector(31 downto 0);
+      ConfigRegsOut  : out std_logic_vector(31 downto 0);
+      ConfigRegsEn   : in std_logic;
+      ConfigRegsLd   : in std_logic;
+      ConfigRegsSt   : in std_logic
+   );
+end TesterFpgaCounterElement;
+
+architecture RTL of TesterFpgaCounterElement is
+   -- Reg 0 - Counter Action
+   -- | [31:16] |[15:14]|[13:12]|[11:10]| [9:8] | [7:6] | [5:4] | [3:2] | [1:0] |
+   -- | Initial | Act7  | Act6  | Act5  | Act4  | Act3  | Act2  | Act1  | Act0  |
+   -- | Value   |Select |Select |Select |Select |Select |Select |Select |Select |
+   -- Action Select
+   -- 0 - Ignore
+   -- 1 - Count Up (with FFFF limit)
+   -- 2 - Count Dn (with 0000 limit)
+   -- 3 - Init
+   -- Reg 1 - Counter Dependancy
+   -- | [31:8]  |    [7]    |    [6]    |    [5]    |    [4]    |    [3]    |    [2]    |    [1]    |    [0]    |
+   -- | Initial | Depend on | Depend on | Depend on | Depend on | Depend on | Depend on | Depend on | Depend on |
+   -- | Value   | Counter 7 | Counter 6 | Counter 5 | Counter 4 | Counter 3 | Counter 2 | Counter 1 | Counter 0 |
+   -- Depend On: When set, the counter advances only when the coresponding counter is at zero.
+
+   type   RegisterBank_t is array (0 to 1) of std_logic_vector(31 downto 0);
+   signal RegisterBank       : RegisterBank_t;
+   signal RegisterBankStatic : RegisterBank_t;
+
+   type ActionSel_t is array (0 to 7) of std_logic_vector(1 downto 0);
+   signal ActSelBus : ActionSel_t;
+   signal InitValue : std_logic_vector(15 downto 0);
+   
+   signal Counter         : integer range  0 to 131071; --(2^17-1)
+   
+   signal DependBus   : std_logic_vector(7 downto 0);
+   signal CountEnable : std_logic;
+
+begin
+   CountEnable <= '1' when ((DependBus and CntEnBus) = DependBus) else '0';
+
+   -- Process counter
+   process (RST, CLK, CntInBus, ActSelBus)
+      variable AdjustBy    : integer range -8 to 8;
+      variable InitAction  : std_logic;
+   begin
+      AdjustBy   := 0;
+      InitAction := '0';
+      for i in 0 to 7 loop
+         if (CntInBus(i)='1') then
+            if (ActSelBus(i) = "01") then
+               AdjustBy := AdjustBy + 1;
+            elsif (ActSelBus(i) = "10") then
+               AdjustBy := AdjustBy - 1;
+            elsif (ActSelBus(i) = "11") then
+               InitAction := '1';
+            end if;
+         end if;
+      end loop;
+
+      if RST = '1' then
+         Counter <= 65535;
+      elsif CLK'event and CLK='1' then
+         if (ConfigRegsSt='1') then
+            Counter <= conv_integer(RegisterBankStatic(0)(31 downto 16));
+
+         elsif (ActionEn = '1') and (CountEnable = '1')then
+            if (InitAction='1')  then
+               Counter <= conv_integer(InitValue);
+               
+            else
+               if (AdjustBy < 0) then
+                  if (Counter > -AdjustBy) then
+                     Counter <= Counter + AdjustBy;
+                  else
+                     Counter <= 0;
+                  end if;
+               elsif (AdjustBy > 0) then
+                  if (Counter + AdjustBy > 65535) then
+                     Counter <= 65535;
+                  else
+                     Counter <= Counter + AdjustBy;
+                  end if;
+               end if;
+            end if;
+         end if;
+      end if;
+   end process;
+   CountZero <= '1' when Counter = 0 else '0';
+      
+
+   -- Config Registers 
+   process (RST, CLK)
+   begin
+      if RST = '1' then
+         RegisterBank       <= (others=>(others=>'0'));
+         RegisterBankStatic <= (others=>(others=>'0'));
+      elsif CLK'event and CLK='1' then
+         if (ConfigRegsSt = '1') then
+            RegisterBank <= RegisterBankStatic;
+         end if;
+         if (ConfigRegsLd = '1') then 
+            RegisterBankStatic <= RegisterBank;
+         end if;
+         if (ConfigRegsEn = '1') then
+            RegisterBankStatic(RegisterBankStatic'high) <= ConfigRegsIn;
+            for i in 0 to RegisterBankStatic'high-1 loop
+               RegisterBankStatic(i) <= RegisterBankStatic(i+1);
+            end loop;
+         end if;
+      end if;
+   end process;
+   ConfigRegsOut <= RegisterBankStatic(0);
+   b: for i in 0 to 7 generate
+      ActSelBus(i) <= RegisterBank(0)(i*2+1 downto i*2);
+   end generate;
+   InitValue <= RegisterBank(0)(31 downto 16);
+   DependBus <= RegisterBank(1)( 7 downto 0);
+
+end RTL;

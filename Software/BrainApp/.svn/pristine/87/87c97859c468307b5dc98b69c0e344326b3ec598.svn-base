@@ -1,0 +1,1053 @@
+#  
+do C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_top.do
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.mpf
+# 
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config
+# 
+# Top level modules:
+# 	tse_config
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module capture_to_memory_tb
+# 
+# Top level modules:
+# 	capture_to_memory_tb
+# 
+# 
+# vsim work.tse_config_tb
+# vsim work.tse_config_tb 
+# ** Error: (vsim-3170) Could not find 'C:\projects\Entropic_Designs\nios2\entropic_ip\capture_to_memory\rtl_work.tse_config_tb'.
+# Error loading design
+# Error: Error loading design 
+#        Pausing macro execution 
+# MACRO C:\projects\Entropic_Designs\nios2\entropic_ip\tse_config\tse_config_top.do PAUSED at line 12
+do C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_top.do
+# transcript on
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.mpf
+# 
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config
+# 
+# Top level modules:
+# 	tse_config
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_tb
+# 
+# Top level modules:
+# 	tse_config_tb
+# 
+# 
+# vsim work.tse_config_tb
+# vsim work.tse_config_tb 
+# Loading work.tse_config_tb
+# Loading work.tse_config
+# ** Error: (vsim-3033) C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v(32): Instantiation of 'tse_config_rom' failed. The design unit was not found.
+#         Region: /tse_config_tb/tse_config_tb
+#         Searched libraries:
+#             C:\projects\Entropic_Designs\nios2\entropic_ip\capture_to_memory\rtl_work
+# Error loading design
+# Error: Error loading design 
+#        Pausing macro execution 
+# MACRO C:\projects\Entropic_Designs\nios2\entropic_ip\tse_config\tse_config_top.do PAUSED at line 12
+
+
+
+
+do C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_top.do
+# transcript on
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.mpf
+# 
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config
+# 
+# Top level modules:
+# 	tse_config
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_tb
+# 
+# Top level modules:
+# 	tse_config_tb
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_rom
+# 
+# Top level modules:
+# 	tse_config_rom
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom_bb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_rom
+# 
+# Top level modules:
+# 	tse_config_rom
+# 
+# 
+# 
+# 
+# vsim work.tse_config_tb
+# vsim work.tse_config_tb 
+# Loading work.tse_config_tb
+# Loading work.tse_config
+# Loading work.tse_config_rom
+# ** Warning: (vsim-3015) C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v(32): [PCDPC] - Port size (32 or 32) does not match connection size (1) for port 'q'. The port definition is at: C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom_bb.v(37).
+#         Region: /tse_config_tb/tse_config_tb/tse_config_rom_inst
+# WARNING: No extended dataflow license exists
+# 
+# do wave.do
+# onerror {resume}
+# quietly WaveActivateNextPane {} 0
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/trigger_position
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/trigger_position'.
+# Executing ONERROR command at macro ./wave.do line 3
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/post_trig_limit
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/post_trig_limit'.
+# Executing ONERROR command at macro ./wave.do line 4
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/clk166
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/clk166'.
+# Executing ONERROR command at macro ./wave.do line 5
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/reset
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/reset'.
+# Executing ONERROR command at macro ./wave.do line 6
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/capture_data32
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/capture_data32'.
+# Executing ONERROR command at macro ./wave.do line 7
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/capture_hdr4
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/capture_hdr4'.
+# Executing ONERROR command at macro ./wave.do line 8
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/capture_ofst16
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/capture_ofst16'.
+# Executing ONERROR command at macro ./wave.do line 9
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/capture_en
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/capture_en'.
+# Executing ONERROR command at macro ./wave.do line 10
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/capture_data40
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/capture_data40'.
+# Executing ONERROR command at macro ./wave.do line 11
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/wr_ptr
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/wr_ptr'.
+# Executing ONERROR command at macro ./wave.do line 12
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/rd_ptr
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/rd_ptr'.
+# Executing ONERROR command at macro ./wave.do line 13
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/size
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/size'.
+# Executing ONERROR command at macro ./wave.do line 14
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/ff_rd_req
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/ff_rd_req'.
+# Executing ONERROR command at macro ./wave.do line 15
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/ff_wr_req
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/ff_wr_req'.
+# Executing ONERROR command at macro ./wave.do line 16
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/ff_ready
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/ff_ready'.
+# Executing ONERROR command at macro ./wave.do line 17
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/data128
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/data128'.
+# Executing ONERROR command at macro ./wave.do line 18
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/ff_40_overflow_sticky
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/ff_40_overflow_sticky'.
+# Executing ONERROR command at macro ./wave.do line 19
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/five_byte_boundary
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/five_byte_boundary'.
+# Executing ONERROR command at macro ./wave.do line 20
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/avl_addr_delayed
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/avl_addr_delayed'.
+# Executing ONERROR command at macro ./wave.do line 21
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/avl_addr
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/avl_addr'.
+# Executing ONERROR command at macro ./wave.do line 22
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/avl_addr_next
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/avl_addr_next'.
+# Executing ONERROR command at macro ./wave.do line 23
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/avl_ready
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/avl_ready'.
+# Executing ONERROR command at macro ./wave.do line 24
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/avl_wdata
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/avl_wdata'.
+# Executing ONERROR command at macro ./wave.do line 25
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/avl_write_req
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/avl_write_req'.
+# Executing ONERROR command at macro ./wave.do line 26
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/oldest_sample_addr
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/oldest_sample_addr'.
+# Executing ONERROR command at macro ./wave.do line 27
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/newest_sample_addr
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/newest_sample_addr'.
+# Executing ONERROR command at macro ./wave.do line 28
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/capture_enable
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/capture_enable'.
+# Executing ONERROR command at macro ./wave.do line 29
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/capture_done
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/capture_done'.
+# Executing ONERROR command at macro ./wave.do line 30
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/arm
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/arm'.
+# Executing ONERROR command at macro ./wave.do line 31
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/trigger
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/trigger'.
+# Executing ONERROR command at macro ./wave.do line 32
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/capture_to_memory_inst/post_trig_byte_cnt
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/post_trig_byte_cnt'.
+# Executing ONERROR command at macro ./wave.do line 33
+# add wave -noupdate /capture_to_memory_tb/capture_to_memory_inst/state
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/capture_to_memory_inst/state'.
+# Executing ONERROR command at macro ./wave.do line 34
+# add wave -noupdate /capture_to_memory_tb/error
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/error'.
+# Executing ONERROR command at macro ./wave.do line 35
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/align_err
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/align_err'.
+# Executing ONERROR command at macro ./wave.do line 36
+# add wave -noupdate -radix hexadecimal /capture_to_memory_tb/ram_sample
+# ** Error: (vish-4014) No objects found matching '/capture_to_memory_tb/ram_sample'.
+# Executing ONERROR command at macro ./wave.do line 37
+# 
+# 
+# 
+# TreeUpdate [SetDefaultTree]
+# WaveRestoreCursors {{Cursor 1} {19690 ps} 0}
+# configure wave -namecolwidth 423
+# configure wave -valuecolwidth 91
+# configure wave -justifyvalue left
+# configure wave -signalnamewidth 0
+# configure wave -snapdistance 10
+# configure wave -datasetprefix 0
+# configure wave -rowmargin 4
+# configure wave -childrowmargin 2
+# configure wave -gridoffset 0
+# configure wave -gridperiod 1
+# configure wave -griddelta 40
+# configure wave -timeline 0
+# configure wave -timelineunits ps
+# update
+# WaveRestoreZoom {19573 ps} {19903 ps}
+# 
+# run -all
+# Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# Simulation Breakpoint: Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# MACRO C:\projects\Entropic_Designs\nios2\entropic_ip\tse_config\tse_config_top.do PAUSED at line 20
+add wave sim:/tse_config_tb/*
+add wave -r sim:/tse_config_tb/*
+run
+write format wave -window .main_pane.wave.interior.cs.body.pw.wf C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/wave.do
+do C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_top.do
+# transcript on
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.mpf
+# 
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config
+# 
+# Top level modules:
+# 	tse_config
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_tb
+# 
+# Top level modules:
+# 	tse_config_tb
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_rom
+# 
+# Top level modules:
+# 	tse_config_rom
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom_bb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_rom
+# 
+# Top level modules:
+# 	tse_config_rom
+# 
+# 
+# 
+# 
+# vsim work.tse_config_tb
+# vsim work.tse_config_tb 
+# Loading work.tse_config_tb
+# Loading work.tse_config
+# Loading work.tse_config_rom
+# ** Warning: (vsim-3015) C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v(32): [PCDPC] - Port size (32 or 32) does not match connection size (1) for port 'q'. The port definition is at: C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom_bb.v(37).
+#         Region: /tse_config_tb/tse_config_tb/tse_config_rom_inst
+# WARNING: No extended dataflow license exists
+# 
+# do wave.do
+# onerror {resume}
+# quietly WaveActivateNextPane {} 0
+# add wave -noupdate -radix hexadecimal /tse_config_tb/clk166
+# add wave -noupdate -radix hexadecimal /tse_config_tb/reset
+# add wave -noupdate -radix hexadecimal /tse_config_tb/waitrequest
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/clk166
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/reset
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/write
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/address
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/writedata
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/waitrequest
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/rom_addr
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/rom_q
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_cnt
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_tick
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/state
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_tick_cnt
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/address
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/clock
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/q
+# TreeUpdate [SetDefaultTree]
+# WaveRestoreCursors {{Cursor 1} {19690 ps} 0}
+# configure wave -namecolwidth 423
+# configure wave -valuecolwidth 91
+# configure wave -justifyvalue left
+# configure wave -signalnamewidth 0
+# configure wave -snapdistance 10
+# configure wave -datasetprefix 0
+# configure wave -rowmargin 4
+# configure wave -childrowmargin 2
+# configure wave -gridoffset 0
+# configure wave -gridperiod 1
+# configure wave -griddelta 40
+# configure wave -timeline 0
+# configure wave -timelineunits ps
+# update
+# WaveRestoreZoom {1000305 ps} {1000635 ps}
+# 
+# run -all
+# Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# Simulation Breakpoint: Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# MACRO C:\projects\Entropic_Designs\nios2\entropic_ip\tse_config\tse_config_top.do PAUSED at line 20
+do C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_top.do
+# transcript on
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.mpf
+# 
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config
+# 
+# Top level modules:
+# 	tse_config
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_tb
+# 
+# Top level modules:
+# 	tse_config_tb
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_rom
+# 
+# Top level modules:
+# 	tse_config_rom
+# vlog -vlog01compat -work work +incdir+C:/altera/12.0/modelsim_ase/altera/verilog/src/ {C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module lcell
+# -- Compiling module ALTERA_MF_MEMORY_INITIALIZATION
+# -- Compiling module ALTERA_MF_HINT_EVALUATION
+# -- Compiling module ALTERA_DEVICE_FAMILIES
+# -- Compiling module dffp
+# -- Compiling module pll_iobuf
+# -- Compiling module stx_m_cntr
+# -- Compiling module stx_n_cntr
+# -- Compiling module stx_scale_cntr
+# -- Compiling module MF_pll_reg
+# -- Compiling module MF_stratix_pll
+# -- Compiling module arm_m_cntr
+# -- Compiling module arm_n_cntr
+# -- Compiling module arm_scale_cntr
+# -- Compiling module MF_stratixii_pll
+# -- Compiling module ttn_m_cntr
+# -- Compiling module ttn_n_cntr
+# -- Compiling module ttn_scale_cntr
+# -- Compiling module MF_stratixiii_pll
+# -- Compiling module cda_m_cntr
+# -- Compiling module cda_n_cntr
+# -- Compiling module cda_scale_cntr
+# -- Compiling module MF_cycloneiii_pll
+# -- Compiling module MF_cycloneiiigl_m_cntr
+# -- Compiling module MF_cycloneiiigl_n_cntr
+# -- Compiling module MF_cycloneiiigl_scale_cntr
+# -- Compiling module cycloneiiigl_post_divider
+# -- Compiling module MF_cycloneiiigl_pll
+# -- Compiling module altpll
+# -- Compiling module altlvds_rx
+# -- Compiling module stratix_lvds_rx
+# -- Compiling module stratixgx_dpa_lvds_rx
+# -- Compiling module stratixii_lvds_rx
+# -- Compiling module flexible_lvds_rx
+# -- Compiling module stratixiii_lvds_rx
+# -- Compiling module stratixiii_lvds_rx_channel
+# -- Compiling module stratixiii_lvds_rx_dpa
+# -- Compiling module altlvds_tx
+# -- Compiling module stratixv_local_clk_divider
+# -- Compiling module stratix_tx_outclk
+# -- Compiling module stratixii_tx_outclk
+# -- Compiling module flexible_lvds_tx
+# -- Compiling module dcfifo_dffpipe
+# -- Compiling module dcfifo_fefifo
+# -- Compiling module dcfifo_async
+# -- Compiling module dcfifo_sync
+# -- Compiling module dcfifo_low_latency
+# -- Compiling module dcfifo_mixed_widths
+# -- Compiling module dcfifo
+# -- Compiling module altaccumulate
+# -- Compiling module altmult_accum
+# -- Compiling module altmult_add
+# -- Compiling module altfp_mult
+# -- Compiling module altsqrt
+# -- Compiling module altclklock
+# -- Compiling module altddio_in
+# -- Compiling module altddio_out
+# -- Compiling module altddio_bidir
+# -- Compiling module altdpram
+# -- Compiling module altsyncram
+# -- Compiling module alt3pram
+# -- Compiling module parallel_add
+# -- Compiling module scfifo
+# -- Compiling module altshift_taps
+# -- Compiling module a_graycounter
+# -- Compiling module altsquare
+# -- Compiling module altera_std_synchronizer
+# -- Compiling module altera_std_synchronizer_bundle
+# -- Compiling module alt_cal
+# -- Compiling module alt_cal_mm
+# -- Compiling module alt_cal_c3gxb
+# -- Compiling module alt_cal_sv
+# -- Compiling module alt_cal_av
+# -- Compiling module alt_aeq_s4
+# -- Compiling module alt_eyemon
+# -- Compiling module alt_dfe
+# -- Compiling module signal_gen
+# -- Compiling module jtag_tap_controller
+# -- Compiling module dummy_hub
+# -- Compiling module sld_virtual_jtag
+# -- Compiling module sld_signaltap
+# -- Compiling module altstratixii_oct
+# -- Compiling module altparallel_flash_loader
+# -- Compiling module altserial_flash_loader
+# -- Compiling module sld_virtual_jtag_basic
+# -- Compiling module altsource_probe
+# 
+# Top level modules:
+# 	lcell
+# 	altpll
+# 	altlvds_rx
+# 	altlvds_tx
+# 	dcfifo
+# 	altaccumulate
+# 	altmult_accum
+# 	altmult_add
+# 	altfp_mult
+# 	altsqrt
+# 	altclklock
+# 	altddio_bidir
+# 	altdpram
+# 	alt3pram
+# 	parallel_add
+# 	scfifo
+# 	altshift_taps
+# 	a_graycounter
+# 	altsquare
+# 	altera_std_synchronizer_bundle
+# 	alt_cal
+# 	alt_cal_mm
+# 	alt_cal_c3gxb
+# 	alt_cal_sv
+# 	alt_cal_av
+# 	alt_aeq_s4
+# 	alt_eyemon
+# 	alt_dfe
+# 	sld_virtual_jtag
+# 	sld_signaltap
+# 	altstratixii_oct
+# 	altparallel_flash_loader
+# 	altserial_flash_loader
+# 	sld_virtual_jtag_basic
+# 	altsource_probe
+# 
+# 
+# 
+# 
+# vsim work.tse_config_tb
+# vsim work.tse_config_tb 
+# Loading work.tse_config_tb
+# Loading work.tse_config
+# Loading work.tse_config_rom
+# Loading work.altsyncram
+# Loading work.ALTERA_DEVICE_FAMILIES
+# Loading work.ALTERA_MF_MEMORY_INITIALIZATION
+# ** Warning: (vsim-3015) C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v(32): [PCDPC] - Port size (32 or 32) does not match connection size (1) for port 'q'. The port definition is at: C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v(42).
+#         Region: /tse_config_tb/tse_config_tb/tse_config_rom_inst
+# WARNING: No extended dataflow license exists
+# 
+# do wave.do
+# onerror {resume}
+# quietly WaveActivateNextPane {} 0
+# add wave -noupdate -radix hexadecimal /tse_config_tb/clk166
+# add wave -noupdate -radix hexadecimal /tse_config_tb/reset
+# add wave -noupdate -radix hexadecimal /tse_config_tb/waitrequest
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/clk166
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/reset
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/write
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/address
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/writedata
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/waitrequest
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/rom_addr
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/rom_q
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_cnt
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_tick
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/state
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_tick_cnt
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/address
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/clock
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/q
+# TreeUpdate [SetDefaultTree]
+# WaveRestoreCursors {{Cursor 1} {19690 ps} 0}
+# configure wave -namecolwidth 423
+# configure wave -valuecolwidth 91
+# configure wave -justifyvalue left
+# configure wave -signalnamewidth 0
+# configure wave -snapdistance 10
+# configure wave -datasetprefix 0
+# configure wave -rowmargin 4
+# configure wave -childrowmargin 2
+# configure wave -gridoffset 0
+# configure wave -gridperiod 1
+# configure wave -griddelta 40
+# configure wave -timeline 0
+# configure wave -timelineunits ps
+# update
+# WaveRestoreZoom {1000305 ps} {1000635 ps}
+# 
+# run -all
+# ** Warning: (vsim-3534) [FOFIR] - Failed to open file "tse_config.mif" for reading.
+# No such file or directory. (errno = ENOENT)    : C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v(187)
+#    Time: 0 ps  Iteration: 0  Instance: /tse_config_tb/tse_config_tb/tse_config_rom_inst/altsyncram_component
+# ERROR: cannot read tse_config.mif.
+# ** Warning: (vsim-7) Failed to open readmem file "tse_config.ver" in read mode.
+# No such file or directory. (errno = ENOENT)    : C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v(45245)
+#    Time: 0 ps  Iteration: 0  Instance: /tse_config_tb/tse_config_tb/tse_config_rom_inst/altsyncram_component
+# Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# Simulation Breakpoint: Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# MACRO C:\projects\Entropic_Designs\nios2\entropic_ip\tse_config\tse_config_top.do PAUSED at line 20
+do C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_top.do
+# transcript on
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.mpf
+# 
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config
+# 
+# Top level modules:
+# 	tse_config
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_tb
+# 
+# Top level modules:
+# 	tse_config_tb
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_rom
+# 
+# Top level modules:
+# 	tse_config_rom
+# vlog -vlog01compat -work work +incdir+C:/altera/12.0/modelsim_ase/altera/verilog/src/ {C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module lcell
+# -- Compiling module ALTERA_MF_MEMORY_INITIALIZATION
+# -- Compiling module ALTERA_MF_HINT_EVALUATION
+# -- Compiling module ALTERA_DEVICE_FAMILIES
+# -- Compiling module dffp
+# -- Compiling module pll_iobuf
+# -- Compiling module stx_m_cntr
+# -- Compiling module stx_n_cntr
+# -- Compiling module stx_scale_cntr
+# -- Compiling module MF_pll_reg
+# -- Compiling module MF_stratix_pll
+# -- Compiling module arm_m_cntr
+# -- Compiling module arm_n_cntr
+# -- Compiling module arm_scale_cntr
+# -- Compiling module MF_stratixii_pll
+# -- Compiling module ttn_m_cntr
+# -- Compiling module ttn_n_cntr
+# -- Compiling module ttn_scale_cntr
+# -- Compiling module MF_stratixiii_pll
+# -- Compiling module cda_m_cntr
+# -- Compiling module cda_n_cntr
+# -- Compiling module cda_scale_cntr
+# -- Compiling module MF_cycloneiii_pll
+# -- Compiling module MF_cycloneiiigl_m_cntr
+# -- Compiling module MF_cycloneiiigl_n_cntr
+# -- Compiling module MF_cycloneiiigl_scale_cntr
+# -- Compiling module cycloneiiigl_post_divider
+# -- Compiling module MF_cycloneiiigl_pll
+# -- Compiling module altpll
+# -- Compiling module altlvds_rx
+# -- Compiling module stratix_lvds_rx
+# -- Compiling module stratixgx_dpa_lvds_rx
+# -- Compiling module stratixii_lvds_rx
+# -- Compiling module flexible_lvds_rx
+# -- Compiling module stratixiii_lvds_rx
+# -- Compiling module stratixiii_lvds_rx_channel
+# -- Compiling module stratixiii_lvds_rx_dpa
+# -- Compiling module altlvds_tx
+# -- Compiling module stratixv_local_clk_divider
+# -- Compiling module stratix_tx_outclk
+# -- Compiling module stratixii_tx_outclk
+# -- Compiling module flexible_lvds_tx
+# -- Compiling module dcfifo_dffpipe
+# -- Compiling module dcfifo_fefifo
+# -- Compiling module dcfifo_async
+# -- Compiling module dcfifo_sync
+# -- Compiling module dcfifo_low_latency
+# -- Compiling module dcfifo_mixed_widths
+# -- Compiling module dcfifo
+# -- Compiling module altaccumulate
+# -- Compiling module altmult_accum
+# -- Compiling module altmult_add
+# -- Compiling module altfp_mult
+# -- Compiling module altsqrt
+# -- Compiling module altclklock
+# -- Compiling module altddio_in
+# -- Compiling module altddio_out
+# -- Compiling module altddio_bidir
+# -- Compiling module altdpram
+# -- Compiling module altsyncram
+# -- Compiling module alt3pram
+# -- Compiling module parallel_add
+# -- Compiling module scfifo
+# -- Compiling module altshift_taps
+# -- Compiling module a_graycounter
+# -- Compiling module altsquare
+# -- Compiling module altera_std_synchronizer
+# -- Compiling module altera_std_synchronizer_bundle
+# -- Compiling module alt_cal
+# -- Compiling module alt_cal_mm
+# -- Compiling module alt_cal_c3gxb
+# -- Compiling module alt_cal_sv
+# -- Compiling module alt_cal_av
+# -- Compiling module alt_aeq_s4
+# -- Compiling module alt_eyemon
+# -- Compiling module alt_dfe
+# -- Compiling module signal_gen
+# -- Compiling module jtag_tap_controller
+# -- Compiling module dummy_hub
+# -- Compiling module sld_virtual_jtag
+# -- Compiling module sld_signaltap
+# -- Compiling module altstratixii_oct
+# -- Compiling module altparallel_flash_loader
+# -- Compiling module altserial_flash_loader
+# -- Compiling module sld_virtual_jtag_basic
+# -- Compiling module altsource_probe
+# 
+# Top level modules:
+# 	lcell
+# 	altpll
+# 	altlvds_rx
+# 	altlvds_tx
+# 	dcfifo
+# 	altaccumulate
+# 	altmult_accum
+# 	altmult_add
+# 	altfp_mult
+# 	altsqrt
+# 	altclklock
+# 	altddio_bidir
+# 	altdpram
+# 	alt3pram
+# 	parallel_add
+# 	scfifo
+# 	altshift_taps
+# 	a_graycounter
+# 	altsquare
+# 	altera_std_synchronizer_bundle
+# 	alt_cal
+# 	alt_cal_mm
+# 	alt_cal_c3gxb
+# 	alt_cal_sv
+# 	alt_cal_av
+# 	alt_aeq_s4
+# 	alt_eyemon
+# 	alt_dfe
+# 	sld_virtual_jtag
+# 	sld_signaltap
+# 	altstratixii_oct
+# 	altparallel_flash_loader
+# 	altserial_flash_loader
+# 	sld_virtual_jtag_basic
+# 	altsource_probe
+# 
+# 
+# 
+# 
+# vsim work.tse_config_tb
+# vsim work.tse_config_tb 
+# Loading work.tse_config_tb
+# Loading work.tse_config
+# Loading work.tse_config_rom
+# Loading work.altsyncram
+# Loading work.ALTERA_DEVICE_FAMILIES
+# Loading work.ALTERA_MF_MEMORY_INITIALIZATION
+# ** Warning: (vsim-3015) C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v(32): [PCDPC] - Port size (32 or 32) does not match connection size (1) for port 'q'. The port definition is at: C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v(42).
+#         Region: /tse_config_tb/tse_config_tb/tse_config_rom_inst
+# 
+# do wave.do
+# onerror {resume}
+# quietly WaveActivateNextPane {} 0
+# add wave -noupdate -radix hexadecimal /tse_config_tb/clk166
+# add wave -noupdate -radix hexadecimal /tse_config_tb/reset
+# add wave -noupdate -radix hexadecimal /tse_config_tb/waitrequest
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/clk166
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/reset
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/write
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/address
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/writedata
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/waitrequest
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/rom_addr
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/rom_q
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_cnt
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_tick
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/state
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_tick_cnt
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/address
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/clock
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/q
+# TreeUpdate [SetDefaultTree]
+# WaveRestoreCursors {{Cursor 1} {19690 ps} 0}
+# configure wave -namecolwidth 423
+# configure wave -valuecolwidth 91
+# configure wave -justifyvalue left
+# configure wave -signalnamewidth 0
+# configure wave -snapdistance 10
+# configure wave -datasetprefix 0
+# configure wave -rowmargin 4
+# configure wave -childrowmargin 2
+# configure wave -gridoffset 0
+# configure wave -gridperiod 1
+# configure wave -griddelta 40
+# configure wave -timeline 0
+# configure wave -timelineunits ps
+# update
+# WaveRestoreZoom {1000305 ps} {1000635 ps}
+# 
+# run -all
+# ** Warning: (vsim-3534) [FOFIR] - Failed to open file "tse_config.mif" for reading.
+# No such file or directory. (errno = ENOENT)    : C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v(187)
+#    Time: 0 ps  Iteration: 0  Instance: /tse_config_tb/tse_config_tb/tse_config_rom_inst/altsyncram_component
+# ERROR: cannot read tse_config.mif.
+# ** Warning: (vsim-7) Failed to open readmem file "tse_config.ver" in read mode.
+# No such file or directory. (errno = ENOENT)    : C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v(45245)
+#    Time: 0 ps  Iteration: 0  Instance: /tse_config_tb/tse_config_tb/tse_config_rom_inst/altsyncram_component
+# Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# Simulation Breakpoint: Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# MACRO C:\projects\Entropic_Designs\nios2\entropic_ip\tse_config\tse_config_top.do PAUSED at line 20
+do C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_top.do
+# transcript on
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.mpf
+# 
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config
+# 
+# Top level modules:
+# 	tse_config
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_tb
+# 
+# Top level modules:
+# 	tse_config_tb
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_rom
+# 
+# Top level modules:
+# 	tse_config_rom
+# vlog -vlog01compat -work work +incdir+C:/altera/12.0/modelsim_ase/altera/verilog/src/ {C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module lcell
+# -- Compiling module ALTERA_MF_MEMORY_INITIALIZATION
+# -- Compiling module ALTERA_MF_HINT_EVALUATION
+# -- Compiling module ALTERA_DEVICE_FAMILIES
+# -- Compiling module dffp
+# -- Compiling module pll_iobuf
+# -- Compiling module stx_m_cntr
+# -- Compiling module stx_n_cntr
+# -- Compiling module stx_scale_cntr
+# -- Compiling module MF_pll_reg
+# -- Compiling module MF_stratix_pll
+# -- Compiling module arm_m_cntr
+# -- Compiling module arm_n_cntr
+# -- Compiling module arm_scale_cntr
+# -- Compiling module MF_stratixii_pll
+# -- Compiling module ttn_m_cntr
+# -- Compiling module ttn_n_cntr
+# -- Compiling module ttn_scale_cntr
+# -- Compiling module MF_stratixiii_pll
+# -- Compiling module cda_m_cntr
+# -- Compiling module cda_n_cntr
+# -- Compiling module cda_scale_cntr
+# -- Compiling module MF_cycloneiii_pll
+# -- Compiling module MF_cycloneiiigl_m_cntr
+# -- Compiling module MF_cycloneiiigl_n_cntr
+# -- Compiling module MF_cycloneiiigl_scale_cntr
+# -- Compiling module cycloneiiigl_post_divider
+# -- Compiling module MF_cycloneiiigl_pll
+# -- Compiling module altpll
+# -- Compiling module altlvds_rx
+# -- Compiling module stratix_lvds_rx
+# -- Compiling module stratixgx_dpa_lvds_rx
+# -- Compiling module stratixii_lvds_rx
+# -- Compiling module flexible_lvds_rx
+# -- Compiling module stratixiii_lvds_rx
+# -- Compiling module stratixiii_lvds_rx_channel
+# -- Compiling module stratixiii_lvds_rx_dpa
+# -- Compiling module altlvds_tx
+# -- Compiling module stratixv_local_clk_divider
+# -- Compiling module stratix_tx_outclk
+# -- Compiling module stratixii_tx_outclk
+# -- Compiling module flexible_lvds_tx
+# -- Compiling module dcfifo_dffpipe
+# -- Compiling module dcfifo_fefifo
+# -- Compiling module dcfifo_async
+# -- Compiling module dcfifo_sync
+# -- Compiling module dcfifo_low_latency
+# -- Compiling module dcfifo_mixed_widths
+# -- Compiling module dcfifo
+# -- Compiling module altaccumulate
+# -- Compiling module altmult_accum
+# -- Compiling module altmult_add
+# -- Compiling module altfp_mult
+# -- Compiling module altsqrt
+# -- Compiling module altclklock
+# -- Compiling module altddio_in
+# -- Compiling module altddio_out
+# -- Compiling module altddio_bidir
+# -- Compiling module altdpram
+# -- Compiling module altsyncram
+# -- Compiling module alt3pram
+# -- Compiling module parallel_add
+# -- Compiling module scfifo
+# -- Compiling module altshift_taps
+# -- Compiling module a_graycounter
+# -- Compiling module altsquare
+# -- Compiling module altera_std_synchronizer
+# -- Compiling module altera_std_synchronizer_bundle
+# -- Compiling module alt_cal
+# -- Compiling module alt_cal_mm
+# -- Compiling module alt_cal_c3gxb
+# -- Compiling module alt_cal_sv
+# -- Compiling module alt_cal_av
+# -- Compiling module alt_aeq_s4
+# -- Compiling module alt_eyemon
+# -- Compiling module alt_dfe
+# -- Compiling module signal_gen
+# -- Compiling module jtag_tap_controller
+# -- Compiling module dummy_hub
+# -- Compiling module sld_virtual_jtag
+# -- Compiling module sld_signaltap
+# -- Compiling module altstratixii_oct
+# -- Compiling module altparallel_flash_loader
+# -- Compiling module altserial_flash_loader
+# -- Compiling module sld_virtual_jtag_basic
+# -- Compiling module altsource_probe
+# 
+# Top level modules:
+# 	lcell
+# 	altpll
+# 	altlvds_rx
+# 	altlvds_tx
+# 	dcfifo
+# 	altaccumulate
+# 	altmult_accum
+# 	altmult_add
+# 	altfp_mult
+# 	altsqrt
+# 	altclklock
+# 	altddio_bidir
+# 	altdpram
+# 	alt3pram
+# 	parallel_add
+# 	scfifo
+# 	altshift_taps
+# 	a_graycounter
+# 	altsquare
+# 	altera_std_synchronizer_bundle
+# 	alt_cal
+# 	alt_cal_mm
+# 	alt_cal_c3gxb
+# 	alt_cal_sv
+# 	alt_cal_av
+# 	alt_aeq_s4
+# 	alt_eyemon
+# 	alt_dfe
+# 	sld_virtual_jtag
+# 	sld_signaltap
+# 	altstratixii_oct
+# 	altparallel_flash_loader
+# 	altserial_flash_loader
+# 	sld_virtual_jtag_basic
+# 	altsource_probe
+# 
+# 
+# 
+# 
+# vsim work.tse_config_tb
+# vsim work.tse_config_tb 
+# Loading work.tse_config_tb
+# Loading work.tse_config
+# Loading work.tse_config_rom
+# Loading work.altsyncram
+# Loading work.ALTERA_DEVICE_FAMILIES
+# Loading work.ALTERA_MF_MEMORY_INITIALIZATION
+# ** Warning: (vsim-3015) C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v(32): [PCDPC] - Port size (32 or 32) does not match connection size (1) for port 'q'. The port definition is at: C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v(42).
+#         Region: /tse_config_tb/tse_config_tb/tse_config_rom_inst
+# 
+# do wave.do
+# onerror {resume}
+# quietly WaveActivateNextPane {} 0
+# add wave -noupdate -radix hexadecimal /tse_config_tb/clk166
+# add wave -noupdate -radix hexadecimal /tse_config_tb/reset
+# add wave -noupdate -radix hexadecimal /tse_config_tb/waitrequest
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/clk166
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/reset
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/write
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/address
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/writedata
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/waitrequest
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/rom_addr
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/rom_q
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_cnt
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_tick
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/state
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/ms_tick_cnt
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/address
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/clock
+# add wave -noupdate -radix hexadecimal /tse_config_tb/tse_config_tb/tse_config_rom_inst/q
+# TreeUpdate [SetDefaultTree]
+# WaveRestoreCursors {{Cursor 1} {19690 ps} 0}
+# configure wave -namecolwidth 423
+# configure wave -valuecolwidth 91
+# configure wave -justifyvalue left
+# configure wave -signalnamewidth 0
+# configure wave -snapdistance 10
+# configure wave -datasetprefix 0
+# configure wave -rowmargin 4
+# configure wave -childrowmargin 2
+# configure wave -gridoffset 0
+# configure wave -gridperiod 1
+# configure wave -griddelta 40
+# configure wave -timeline 0
+# configure wave -timelineunits ps
+# update
+# WaveRestoreZoom {1000305 ps} {1000635 ps}
+# 
+# run -all
+# ** Warning: (vsim-3534) [FOFIR] - Failed to open file "tse_config.hex" for reading.
+# No such file or directory. (errno = ENOENT)    : C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v(782)
+#    Time: 0 ps  Iteration: 0  Instance: /tse_config_tb/tse_config_tb/tse_config_rom_inst/altsyncram_component
+# ERROR: cannot read tse_config.hex.
+# ** Warning: (vsim-7) Failed to open readmem file "tse_config.ver" in read mode.
+# No such file or directory. (errno = ENOENT)    : C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v(45245)
+#    Time: 0 ps  Iteration: 0  Instance: /tse_config_tb/tse_config_tb/tse_config_rom_inst/altsyncram_component
+# Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# Simulation Breakpoint: Break in Module tse_config_tb at C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v line 13
+# MACRO C:\projects\Entropic_Designs\nios2\entropic_ip\tse_config\tse_config_top.do PAUSED at line 20
+do C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_top.do
+# transcript on
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory/capture_to_memory.mpf
+# 
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config
+# 
+# Top level modules:
+# 	tse_config
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_tb.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_tb
+# 
+# Top level modules:
+# 	tse_config_tb
+# vlog -vlog01compat -work work +incdir+C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config {C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v}
+# Model Technology ModelSim ALTERA vlog 10.0d Compiler 2012.01 Jan 18 2012
+# -- Compiling module tse_config_rom
+# 
+# Top level modules:
+# 	tse_config_rom
+# 
+# vsim work.tse_config_tb
+# vsim work.tse_config_tb 
+# Loading work.tse_config_tb
+# Loading work.tse_config
+# Loading work.tse_config_rom
+# ** Error: (vsim-3033) C:/projects/Entropic_Designs/nios2/entropic_ip/tse_config/tse_config_rom.v(81): Instantiation of 'altsyncram' failed. The design unit was not found.
+#         Region: /tse_config_tb/tse_config_tb/tse_config_rom_inst
+#         Searched libraries:
+#             C:\projects\Entropic_Designs\nios2\entropic_ip\capture_to_memory\rtl_work
+# Error loading design
+# Error: Error loading design 
+#        Pausing macro execution 
+# MACRO C:\projects\Entropic_Designs\nios2\entropic_ip\tse_config\tse_config_top.do PAUSED at line 12
+pwd
+# C:/projects/Entropic_Designs/nios2/entropic_ip/capture_to_memory
+ls
+#capture_to_memory_top.do#
+# capture_to_memory.cr.mti
+# capture_to_memory.mpf
+# capture_to_memory.v
+# capture_to_memory.v~
+# capture_to_memory_tb.v
+# capture_to_memory_tb.v~
+# capture_to_memory_top.do
+# capture_to_memory_top.do~
+# rtl_work
+# transcript
+# vsim.wlf
+# wave.do
+# wave.do~
+# work
+cd ..

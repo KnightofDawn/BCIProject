@@ -1,0 +1,610 @@
+# Import sys, os modules in Python.
+# These are needed to run the GUI and 
+# also to handle directory and other os related functions
+import sys, os
+
+# Import the modules QtCore (for low level Qt functions)
+# QtGui (for visual/GUI related Qt functions)
+from PyQt4 import QtCore, QtGui, Qt
+
+# Import the matplotlib module
+import matplotlib as mplib
+
+# Import the FigureCanvas object from matplotlib, this is the canvas on which the figure is drawn in the GUI.
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+
+# Import the navigation toolbar -- shown on the figure in the GUI. (having options such as zoom, save etc.)
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+
+# Import Figure -- actual figure object containing the matplotlib figure in the GUI
+from matplotlib.figure import Figure
+
+# FuncFormatter is the function to do a custom formatting of the figure axis. 
+from matplotlib.ticker import FuncFormatter
+
+# SpanSelector is the function for selecting a portion of the plot graphically using the mouse.
+from matplotlib.widgets import SpanSelector
+
+# InternalShell is the python shell used in the GUI.
+from spyderlib.widgets.internalshell import InternalShell
+
+# NamespaceBrowser and VariableExplorer are used to create the variable explorer table using in the GUI.
+from spyderlib.widgets.externalshell.namespacebrowser import NamespaceBrowser
+from spyderlib.plugins.variableexplorer import VariableExplorer
+
+import numpy as np
+import numpy.lib.recfunctions as nprf
+
+# FFT functions from SciPy
+from scipy.signal import fftconvolve
+from scipy.fftpack import fftshift, fft
+
+# The GUI MainWindow object from the python code generated using the .ui file
+from main_app_gui import Ui_MainWindow
+
+# conf.py contains various configurations such as testmux parameter structures, result filenames etc...
+import conf
+
+# testdebuglib is a custom module/library of signal processing functions.
+# Currently includes preamble type detection and correlation functions.
+import testdebuglib as tdlib
+
+class SystemAnalyzer(QtGui.QMainWindow):
+    
+    def __init__(self, parent=None):
+        """ Initialize the GUI application. 
+        Connect Signals and Slots within the GUI.
+        Create the Python Console and Variable Explorer.
+        Initialize variables needed by the application.
+        """
+
+        # Initialize the QWidget with the parent (in this case no parent)
+        QtGui.QWidget.__init__(self, parent)
+        # Center the GUI on the screen
+        self.center()
+        # Create a Ui_MainWindow object representing the GUI
+        self.ui = Ui_MainWindow()
+        # Call the setuUi function of the main window object.
+        self.ui.setupUi(self)
+        # Populate the testmux parameter tree in the GUI.
+        self.populate_tree(0)
+        # Create a tooltip for the browse button on the GUI.
+        self.ui.browseButton.setToolTip("Select the directory where result files are located")
+        # Set the folder path text box style to 'cleanlooks'. Acts as an example on how to do it if required and also looks better.
+        self.ui.folderPathText.setStyle(QtGui.QStyleFactory.create("Cleanlooks"))
+
+        # Setup the SIGNAL-SLOT connections for the GUI components
+        # SIGNAL represents the event on the GUI. eg., clicked, activated, doubleClicked etc...
+        # SLOT represents the function which will handle the event, this can be an inbuilt function or a custom function defined in this class.
+        self.ui.testMuxSelect.activated.connect(self.populate_tree)
+        self.ui.browseButton.clicked.connect(self.get_results_folder)
+        self.ui.testModeBox.activated.connect(self.select_mode)
+        # To pass extra arguments to a SLOT function we use lambda 
+        self.ui.loadButton.clicked.connect(lambda: self.read_load_data(self.ui.testMuxSelect.currentIndex(), self.ui.testModeBox.currentText()))
+        self.ui.clearButton.clicked.connect(self.clear_plots)
+        self.ui.tabWidget.currentChanged.connect(self.tab_guihandler)
+        self.ui.paramTreeView.doubleClicked.connect(self.command_complete)
+        self.ui.expandTreeButton.clicked.connect(self.ui.paramTreeView.expandAll)
+        self.ui.detectPacketButton.clicked.connect(self.generate_packet_info)
+        self.ui.plotCorrButton.clicked.connect(self.plot_correlations)
+        self.ui.plotPSDButton.clicked.connect(self.plot_PSD)
+        self.ui.plotConstButton.clicked.connect(self.plot_slicer_constellation)
+        self.ui.fsBox.valueChanged.connect(self.update_Fs)
+        QtCore.QObject.connect(self.ui.mplPlot, QtCore.SIGNAL("dropped"), self.parameter_dropped)
+        QtCore.QObject.connect(self.ui.mplPlotSingle, QtCore.SIGNAL("dropped"), self.parameter_dropped)
+        QtCore.QObject.connect(self.ui.mplPlotSingle, QtCore.SIGNAL("selected"), self.subset_selected)
+        QtCore.QObject.connect(self.ui.mplPlotSingleIQ, QtCore.SIGNAL("selected"), self.corr_subset_selected)
+        QtCore.QObject.connect(self.ui.actionRun_Python_Script, QtCore.SIGNAL("triggered()"), self.run_python_script)
+        self.ui.mplPlot.canvas.mpl_connect('pick_event', self.onpick_tooltip)
+        self.ui.mplPlotSingle.canvas.mpl_connect('pick_event', self.onpick_tooltip) 
+
+        # Create the Python Console and Variable Explorer Dock Widgets (Based on the widgets/plugins from spyderlib module)
+        font = QtGui.QFont("Consolas")
+        font.setPointSize(14)
+        msg = "NumPy, SciPy, Matplotlib have been imported"
+        cmds = ['from numpy import *', 'from scipy import *', 'from matplotlib.pyplot import *']
+        # Note: by default, the internal shell is multithreaded which is safer 
+        # but not compatible with graphical user interface creation.
+        # For example, if you need to plot data with Matplotlib, you will need 
+        # to pass the option: multithreaded=False
+        # Create a python shell object 
+        self.console = cons = InternalShell(self, namespace=globals(), message=msg, commands=cmds, multithreaded=False)
+        self.console.setMinimumWidth(200)
+        # Create a variable explorer object
+        self.vexplorer = VariableExplorer(self)
+        # Connect the python shell to the variable explorer
+        self.nsb = self.vexplorer.add_shellwidget(cons)
+        # Set visual properties
+        cons.set_font(font)
+        cons.set_codecompletion_auto(True)
+        cons.set_calltips(True)
+        cons.setup_calltips(size=300, font=font)
+        cons.setup_completion(size=(200, 150), font=font)
+        # Add the python shell to the main gui
+        self.console_dock = QtGui.QDockWidget("Python Console", self)
+        self.console_dock.setWidget(cons)
+        # Add the variable explorer to the main gui
+        self.vexplorer_dock = QtGui.QDockWidget("Variable Explorer", self)
+        self.vexplorer_dock.setWidget(self.vexplorer)
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.vexplorer_dock)
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.console_dock)
+        # Add a menu to toggle the visibility of the python shell and variable explorer
+        self.ui.menuView.addAction(self.vexplorer_dock.toggleViewAction())
+        self.ui.menuView.addAction(self.console_dock.toggleViewAction())
+
+        # Initialize a dictionary to hold all the GUI Data
+        self.guidata = { }
+        # Initialize empty array to hold correlation-subset data
+        self.corr_subset = np.empty([])
+        # Initialize sampling frequency value (user specified or default)
+        self.Fs = self.ui.fsBox.value()*1e6
+        # Initialize count to point to the current empty plot in the Multi-plot mode
+        self.current_plot_count = 0
+        # Initialize empty list to hold markers
+        self.markers = []
+        # Initialize a empty object to hold the selected ADC IQ Magnitude Envelope plot
+        self.selected_collection = None
+        # Initialize the list of available plot axes
+        self.available_axes = [self.ui.mplPlotSingle.canvas.ax1]
+        # Initialize the current plot canvas
+        self.current_canvas = self.ui.mplPlotSingle.canvas
+        # Show the help text message on the current plot canvas/axes
+        self.ui.mplPlotSingle.canvas.ax1.text(0.5, 0.5, 'Drag and Drop Parameter Values \n from the left to plot', color='#11557c', fontsize=20,
+               ha='center', va='center', alpha=1.0)
+
+        # Check if the gui_params.txt file exists. If so read the value of the RESULTS_PATH.
+        try:
+            gui_params = { }
+            fp = open('gui_params.txt', 'r')
+            for line in fp.readlines():
+                gui_params[line.split('=')[0]] = line.split('=')[1]
+            self.ui.folderPathText.setText(gui_params['RESULTS_PATH'])
+        except:
+            pass
+
+      
+    def center(self):
+        """ Position the GUI at the center of the screen """
+        qr = QtCore.QRect(0, 0, 1360, 768)
+        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+    
+    def closeEvent(self, event):
+        """ Executes on closing the GUI Application.
+        Exits interpreter and stores the 
+        location of the results directory into a .txt file.
+        """
+        self.console.exit_interpreter()
+        event.accept()
+        # Store the results path used
+        fp = open('gui_params.txt', 'w')
+        fp.write('RESULTS_PATH=' + str(self.ui.folderPathText.text()))
+        fp.close()
+    
+    def update_Fs(self, i):
+        """ (Slot) Update sampling frequency. """
+        self.Fs = i*1e6
+
+    def run_python_script(self):
+        """ (Slot) Run a custom python script. """
+        file_choices = ""
+        pyfilepath = unicode(QtGui.QFileDialog.getOpenFileName(self, 'Select a Python script', '', file_choices))
+        if pyfilepath[-3:] == '.py':
+            self.console.interpreter.execfile(pyfilepath)
+
+    def get_results_folder(self):
+        """ (Slot) Browse and get the results folder. """
+        file_dialogobj = QtGui.QFileDialog()
+        file_dialogobj.setFileMode(2)
+        path = unicode(file_dialogobj.getExistingDirectory(self, 'Choose Results Directory'))
+        self.ui.folderPathText.setText(path)
+
+    def select_mode(self, index):
+        """ (Slot) Check if Logic Analyzer/genvec mode. """
+        if index == 0:
+            self.ui.genvecTestNumberBox.setEnabled(False)
+        else:
+            self.ui.genvecTestNumberBox.setEnabled(True)
+
+    def build_parameter_tree(self, parent, elements):
+        """ (Utility) Create a model representing the parameter 
+        tree using pre-defined list-tuple data structure.
+        """
+        # Recursively call the function on children starting 
+        # from root to build the parameters tree
+        # Refer to the test mux parameter trees defined in conf.py
+        for text, children in elements:
+            item = QtGui.QStandardItem(text)
+            parent.appendRow(item)
+            if children:
+                self.build_parameter_tree(item, children)
+
+    def populate_tree(self, index):
+        """ (Slot) Populate the parameter tree based 
+        on the Test Mux Configuration selection. 
+        """
+        self.tree_data = eval('conf.TEST_MUX_CONFIG_' + str(index+1))
+        self.get_tree_children(self.tree_data, 0)
+        if ('SlicerInputMSBsI' in self.param_list) or ('SlicerInputMSBsQ' in self.param_list):
+            self.ui.plotConstButton.setEnabled(True)
+        else:
+            self.ui.plotConstButton.setEnabled(False)
+
+        # Create a model and use the treeview widget 
+        # to display the model (test mux parameter tree)
+        self.param_model = QtGui.QStandardItemModel()
+        self.build_parameter_tree(self.param_model, self.tree_data)
+        self.ui.paramTreeView.setModel(self.param_model)
+        # Set the header of the tree to 'Parameters', 
+        # self.tr() is used for translation of the string
+        self.param_model.setHorizontalHeaderLabels([self.tr("Parameters")])
+
+    def parameter_dropped(self):
+        """ (Slot) Wrapper to handle parameter dropped on the plot. """
+        try:
+            self.create_plot()
+        except:
+            error_msg_obj = QtGui.QMessageBox()
+            error_msg_obj.critical(self, 'Error', 'Parameter not present.')
+
+    def create_plot(self):
+        """ (Utility) Create the appropriate plot(s). """
+        index = self.ui.paramTreeView.selectedIndexes()[0]
+        treeitem_object = index.model().itemFromIndex(index)
+        treeitem_text = str(treeitem_object.text())
+       
+        # Based the current user selected tab (multiplot v/s singleplot) 
+        # select the appropirate figure axes
+        if self.ui.tabWidget.currentIndex() == 1:
+            current_ax = self.available_axes[self.current_plot_count] 
+        else:
+            current_ax = self.available_axes[0]
+
+        if not self.ui.plotHoldBox.isChecked():
+            current_ax.clear()
+
+        # Change to step type plots for binary signals
+        if np.max(self.guidata[treeitem_text]) > 1:
+            plot_style = 'default'
+        else:
+            plot_style = 'steps'
+        
+        if self.ui.testModeBox.currentText() == 'Logic Analyzer':
+            current_ax.plot(self.guidata['Time'], self.guidata[treeitem_text], picker=True, drawstyle=plot_style, linestyle='-', label=treeitem_text)
+            xaxis_formatter = FuncFormatter(self.time_axis_ticks)
+            current_ax.xaxis.set_major_formatter(xaxis_formatter)
+        elif self.ui.testModeBox.currentText() == 'genvec':
+            current_ax.plot(self.guidata[treeitem_text], picker=True, drawstyle=plot_style, linestyle='-', label=treeitem_text)
+        current_ax.legend(prop={'size':10})
+
+        # When using the multiplot circulate through the plots using a mod-counter
+        if self.ui.tabWidget.currentIndex() == 1:
+            if self.current_plot_count != 3:
+                mplib.artist.setp(current_ax.get_xticklabels(), visible=False)
+            self.current_plot_count = (self.current_plot_count + 1) % 4
+
+        # Draw the figure on the canvas
+        self.current_canvas.draw()
+
+    def clear_plots(self):
+        """ (Slot) Clear the plots. """
+        # Clearing the plots
+        for ax in self.available_axes:
+            ax.clear()
+            mplib.artist.setp(ax.get_xticklabels(), visible=False)
+        self.current_canvas.draw()
+
+        # Clearing markers in the marker table
+        self.ui.markerTableWidget.clearContents()
+        for row_num in reversed(range(self.ui.markerTableWidget.rowCount())):
+            self.ui.markerTableWidget.removeRow(row_num)
+
+        # Re-initialize the plot count to 0
+        if self.ui.tabWidget.currentIndex() == 1:
+            self.current_plot_count = 0
+
+    def get_tree_children(self, param_tree, calltype = 0):
+        """ (Utility) Extract the child nodes (leaf nodes) of the parameter tree. """
+        if calltype == 0:
+            self.param_list = []
+        for text, children in param_tree:
+            if children:
+                self.get_tree_children(children, 1)
+            else:
+                self.param_list.append(text)
+
+    def read_load_data(self, index, testmode = 'Logic Analyzer'):
+        """ (Slot) Read the specified results file and load the data into a dictionary object. """
+        print " Loading Data from Results File ... "
+        if testmode == 'Logic Analyzer':
+            filename = eval('conf.TEST_MUX_RESULTS_FILE_' + str(index+1))
+            filepath = str(self.ui.folderPathText.text()) + '/' + filename
+            self.guidata = { }
+            try:
+                record_array = np.genfromtxt(filepath, delimiter=',', names=True, converters = {'Time': lambda s: self.time_formatter(s), 'ADC_I': lambda s: self.convert_to_signed(s), \
+                        'ADC_Q':  lambda s: self.convert_to_signed(s)})  
+                for key in record_array.dtype.names:
+                    if key == "Time":
+                        self.guidata[key] = record_array[key]
+                    else:
+                        self.guidata[key] = record_array[key].astype(int)
+            except IOError:
+                error_msg_obj = QtGui.QMessageBox()
+                error_msg_obj.critical(self, 'Error', 'Please select a valid Results Directory')
+
+        elif testmode == 'genvec':
+            self.guidata = { }            
+            dt = (1/self.Fs)*1e3
+            self.get_tree_children(self.tree_data, 0)
+            for parameter in self.param_list:
+                try:
+                    if parameter == 'ADC_I':
+                        ss_prefix = 'sim_node1_'
+                    elif parameter == 'ADC_Q':
+                        ss_prefix = 'sim_node1_'
+                    else:
+                        ss_prefix = 'sim_node1_rx_'
+                    genvec_parameter_name = ss_prefix + conf.GENVEC_TESTMUX_MAPPING[parameter] + '.block1'
+                    filename = str(self.ui.folderPathText.text()) + '/testcase' + str(self.ui.genvecTestNumberBox.currentIndex()+1) + '_checker/' + genvec_parameter_name
+                    filedata = np.loadtxt(filename, dtype=int, skiprows=1)
+                    if parameter == 'ADC_Q' or parameter == 'SlicerInputMSBsQ':
+                        self.guidata[parameter] = filedata[:,2]
+                    else:
+                        self.guidata[parameter] = filedata[:,1]
+                except (KeyError, IndexError):
+                    pass
+                except IOError:
+                    error_msg_obj = QtGui.QMessageBox()
+                    error_msg_obj.critical(self, 'Error', 'Please select a valid Results Directory')
+                    break
+        try:
+            self.ui.mplPlotSingleIQ.canvas.ax1.clear()
+            self.ui.mplPlotSingleIQ.canvas.ax1.plot(abs(self.guidata['ADC_I'] + 1j*self.guidata['ADC_Q']), label='ADC IQ Magnitude Envelope')
+            self.ui.mplPlotSingleIQ.canvas.ax1.legend()
+            self.selected_collection = None
+            print "Done!"
+            print "The data can be accessed as follows: tdapp.guidata[name] where 'name' is the parameter name."
+            print "E.g., tdapp.guidata['burstDetect'] \n"
+            print "Drag-Drop the parameters from the tree to create plots. \n"
+            print "To access the selected subset data from the plot, use tdapp.guidata['selected_y'] or tdapp.guidata['selected_x'].\n"
+
+            # Refresh the variable explorer table to update the values shown in the table
+            self.refresh_vexplorer_table()
+        except:
+            pass
+       
+
+    def time_formatter(self, s):
+        """ (Utility) Custom formatter for reading the 
+        time data from the .csv files.
+        """
+        if s[-3:] == ' ms':
+            return float(s[:-3])
+        elif s[-3:] == ' us':
+            return float(s[:-3])*1e-3
+        elif s[-3:] == ' ns':
+            return float(s[:-3])*1e-6
+        else:
+            return 0
+    
+    def convert_to_signed(self, s):
+        """ (Utility) Custom data converter 
+        function used in reading files. 
+        """
+        if s.isdigit():
+            s = int(s)
+            return s-512
+        else:
+            return 0
+
+    def time_axis_ticks(self, x, pos):
+        """ (Utility) Custom formatter for the Time (X) axis of the plots."""
+        return '%5.2f us' % (x*1e3)
+
+    def onpick_tooltip(self, event):
+        """ (Slot) Handle the pick event on the Plots. 
+        Creates a marker on pick event.
+        """
+        if self.ui.markerEnabledBox.isChecked() and isinstance(event.artist, Line2D):
+            thisline = event.artist
+            xdata = thisline.get_xdata()
+            ydata = thisline.get_ydata()
+            ind = event.ind
+            x_points = np.take(xdata, ind)
+            y_points = np.take(ydata, ind)
+            self.markers.append(x_points[0])
+            self.ui.markerTableWidget.insertRow(self.ui.markerTableWidget.rowCount())
+            marker_name_item = QtGui.QTableWidgetItem('Marker ' + str(self.ui.markerTableWidget.rowCount()))
+            marker_xdata_item = QtGui.QTableWidgetItem(str(x_points[0]))
+            marker_ydata_item = QtGui.QTableWidgetItem(str(y_points[0]))
+            self.ui.markerTableWidget.setItem(self.ui.markerTableWidget.rowCount()-1, 0, marker_name_item)
+            self.ui.markerTableWidget.setItem(self.ui.markerTableWidget.rowCount()-1, 1, marker_xdata_item)
+            self.ui.markerTableWidget.setItem(self.ui.markerTableWidget.rowCount()-1, 2, marker_ydata_item)
+            for i in range(len(self.available_axes)):
+                    self.available_axes[i].axvline(x=x_points[0], linewidth=2, color='r', alpha=0.7)
+            self.available_axes[0].text(x=x_points[0], y=y_points[0], s='Marker ' + str(self.ui.markerTableWidget.rowCount()), bbox=dict(facecolor='white', alpha=0.9), color='black')
+            self.current_canvas.draw()
+        else:
+            pass
+
+    def tab_guihandler(self, index):
+        """ (Slot) Disable/Enable GUI components based on the 
+        tab selection.
+        """
+        if index == 1:
+            self.ui.plotHoldBox.setCheckState(0)
+            self.ui.plotHoldBox.setEnabled(False)
+            self.available_axes = [self.ui.mplPlot.canvas.ax1, self.ui.mplPlot.canvas.ax2, self.ui.mplPlot.canvas.ax3, self.ui.mplPlot.canvas.ax4]
+            self.current_canvas = self.ui.mplPlot.canvas
+            for ax in self.available_axes[:-1]:
+                mplib.artist.setp(ax.get_xticklabels(), visible=False)
+        elif index == 0:
+            self.ui.plotHoldBox.setEnabled(True)
+            self.available_axes = [self.ui.mplPlotSingle.canvas.ax1]
+            self.current_canvas = self.ui.mplPlotSingle.canvas
+        else:
+            pass
+
+    def command_complete(self, index):
+        """ (Slot) Print the parameter variable name corresponding to 
+        the tree element on double-click event in the tree.
+        """
+        index = self.ui.paramTreeView.selectedIndexes()[0]
+        treeitem_object = index.model().itemFromIndex(index)
+        treeitem_text = str(treeitem_object.text())        
+        self.console.insertPlainText('myapp.guidata[' + treeitem_text + ']')
+
+    def subset_selected(self, xmin, xmax):
+        """ (Slot) Read and store the subset selected on the singlePlot. """
+        try:
+            line = self.current_canvas.ax1.get_lines()[0]
+            xdata = line.get_xdata()
+            ydata = line.get_ydata()
+            indmin, indmax = np.searchsorted(xdata, (xmin, xmax))
+            indmax = min(len(xdata)-1, indmax)
+            selected_xdata = xdata[indmin:indmax]
+            selected_ydata = ydata[indmin:indmax]
+            self.guidata['selected_y'] = selected_ydata
+            self.guidata['selected_x'] = selected_xdata
+            self.refresh_vexplorer_table()
+        except:
+            error_msg_obj = QtGui.QMessageBox()
+            error_msg_obj.critical(self, 'Error', 'No data present on the plot!')
+
+    def corr_subset_selected(self, xmin, xmax):
+        """ (Slot) Read and store the subset selected on the ADC IQ Magnitude Envelope plot. """
+        self.corr_subset = self.guidata['ADC_I'][xmin:xmax] + 1j*self.guidata['ADC_Q'][xmin:xmax]
+        if self.selected_collection is not None:
+            self.ui.mplPlotSingleIQ.canvas.ax1.collections.remove(self.selected_collection)
+        x_axrange = np.arange(xmin, xmax)
+        self.selected_collection = mplib.collections.BrokenBarHCollection.span_where(x_axrange, ymin=0, ymax=np.max(np.abs(self.guidata['ADC_I']+1j*self.guidata['ADC_Q'])), 
+                                                                        where=np.bitwise_and((x_axrange > xmin), (x_axrange < xmax)), facecolor='green', alpha=0.5)
+        self.ui.mplPlotSingleIQ.canvas.ax1.add_collection(self.selected_collection)
+    
+    def plot_PSD(self):
+        """ (Slot) Plot the Power Spectral Density. """    
+        try:
+            mplib.pyplot.figure()
+            mplib.pyplot.psd(self.corr_subset, NFFT=512, Fs=self.Fs)
+        except TypeError:
+            error_msg_obj = QtGui.QMessageBox()
+            error_msg_obj.critical(self, 'Error', 'Please select a subset of the plot shown above')
+        else:
+            mplib.pyplot.show()
+
+    def plot_slicer_constellation(self):
+        """ (Slot) Plot the Slicer input constellation and compute EVM. """
+        try:
+            error_snr_table = np.loadtxt('snr_table.txt', delimiter=',')
+            slicerinput = self.guidata['SlicerInputMSBsI'] + 1j*self.guidata['SlicerInputMSBsQ']
+            ideal_xy = np.array([-31, -29, -27, -25, -23, -21, -19, -17, -15, -13, -11, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31])
+            err = 0
+            count = 0 
+            err_xsum = 0
+            err_ysum = 0
+            count_y = 0
+            for point in slicerinput:
+                if np.real(point) != 0 or np.imag(point) != 0:
+                    err_x = np.min(abs(ideal_xy - (np.real(point)/64.0)))
+                    err_y = np.min(abs(ideal_xy - (np.imag(point)/64.0)))
+                    
+                    if np.imag(point) == 1 or np.imag(point) == -1:
+                        count_y += 1
+
+                    err_xsum += err_x
+                    err_ysum += err_y 
+                    err = err + err_x*err_x + err_y*err_y
+                    count+=1
+            err_n = np.sqrt(err/count)
+            min_idx = np.argmin(abs(err_n - error_snr_table[:,0]))
+            f = mplib.pyplot.figure()
+            ax = f.add_subplot(111)
+            mplib.pyplot.plot(self.guidata['SlicerInputMSBsI'], self.guidata['SlicerInputMSBsQ'], 'or', label='Slicer Input Constellation', alpha=0.5)
+            mplib.pyplot.text(0.01, 1.02, 'SNR: ' + str(error_snr_table[:,1][min_idx]) + 'dB', transform=ax.transAxes, color='black')
+            mplib.pyplot.legend()
+            mplib.pyplot.show()
+        except TypeError:
+            error_msg_obj = QtGui.QMessageBox()
+            error_msg_obj.critical(self, 'Error', 'Please select a subset of the plot shown above')
+
+    def plot_correlations(self):
+        """ (Slot) Plot the packet correlations with SS, LS and CE. """
+        try:
+            lstype = self.ui.lsTypeBox.currentText()
+            version = self.ui.mocaVersionBox.currentText()
+            corr_list = tdlib.corr_functions.get_correlations(self.corr_subset, self.Fs, version, lstype)
+            label_list = ['MoCA ' + version + ' SS Correlation', 'MoCA ' + version + ' ' + lstype + ' Correlation', 'MoCA ' + version + ' CE Correlation']
+            mplib.pyplot.figure()
+            for i, sig in enumerate(corr_list):
+                mplib.pyplot.plot(abs(sig), label=label_list[i])
+            mplib.pyplot.legend(label_list, prop={'size':10})
+            mplib.pyplot.show()
+        except TypeError:
+            error_msg_obj = QtGui.QMessageBox()
+            error_msg_obj.critical(self, 'Error', 'Please select a subset of the plot shown above')
+        except UnboundLocalError:
+            error_msg_obj = QtGui.QMessageBox()
+            error_msg_obj.critical(self, 'Error', 'MoCA 2.0 doesn\'t define LS3/LS4')
+
+
+    def generate_packet_info(self):
+        """ (Slot) Auto detect packet preamble type. """
+        try:
+            [mocaversion, preamble_types, preamble_config] = tdlib.corr_functions.detect_MoCA_packets(self.corr_subset, self.Fs)
+            self.ui.packetInfoTableWidget.insertRow(self.ui.packetInfoTableWidget.rowCount())
+            packet_name_item = QtGui.QTableWidgetItem('Packet ' + str(self.ui.packetInfoTableWidget.rowCount()))
+            mocaversion_item = QtGui.QTableWidgetItem(mocaversion) 
+            preamble_config_item = QtGui.QTableWidgetItem(preamble_config)
+            preamble_type_item = QtGui.QTableWidgetItem(preamble_types[0])
+            self.ui.packetInfoTableWidget.setItem(self.ui.packetInfoTableWidget.rowCount()-1, 0, packet_name_item)
+            self.ui.packetInfoTableWidget.setItem(self.ui.packetInfoTableWidget.rowCount()-1, 1, mocaversion_item)
+            self.ui.packetInfoTableWidget.setItem(self.ui.packetInfoTableWidget.rowCount()-1, 2, preamble_config_item)
+            self.ui.packetInfoTableWidget.setItem(self.ui.packetInfoTableWidget.rowCount()-1, 3, preamble_type_item)
+        except TypeError:
+            error_msg_obj = QtGui.QMessageBox()
+            error_msg_obj.critical(self, 'Error', 'Please select a subset of the plot shown above')
+     
+    def refresh_vexplorer_table(self):
+        """ (Utility) Refresh variable explorer table"""
+        if self.nsb.is_visible and self.nsb.isVisible():
+            if self.nsb.is_internal_shell:
+                wsfilter = self.nsb.get_internal_shell_filter('editable')
+                self.nsb.editor.set_filter(wsfilter)
+                interpreter = self.nsb.shellwidget.interpreter
+                if interpreter is not None:
+                    self.nsb.editor.set_data(self.guidata)
+                    self.nsb.editor.adjust_columns()
+    
+# Entry point of execution
+if __name__ == "__main__":
+    
+    import time
+
+    app = QtGui.QApplication.instance()
+    if not app:
+        app = QtGui.QApplication(sys.argv)
+        # Example for setting a particular style for the GUI.
+        #app.setStyle("plastique")
+
+        # Create and display the splash screen
+        splash_pix = QtGui.QPixmap('entropic_logo.jpg')
+        splash = QtGui.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
+        splash.setMask(splash_pix.mask())
+        splash.show()
+        app.processEvents()
+        
+        # Create an object of the class 
+        # defined above (represents the GUI)
+        tdapp = SystemAnalyzer()
+        
+        # Simulate something that takes time
+        time.sleep(1)
+
+        # Show the GUI application object created 
+        # using the class definition above.
+        tdapp.show()
+        #tdapp.showMaximized()
+  
+        splash.finish(tdapp)
+        sys.exit(app.exec_())

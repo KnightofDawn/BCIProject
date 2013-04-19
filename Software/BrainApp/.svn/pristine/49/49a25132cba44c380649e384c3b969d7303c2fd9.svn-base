@@ -1,0 +1,351 @@
+import string
+from xml.etree import ElementTree
+from time import sleep
+from collections import defaultdict
+
+# Import the modules QtCore (for low level Qt functions)
+# QtGui (for visual/GUI related Qt functions)
+from PyQt4 import QtCore, QtGui, Qt
+
+
+# The GUI MainWindow object from the python code generated using the .ui file
+from main_app_gui import Ui_MainWindow
+
+"""
+Created on Sat Feb 09 10:16:56 2013
+
+@author: yozturk
+"""
+class tdPortHeaders(QtGui.QGroupBox): 
+     deleteClickedSignal = QtCore.pyqtSignal()
+     def __init__(self,master):
+      
+        self.container = master
+        self.isEnabled = True
+        self.DrawtdPortHeaders(master)
+        
+     def DrawtdPortHeaders(self,master):
+        hbox = master
+        
+        dataTypeLabel = QtGui.QLabel("StrmVar")         
+        labeltdPort =QtGui.QLabel("BaseVar ")
+        labelOffset = QtGui.QLabel("OffsetVar")
+        labelRange = QtGui.QLabel("RangeVar")
+        dataTypeLabel.setFixedWidth(75)
+        labeltdPort.setFixedWidth(75)
+#        labelBase = QtGui.QLabel("BaseAddr") 
+#        labelBase.setFixedWidth(75)      
+##       labelStreamMin = QtGui.QLabel("StrmIDMin")
+#        labelStreamMin.setFixedWidth(60)
+#        labelStreamMax = QtGui.QLabel("StrmIDMax")      
+#        labelStreamMax.setFixedWidth(60)
+#        labelOffsetMin = QtGui.QLabel("OffsetMin")        
+#        labelOffsetMin.setFixedWidth(50)
+#        labelOffsetMax = QtGui.QLabel("OffsetMax")      
+#        labelOffsetMax.setFixedWidth(50)
+#        labelBits = QtGui.QLabel("BitRange")      
+#        labelBits.setFixedWidth(50)
+        labelValue = QtGui.QLabel("State") 
+        labelValue.setFixedWidth(50)
+        labelOptions = QtGui.QLabel("Options") 
+        labelOptions.setFixedWidth(50)
+        labelSend = QtGui.QLabel("Send Command") 
+        labelSend.setFixedWidth(50)
+                
+        labelEnable=QtGui.QLabel("Enable")
+        labelSelect=QtGui.QLabel("Select")        
+        hbox.addWidget(dataTypeLabel,0,0)        
+        hbox.addWidget(labeltdPort,0,1)
+        hbox.addWidget(labelOffset,0,2)
+        hbox.addWidget(labelRange,0,3)   
+        hbox.addWidget(labelValue,0,4)
+        hbox.addWidget(labelOptions,0,5)
+#        hbox.addWidget(labelBase,0,4)
+#        hbox.addWidget(labelStreamMin,0,5)
+#        hbox.addWidget(labelStreamMax,0,6)
+#        hbox.addWidget(labelOffsetMin,0,7)
+#        hbox.addWidget(labelOffsetMax,0,8)
+#        hbox.addWidget(labelBits,0,9)
+#        hbox.addWidget(labelDecimation,0,10)
+        hbox.addWidget(labelEnable,0,6)
+        hbox.addWidget(labelSelect,0,7)
+        hbox.addWidget(labelSend,0,8)
+        
+                
+                
+          
+        #self.groupBox.setLayout(hbox)
+        #master.addWidget(self.groupBox)
+
+
+class tdPortItem(QtGui.QGroupBox): 
+     deleteClickedSignal = QtCore.pyqtSignal()
+     def __init__(self,master,baseVarList,tdPortindex):
+      
+        self.container = master
+        self.isEnabled = True
+        self.baseVarList =baseVarList
+        self.addtdPortElement(master)
+        self.index = tdPortindex
+        self.DrawtdPortElement(master)
+        self.setStyleEnabled(True)
+    
+
+     def addtdPortElement(self,master):
+         
+        self.dataVar = QtGui.QComboBox()
+        self.dataVar.setFixedWidth(75)
+        self.dataVar.NoInsert
+        self.dataVar.setEditable(True) 
+         
+        self.baseVar = QtGui.QComboBox()
+        self.baseVar.setFixedWidth(75)
+        self.baseVar.NoInsert
+        self.baseVar.setEditable(True) 
+       
+      
+        
+        self.OffsetVar = QtGui.QComboBox()
+        self.OffsetVar.setFixedWidth(150)
+        self.OffsetVar.setEditable(True)
+        self.OffsetVar.NoInsert
+
+        self.rangeVar = QtGui.QComboBox()
+        self.rangeVar.setFixedWidth(125)
+        self.rangeVar.setEditable(True)
+        self.rangeVar.NoInsert
+        
+        self.state = QtGui.QLineEdit()
+        self.state.setFixedWidth(75)
+        
+        self.options = QtGui.QComboBox()
+        self.options.setFixedWidth(200)
+        self.options.setEditable(True)
+        self.options.NoInsert
+        
+        self.options.addItem("Enable Port")
+        self.options.addItem("Disable Port")
+        self.options.addItem("TestMux Port")
+        self.options.addItem("Option 4")
+        self.options.addItem("Option 5")
+                
+#        self.baseAddres.setMaxLength(8)
+#        self.baseAddres.setInputMask("hhhhhhhh")
+                
+#        self.baseAddres = QtGui.QLineEdit()
+#        self.baseAddres.setFixedWidth(75)
+#        self.baseAddres.setMaxLength(8)
+#        self.baseAddres.setInputMask("hhhhhhhh")
+#        
+#        self.streamIDMin = QtGui.QLineEdit()
+#        self.streamIDMin.setFixedWidth(50)
+#        self.streamIDMin.setMaxLength(2)
+#        self.streamIDMin.setInputMask("hh")
+#
+#        self.streamIDMax = QtGui.QLineEdit()
+#        self.streamIDMax.setFixedWidth(50)
+#        self.streamIDMax.setMaxLength(2)
+#        self.streamIDMax.setInputMask("hh")
+#       
+#        self.offsetMin = QtGui.QLineEdit()
+#        self.offsetMin.setFixedWidth(50)
+#        self.offsetMin.setMaxLength(4)
+#        self.offsetMin.setInputMask("hhhh")
+#
+#        self.offsetMax = QtGui.QLineEdit()
+#        self.offsetMax.setFixedWidth(50)
+#        self.offsetMax.setMaxLength(4)
+#        self.offsetMax.setInputMask("hhhh")
+#        
+#      
+#        self.bitRange = QtGui.QLineEdit()
+#        self.bitRange.setFixedWidth(50)
+#        self.bitRange.setEnabled(False)
+#     
+#        self.decimation = QtGui.QLineEdit()
+#        self.decimation.setFixedWidth(50)
+        self.enableButton = QtGui.QCheckBox()
+        self.checkBox = QtGui.QCheckBox()
+ 
+        for baseElement in self.baseVarList:
+            if (baseElement == "PhyDbg"):
+                self.dataVar.addItem(baseElement) 
+        self.enableButton.setChecked(True)
+    
+        self.dataVar.setCurrentIndex(0)
+        
+        self.sendButton = QtGui.QPushButton("Send")
+        
+    
+#        self.proxy3 = Qt.QSorttdPortProxyModel(self.dataVar)
+#        self.proxy3.setSourceModel(self.dataVar.model())
+#        self.dataVar.model().setParent(self.proxy3)
+#        self.dataVar.setModel(self.proxy3)
+#        self.dataVar.model().sort(0)
+#        
+#        self.proxy = Qt.QSorttdPortProxyModel(self.baseVar)
+#        self.proxy.setSourceModel(self.baseVar.model())
+#        self.baseVar.model().setParent(self.proxy)
+#        self.baseVar.setModel(self.proxy)
+#        self.baseVar.model().sort(0)
+#        
+#        self.proxy1 = Qt.QSorttdPortProxyModel(self.OffsetVar)
+#        self.proxy1.setSourceModel(self.OffsetVar.model())
+#        self.OffsetVar.model().setParent(self.proxy1)
+#        self.OffsetVar.setModel(self.proxy1)
+#        self.OffsetVar.model().sort(0)
+#
+#        self.proxy2 = Qt.QSorttdPortProxyModel(self.rangeVar)
+#        self.proxy2.setSourceModel(self.rangeVar.model())
+#        self.rangeVar.model().setParent(self.proxy2)
+#        self.rangeVar.setModel(self.proxy2)
+#        self.rangeVar.model().sort(0)
+        
+        #self.baseVar.model().settdPortFixedString("TxCs")
+        
+        
+        self.baseVar.setCurrentIndex(0)
+        self.state.setText(Qt.QString("%1") .arg(0x0))
+#       
+#        self.baseAddres.setText(Qt.QString("%1") .arg(0x0))
+#        self.streamIDMin.setText(Qt.QString("%1") .arg(0))
+#        self.streamIDMax.setText(Qt.QString("%1") .arg(255))                       
+#        self.offsetMin.setText(Qt.QString("%1") .arg(0))
+#        self.offsetMax.setText(Qt.QString("%1") .arg(0xFFFF))                        
+#        self.bitRange.setText(Qt.QString("%1") .arg(0))
+#        self.decimation.setText(Qt.QString("%1") .arg(0))
+#    
+
+
+     def DrawtdPortElement(self,master):
+        hbox = master           
+        hbox.addWidget(self.dataVar,self.index,0)
+      
+        hbox.addWidget(self.baseVar,self.index,1)
+        hbox.addWidget(self.OffsetVar,self.index,2)
+        hbox.addWidget(self.rangeVar,self.index,3)
+        
+        hbox.addWidget(self.state,self.index,4)
+        hbox.addWidget(self.options,self.index,5)
+                
+        #hbox.addWidget(labelBase,0,1)
+        
+#        hbox.addWidget(self.baseAddres,self.index,4)
+#        #hbox.addWidget(labelStreamMin,0,2)
+#        hbox.addWidget(self.streamIDMin,self.index,5)
+#
+#        #hbox.addWidget(labelStreamMax,0,3)
+#        hbox.addWidget(self.streamIDMax,self.index,6)
+#
+#        #hbox.addWidget(labelOffsetMin,0,4)
+#        hbox.addWidget(self.offsetMin,self.index,7)
+#
+#        #hbox.addWidget(labelOffsetMax,0,5)
+#        hbox.addWidget(self.offsetMax,self.index,8)
+#
+#        #hbox.addWidget(labelBits,0,6)
+#        hbox.addWidget(self.bitRange,self.index,9)
+#        
+#        #hbox.addWidget(labelDecimation,0,7)
+#        hbox.addWidget(self.decimation,self.index,10)
+        hbox.addWidget(self.enableButton,self.index,6)
+        hbox.addWidget(self.checkBox,self.index,7)
+        hbox.addWidget(self.sendButton,self.index,8)
+                
+          
+        #self.groupBox.setLayout(hbox)
+        #master.addWidget(self.groupBox)
+
+
+        #self.buttonDelete.clicked.connect(self.deleteButtonClicked)
+     def deletetdPort(self,master):
+        self.dataVar.deleteLater()
+        self.baseVar.deleteLater()
+        self.OffsetVar.deleteLater()
+        self.rangeVar.deleteLater()   
+        self.state.deleteLater()
+        self.options.deleteLater()
+#        self.baseAddres.deleteLater()
+#        self.streamIDMin.deleteLater()
+#        self.streamIDMax.deleteLater()
+#        self.offsetMax.deleteLater()
+#        self.offsetMin.deleteLater()
+#        self.bitRange.deleteLater()
+#        self.decimation.deleteLater()
+        self.checkBox.deleteLater()
+        self.enableButton.deleteLater()
+        self.sendButton.deleteLater()
+        master.update()
+        del(self)
+     
+  
+        
+     def setStyleEnabled(self,isenabled):
+        if (isenabled):
+#            self.streamIDMin.setStyleSheet("background-color: rgb(255, 255, 255);"
+#                                           "color:green")
+#            self.streamIDMax.setStyleSheet("background-color: rgb(255, 255, 255);"
+#                                           "color:green")           
+            self.dataVar.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:green")
+            self.OffsetVar.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:green")
+            self.rangeVar.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:green")
+            self.baseVar.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:green")
+            self.options.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:green")
+#   
+#            self.baseAddres.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:green")   
+#            self.offsetMin.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:green")
+#            self.offsetMax.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:green")   
+#                                           
+#            self.bitRange.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:green")   
+#            self.decimation.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#  #                                         "border:2px solid rgb(255, 0, 0);"
+#                                           "color:green")
+            self.enableButton.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:green")      
+            self.checkBox.setStyleSheet("background-color: rgb(255, 255, 255);\n"            
+                                           "color:green")                
+            self.sendButton.setStyleSheet("background-color: rgb(255, 255, 255);\n"            
+                                           "color:green")                
+
+        else:
+#            self.streamIDMin.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:red")
+#            self.streamIDMax.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:red")           
+            self.dataVar.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:red")
+            self.baseVar.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:red")
+
+            self.OffsetVar.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:red")
+            self.rangeVar.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:red")
+            self.options.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:red")
+#   
+#            self.baseAddres.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:red")   
+#            self.offsetMin.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:red")
+#            self.offsetMax.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:red")                                           
+#            self.bitRange.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:red")   
+#            self.decimation.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+#                                           "color:red")
+            self.enableButton.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:red")      
+            self.checkBox.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+                                           "color:red")
+            self.sendButton.setStyleSheet("background-color: rgb(255, 255, 255);\n"            
+                                           "color:red")                

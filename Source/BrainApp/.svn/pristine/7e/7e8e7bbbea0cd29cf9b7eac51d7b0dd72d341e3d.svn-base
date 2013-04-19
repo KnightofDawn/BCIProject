@@ -1,0 +1,416 @@
+//this module sits in between the drip filter and the MAC and streams out real time debug data
+// this module takes in streaming "drip" data from the drip filter block and fifo's it and
+// then sends ethernet frames out.
+
+
+module drip_data_stream
+  (
+   input 	     clk166,
+   input 	     reset,
+  
+   input 	     drip_fsm_finish,
+   output 	     drip_fsm_idle,
+
+   input 	     armed,
+   input             triggered,
+   
+   //drip filter data interface
+   input [31:0]      drip_data_out,
+   input [3:0] 	     drip_hdr_out,
+   input [15:0]      drip_ofst_out, 
+   input 	     drip_en_out, 
+   
+   //Ethernet Avalon Streaming source
+   output reg 	     avl_str_sop,
+   output reg 	     avl_str_eop,
+   output reg [31:0] avl_str_data,
+   output reg 	     avl_str_data_valid,
+   output [1:0]      avl_str_empty,
+   input 	     avl_str_ready,
+   output 	     avl_str_error,
+
+   output reg 	     ff_56_overflow_sticky
+   );
+
+   //signal which combines the drip data, hdr, cnt and additional 4 bit data into 56bit data
+   wire [55:0] 	     drip_ff_data_56_in;
+
+   assign drip_ff_data_56_in = {2'h0, armed, triggered,drip_hdr_out,drip_ofst_out,drip_data_out};
+   
+   wire [55:0] 	     drip_ff_data_56;
+   wire 	     drip_ff_empty;
+   reg 		     drip_ff_read_req;
+   wire 	     drip_ff_almost_empty;
+   wire              drip_ff_full;
+   
+   //fifo 56 bits wide used to fifo the drip data in order to provide elastisity between the drip
+   //stream and the ethernet packet generation logic since the ethernet packet generation can
+   //not keep up with the drip stream if there is a large burst of data in consecutive clock cycles.
+   //trying to cram 56bits out per cycle on a 32 bit (ethernet) interface doesn't work, hence the fifo.
+
+   //FIXME!  need to prevent a fifo overflow and create a sticky bit indicating there was a drip fifo overflow.
+   // this case can certainly happen if the filters are not filtering data to a rate that the ethernet can offload.
+   fifo56_drip_data fifo56_drip_data_inst 
+     (
+      .clock(clk166),
+      .data(drip_ff_data_56_in),
+      .rdreq(drip_ff_read_req),
+      .wrreq(drip_en_out & ~drip_ff_full),
+      .almost_empty(drip_ff_almost_empty),
+      .empty(drip_ff_empty),
+      .full(drip_ff_full),
+      .q(drip_ff_data_56)
+      );
+
+   always @ (posedge clk166)
+     begin
+	if(reset)
+	  begin
+	     ff_56_overflow_sticky <= 1'b0;
+	  end
+	else
+	  begin
+	     if(drip_ff_full)
+	       begin
+		  ff_56_overflow_sticky <= 1'b1;
+	       end		
+	  end
+     end
+   
+   
+   // packet generation state definitions */
+   reg [2:0] 	     pkt_gen_state;
+   
+`define PKT_GEN_STATE_IDLE 3'b000
+`define PKT_GEN_STATE_ETH_HDR 3'b001
+`define PKT_GEN_STATE_ETH_PAYLOAD 3'b010  
+`define PKT_GEN_STATE_END 3'b011
+`define PKT_GEN_STATE_HOLD 3'b100
+   
+   // end packet generation state definitions */
+   
+   
+   
+   //destination addr, source addr,,,
+`define DRIP_WORD_1 32'h01000000 // DA (4bytes)
+`define DRIP_WORD_2 32'h00000100 // DA (2bytes)/SA (2bytes)
+`define DRIP_WORD_3 32'h00000000 // SA (4bytes)
+   //`define DRIP_WORD_4 // ETH PKT TYPE(0x0800,CMD(0xFF),status(0xX),drip_header(0xX)
+   //`define DRIP_WORD_5 // drip_data (0xXXXXXXXX)
+   //`define DRIP_WORD_6 // drip_ofst (0xXXXX), drip_ofst(0xXXXX)
+   
+`define DRIP_DEST_ADDR 48'h010000
+`define DRIP_SOURCE_ADDR 48'h010000
+`define DRIP_ETH_PKT_TYPE 16'h0500
+`define DRIP_CMD          8'hC0
+   
+   reg [10:0] 	     pkt_byte_cnt;
+   reg [55:0] 	     drip_data_buffer56;
+   reg [2:0] 	     drip_data_buffer_cnt;
+   reg [7:0] 	     pkt_cnt;
+   reg [1:0] 	     pkt_end_cnt;
+   
+   wire              drip_ff_data_available;
+   
+   assign drip_ff_data_available = (~drip_ff_almost_empty) | ((~drip_ff_empty) & (~drip_ff_read_req));
+   assign avl_str_empty = 2'h0;
+   assign avl_str_error = 1'b0;
+   assign drip_fsm_idle = (pkt_gen_state ==`PKT_GEN_STATE_IDLE);
+
+   reg [31:0] 	     timeout; 	     
+
+`define TIMEOUT_MAX 32'd16000000
+//`define TIMEOUT_MAX 32'd16000   
+
+   reg [2:0] 	     pkt_gen_state_next;
+   
+   
+   //this process reads drip data from a 56bit wide fifo interface and spits out ethernet frames
+   
+   always @ (posedge clk166)
+     begin
+        if(reset)
+          begin
+	     timeout <= 32'd0;
+	     
+	     pkt_end_cnt <= 2'b01;
+	     
+	     pkt_cnt <= 8'h00;
+	     
+	     drip_data_buffer56 <= 56'h00000000000000;
+	     drip_data_buffer_cnt <= 3'b000;
+	     
+             drip_ff_read_req <= 1'b0;
+             
+             avl_str_sop <= 1'b0;
+             avl_str_eop <= 1'b0;
+             avl_str_data <= 32'h00000000;
+             avl_str_data_valid <= 1'b0;
+             
+             pkt_byte_cnt <= 11'h000;
+             
+             pkt_gen_state <= `PKT_GEN_STATE_IDLE;
+	     pkt_gen_state_next <= `PKT_GEN_STATE_IDLE;
+          end
+        else
+          begin
+	     
+	     if(drip_ff_data_available)
+	       begin
+		  timeout <= 32'd0;
+	       end
+	     else
+	       begin
+		  timeout <= timeout + 32'd1;
+		  
+		  if(timeout > `TIMEOUT_MAX)
+		    begin
+		       pkt_gen_state <= `PKT_GEN_STATE_END;
+		    end
+	       end
+	     
+	     
+             drip_ff_read_req <= 1'b0;
+	     
+	     avl_str_sop <= 1'b0;
+	     avl_str_eop <= 1'b0;
+	     avl_str_data <= 32'h00000000;
+	     avl_str_data_valid <= 1'b0;
+	     
+             case(pkt_gen_state)
+               `PKT_GEN_STATE_IDLE:
+                 begin
+		    timeout <= 32'd0;
+		    
+		    pkt_byte_cnt <= 11'h000;
+
+		    if(~drip_fsm_finish & drip_ff_data_available)		      
+		      begin
+			 pkt_byte_cnt <= 11'h004;
+			 
+			 avl_str_sop <= 1'b1;
+			 avl_str_data <= `DRIP_WORD_1;
+			 avl_str_data_valid <= 1'b1;
+			 
+			 pkt_gen_state_next <= `PKT_GEN_STATE_ETH_HDR;
+			 pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+		      end // if (~drip_fsm_finish & avl_str_ready)
+		 end
+	       `PKT_GEN_STATE_ETH_HDR:
+		 begin
+		    //if(avl_str_ready)
+		      //begin			 
+			 case(pkt_byte_cnt)
+			   11'h004:
+			     begin
+				avl_str_data <= `DRIP_WORD_2;
+				avl_str_data_valid <= 1'b1;
+				pkt_byte_cnt <= pkt_byte_cnt + 11'h004;
+
+				pkt_gen_state_next <= `PKT_GEN_STATE_ETH_HDR;
+				pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+			     end
+			   11'h008:
+			     begin
+				avl_str_data <= `DRIP_WORD_3;
+			     	avl_str_data_valid <= 1'b1;
+				pkt_byte_cnt <= pkt_byte_cnt + 11'h004;
+
+				pkt_gen_state_next <= `PKT_GEN_STATE_ETH_HDR;
+				pkt_gen_state <= `PKT_GEN_STATE_HOLD;				
+			     end
+			   11'h00c:
+			     begin
+				if(drip_ff_data_available)
+				  begin
+				     avl_str_data <= {`DRIP_ETH_PKT_TYPE, `DRIP_CMD, pkt_cnt};
+				     pkt_cnt <= pkt_cnt + 8'h01;
+				     drip_data_buffer_cnt <= 3'b000;
+				     drip_ff_read_req <= 1'b1;
+				     avl_str_data_valid <= 1'b1;
+				     pkt_byte_cnt <= pkt_byte_cnt + 11'h004;
+
+				     pkt_gen_state_next <= `PKT_GEN_STATE_ETH_PAYLOAD;
+				     pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+				  end
+			     end
+			 endcase
+		      //end
+		 end
+	       `PKT_GEN_STATE_ETH_PAYLOAD:
+		 begin
+		    //if(avl_str_ready)
+		      //begin
+			 avl_str_data_valid <= 1'b1;
+			 pkt_byte_cnt <= pkt_byte_cnt + 11'h004;
+			 
+			 case(drip_data_buffer_cnt)
+			   3'h0:
+			     begin
+				if(drip_fsm_finish || (pkt_byte_cnt >= 11'd1016))
+				  begin
+				     avl_str_data_valid <= 1'b0;
+				     pkt_end_cnt <= 2'b1;
+				     pkt_gen_state <= `PKT_GEN_STATE_END;
+				     pkt_byte_cnt <= pkt_byte_cnt;
+				  end
+				else
+				  begin
+				     if(drip_ff_data_available)
+				       begin
+					  avl_str_data <= drip_ff_data_56[55:24];
+					  drip_data_buffer_cnt <= 3'h3;
+					  drip_data_buffer56 <= drip_ff_data_56;
+					  drip_ff_read_req <= 1'b1;
+
+					  pkt_gen_state_next <= `PKT_GEN_STATE_ETH_PAYLOAD;
+					  pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+				       end
+				     else
+				       begin
+					  avl_str_data_valid <= 1'b0;
+					  pkt_byte_cnt <= pkt_byte_cnt;
+				       end
+				  end
+			     end
+			   3'h1:
+			     begin
+				avl_str_data <= {drip_data_buffer56[7:0],drip_ff_data_56[55:32]};
+				drip_data_buffer_cnt <= 3'h4;
+				drip_data_buffer56 <= drip_ff_data_56;
+				
+				pkt_gen_state_next <= `PKT_GEN_STATE_ETH_PAYLOAD;
+				pkt_gen_state <= `PKT_GEN_STATE_HOLD;				
+			     end
+			   3'h2:
+			     begin
+				avl_str_data <= {drip_data_buffer56[15:0], drip_ff_data_56[55:40]};
+				drip_data_buffer_cnt <= 3'h5;
+				drip_data_buffer56 <= drip_ff_data_56;
+				
+				pkt_gen_state_next <= `PKT_GEN_STATE_ETH_PAYLOAD;
+				pkt_gen_state <= `PKT_GEN_STATE_HOLD;				
+			     end
+			   3'h3:
+			     begin
+				avl_str_data <= {drip_data_buffer56[23:0], drip_ff_data_56[55:48]};
+				drip_data_buffer_cnt <= 3'h6;
+				drip_data_buffer56 <= drip_ff_data_56;
+
+				pkt_gen_state_next <= `PKT_GEN_STATE_ETH_PAYLOAD;
+				pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+			     end
+			   3'h4:
+			     begin
+				if(drip_ff_data_available)
+				  begin
+			             avl_str_data <= drip_data_buffer56[31:0];
+				     drip_data_buffer_cnt <= 3'h0;
+				     drip_ff_read_req <= 1'b1;
+				     
+				     pkt_gen_state_next <= `PKT_GEN_STATE_ETH_PAYLOAD;
+				     pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+				  end
+				else
+				  begin
+				     avl_str_data_valid <= 1'b0;
+				     pkt_byte_cnt <= pkt_byte_cnt;
+				  end
+			     end
+			   3'h5:
+			     begin
+				if(drip_ff_data_available)
+				  begin
+                                     avl_str_data <= {drip_data_buffer56[39:8]};
+				     drip_data_buffer_cnt <= 3'h1;
+				     drip_ff_read_req <= 1'b1;
+				     
+				     pkt_gen_state_next <= `PKT_GEN_STATE_ETH_PAYLOAD;
+				     pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+				  end
+				else
+				  begin
+				     avl_str_data_valid <= 1'b0;
+				     pkt_byte_cnt <= pkt_byte_cnt;
+				  end
+			     end
+			   3'h6:
+			     begin
+				if(drip_ff_data_available)
+				  begin
+				     avl_str_data <= drip_data_buffer56[47:16];
+				     drip_data_buffer_cnt <= 3'h2;
+				     drip_ff_read_req <= 1'b1;
+				     
+				     pkt_gen_state_next <= `PKT_GEN_STATE_ETH_PAYLOAD;
+				     pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+				  end
+				else
+				  begin
+				     avl_str_data_valid <= 1'b0;
+				     pkt_byte_cnt <= pkt_byte_cnt;
+				  end
+			     end
+			 endcase
+		      //end // if (avl_str_ready)
+		 end // case: `PKT_GEN_STATE_ETH_PAYLOAD
+	       `PKT_GEN_STATE_END:
+		 begin
+		    //if(avl_str_ready)
+		      //begin
+			 avl_str_data_valid <= 1'b1;
+			 avl_str_data <= 32'hFFFFFFFF;
+			 pkt_byte_cnt <= pkt_byte_cnt + 11'h004;
+			 
+			 if(pkt_end_cnt != 0)
+			   begin
+			      pkt_end_cnt <= pkt_end_cnt - 2'b01;
+			   end
+			 
+ 			 pkt_gen_state_next <= `PKT_GEN_STATE_END;
+			 pkt_gen_state <= `PKT_GEN_STATE_HOLD;
+			 
+			 if((pkt_byte_cnt >= 11'd64) && (pkt_end_cnt == 0))
+			   begin
+			      avl_str_eop <= 1'b1;
+			      pkt_gen_state_next <= `PKT_GEN_STATE_IDLE;
+			   end
+		     // end
+		 end // case: `PKT_GEN_STATE_END
+	       `PKT_GEN_STATE_HOLD:
+		 begin
+		    pkt_gen_state <= pkt_gen_state;
+		    avl_str_data_valid <= 1'b1;
+		    avl_str_sop <= avl_str_sop;
+		    avl_str_eop <= avl_str_eop; 
+		    avl_str_data <= avl_str_data;
+		    
+		    if(avl_str_ready) //loop and stay in this state until we get a ready indication
+		      begin
+			 pkt_gen_state <= pkt_gen_state_next;
+			 avl_str_data_valid <= 1'b0;
+			 avl_str_sop <= 1'b0;
+			 avl_str_eop <= 1'b0;
+		      end // if (avl_str_ready)
+		 end
+	     endcase // case (pkt_gen_state)
+	  end // else: !if(reset)
+     end // alwyas @ (posedge clk166)
+endmodule
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+

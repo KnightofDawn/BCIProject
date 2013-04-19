@@ -1,0 +1,62 @@
+
+import numpy as np
+from itertools import product
+import matplotlib.pyplot as plt
+import pprint
+
+ideal_xy = np.array([-31, -29, -27, -25, -23, -21, -19, -17, -15, -13, -11, -9, -7, -5, -3, -1, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31])
+
+qam16_const = np.array(map(lambda x: x[0] + 1j*x[1], list(product(ideal_xy[14:18], repeat=2))))
+
+#print qam16_const
+
+N = 10000
+
+msg = np.random.randint(0, 16, N)
+modulated_msg = qam16_const[msg]
+avg_signal_power = 10
+error_array = np.empty([])
+snr_array = np.empty([])
+
+for i in np.arange(0, 50.1, 0.1):
+    avg_snr = i # dB
+    noise_var = (10**(-avg_snr/10))*avg_signal_power
+    noise = np.sqrt(noise_var/2) * (np.random.randn(N) + 1j*np.random.randn(N)) 
+    tx_signal = modulated_msg + noise
+
+    slicerinput = tx_signal
+    err = 0
+    count = 0 
+    for point in slicerinput:
+        if np.real(point) != 0 or np.imag(point) != 0:
+            err_x = np.min(abs(ideal_xy - (np.real(point))))
+            err_y = np.min(abs(ideal_xy - (np.imag(point))))
+            err = err + err_x*err_x + err_y*err_y
+            count+=1
+
+    err_n = np.sqrt(err/count)
+    error_array = np.append(error_array, err_n)
+    snr_array = np.append(snr_array, avg_snr)
+
+np.savetxt('snr_table.txt', zip(error_array[1:], snr_array[1:]), delimiter=',', fmt=['%2.8f', '%2.3f'])
+
+#print error_array
+#print snr_array
+
+#pprint.pprint(error_snr_array)
+
+#evm_db = 10*np.log10(np.sqrt(err)/(count))
+#f = plt.figure()
+#ax = f.add_subplot(111)
+#plt.plot(np.real(slicerinput), np.imag(slicerinput), 'or', label='Slicer Input Constellation', alpha=0.5)
+#plt.text(0.01, 1.02, 'Total Error: ' + str(np.sqrt(err/count))[0:7], transform=ax.transAxes, color='black')
+#plt.legend()
+#plt.show()
+
+#print modulated_msg
+
+#plt.figure()
+#plt.plot(np.real(modulated_msg), np.imag(modulated_msg), 'or')
+#plt.show()
+
+

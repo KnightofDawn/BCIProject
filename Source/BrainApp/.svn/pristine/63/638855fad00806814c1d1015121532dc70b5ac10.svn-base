@@ -1,0 +1,345 @@
+module entropic_ip_top
+  (
+   input 	  clk166,
+   input 	  reset,
+  
+   //export datapath signals
+   input [35:0]   data_36,
+   input 	  data_36_valid,
+   input [3:0] 	  fpga_dip_id, 
+   
+   //DDR Avalon Write master
+   output [31:0]  avl_addr, 
+   output [2:0]   avl_size, 
+   output [15:0]  avl_be, 
+   input 	  avl_ready, 
+   output [127:0] avl_wdata,
+   output 	  avl_write_req,
+  
+   //DDR Avalon Read master
+   output [31:0]  avl_read_addr, 
+   input [127:0]  avl_read_rdata,
+   //output [2:0]   avl_read_size, 
+   output [15:0]  avl_read_be, 
+   input 	  avl_read_ready, 
+   output 	  avl_read_read_req,
+  
+   //Ethernet Avalon Streaming source
+   output 	  avl_str_sop,
+   output 	  avl_str_eop,
+   output [31:0]  avl_str_data,
+   output 	  avl_str_data_valid,
+   output [1:0]   avl_str_empty,
+   input 	  avl_str_ready,
+   output 	  avl_str_error,
+  
+   //Ethernet Avalon Streaming sink
+   input 	  avl_sink_sop,
+   input 	  avl_sink_eop,
+   input [31:0]   avl_sink_data,
+   input 	  avl_sink_data_valid, 
+   input [1:0] 	  avl_sink_empty,
+   output 	  avl_sink_ready,
+   input [5:0] 	  avl_sink_error
+   );
+
+   wire [31:0] 	  DripFilterConfigRegsIn;
+   wire [31:0] 	  DripFilterConfigRegsOut;
+   wire 	  DripFilterConfigRegsEn;
+   wire 	  DripFilterConfigRegsLd;
+   wire 	  DripFilterConfigRegsSt;
+   
+   wire [31:0] 	  DripFilterDataOut;
+   wire [3:0] 	  DripFilterHdrOut;
+   wire [15:0] 	  DripFilterOffsetOut;
+   wire 	  DripFilterOutEn;
+   
+   //Capture filter configuration registers
+   wire [31:0] 	  CaptureFilterConfigRegsIn;
+   wire [31:0] 	  CaptureFilterConfigRegsOut;
+   wire 	  CaptureFilterConfigRegsEn;
+   wire 	  CaptureFilterConfigRegsLd;
+   wire 	  CaptureFilterConfigRegsSt;
+   
+   //Capture Filter data out
+   wire [31:0] 	  CaptureFilterDataOut;
+   wire [3:0] 	  CaptureFilterHdrOut;
+   wire [15:0] 	  CaptureFilterOffsetOut;
+   wire 	  CaptureFilterOutEn;
+   
+   // Trigger Module configuration registers
+   wire [31:0] 	  TriggerConfigRegsIn;
+   wire [31:0] 	  TriggerConfigRegsOut;
+   wire 	  TriggerConfigRegsEn;
+   wire 	  TriggerConfigRegsLd;
+   wire 	  TriggerConfigRegsSt;
+   
+   wire 	  TriggerArmed;
+   wire 	  TriggerTriggered;
+
+   
+   wire [31:0] 	  FSMConfigRegsIn;
+   wire [31:0] 	  FSMConfigRegsOut;
+   wire 	  FSMConfigRegsEn;
+   wire 	  FSMConfigRegsSt;
+   wire 	  FSMConfigRegsLd;
+   
+   wire [2:0] 	  TriggerPosition;
+   
+   assign avl_read_be = 16'hFFFF;
+   //assign avl_read_size = 3'h1;
+
+
+   wire [35:0] 	  self_generate_data_36;
+   wire           self_generate_data_36_valid;
+   
+   
+   wire [35:0] 	  data_36_muxed;
+   wire           data_36_muxed_valid;
+   
+   
+   self_generate_data_stream self_generate_data_stream_inst
+     (
+      .clk166(clk166),
+      .reset(reset),
+      .data_36_out(self_generate_data_36),
+      .data_36_valid(self_generate_data_36_valid)
+      );
+
+   wire 	  self_generate_data;
+   
+   assign data_36_muxed       = (self_generate_data) ? self_generate_data_36 : data_36; 
+   assign data_36_muxed_valid = (self_generate_data) ? self_generate_data_36_valid : data_36_valid;
+   
+   //PORT MAP THE PARSER FILTER TRIGGER BLOCK
+   TesterFpgaPFT 
+     #(0,16,16,16)
+   TesterFpgaPFT_inst
+     (
+      .RST(reset),
+      .CLK(clk166),
+      
+      // Data from DUT
+      .DutData(data_36_muxed),
+      .DutDataEn(data_36_muxed_valid),
+      
+      //Drip filter configuration registers
+      .DripFilterConfigRegsIn(DripFilterConfigRegsIn),   // : in std_logic_vector(31 downto 0);
+      .DripFilterConfigRegsOut(DripFilterConfigRegsOut), // : out std_logic_vector(31 downto 0);
+      .DripFilterConfigRegsEn(DripFilterConfigRegsEn),   // : in std_logic;
+      .DripFilterConfigRegsLd(DripFilterConfigRegsLd),   // : in std_logic;
+      .DripFilterConfigRegsSt(DripFilterConfigRegsSt),   // : in std_logic;
+      
+      //Drip filter data out
+      .DripFilterDataOut(DripFilterDataOut),     // : out std_logic_vector(31 downto 0);
+      .DripFilterHdrOut(DripFilterHdrOut),       // : out std_logic_vector( 3 downto 0);
+      .DripFilterOffsetOut(DripFilterOffsetOut), // : out std_logic_vector(15 downto 0);
+      .DripFilterOutEn(DripFilterOutEn),         // : out std_logic;
+      
+      //Capture filter configuration registers
+      .CaptureFilterConfigRegsIn(CaptureFilterConfigRegsIn), // : in std_logic_vector(31 downto 0);
+      .CaptureFilterConfigRegsOut(CaptureFilterConfigRegsOut), //: out std_logic_vector(31 downto 0);
+      .CaptureFilterConfigRegsEn(CaptureFilterConfigRegsEn), // : in std_logic;
+      .CaptureFilterConfigRegsLd(CaptureFilterConfigRegsLd), // : in std_logic;
+      .CaptureFilterConfigRegsSt(CaptureFilterConfigRegsSt), // : in std_logic;
+      
+      //Capture Filter data out
+      .CaptureFilterDataOut(CaptureFilterDataOut), //   : out std_logic_vector(31 downto 0);
+      .CaptureFilterHdrOut(CaptureFilterHdrOut), //    : out std_logic_vector( 3 downto 0);
+      .CaptureFilterOffsetOut(CaptureFilterOffsetOut), // : out std_logic_vector(15 downto 0);
+      .CaptureFilterOutEn(CaptureFilterOutEn), //     : out std_logic;
+      
+      // Trigger Module configuration registers
+      .TriggerConfigRegsIn(TriggerConfigRegsIn), // : in std_logic_vector(31 downto 0);
+      .TriggerConfigRegsOut(TriggerConfigRegsOut), //: out std_logic_vector(31 downto 0);
+      .TriggerConfigRegsEn(TriggerConfigRegsEn), // : in std_logic;
+      .TriggerConfigRegsLd(TriggerConfigRegsLd), // : in std_logic;
+      .TriggerConfigRegsSt(TriggerConfigRegsSt), // : in std_logic;
+
+      // Trigger FSM
+      .FSMConfigRegsIn(FSMConfigRegsIn),   // : in  std_logic_vector(31 downto 0);
+      .FSMConfigRegsOut(FSMConfigRegsOut), // : out std_logic_vector(31 downto 0);
+      .FSMConfigRegsEn(FSMConfigRegsEn),   // : in  std_logic;
+      .FSMConfigRegsSt(FSMConfigRegsSt),   // : in  std_logic;
+      .FSMConfigRegsLd(FSMConfigRegsLd),   // : in  std_logic;
+      
+      .TriggerPosition(TriggerPosition),   // : out std_logic_vector(2 downto 0);
+      .ExtTriggerSource(1'b0),             // : in  std_logic;
+      
+      .TriggerArmed(TriggerArmed),        // : out std_logic;
+      .TriggerTriggered(TriggerTriggered), // : out std_logic
+      
+      .SelfGenData(self_generate_data),//      : out std_logic;  -- Reg1[13] - when '1' generate debug internally
+      .CaptureDone(capture_done),//      : in  std_logic;
+      //FIXME
+      .FifoOverflow({2'b00, ff_56_overflow_sticky, ff_40_overflow_sticky}) //    : in  std_logic_vector(3 downto 0) := (others=>'0')
+      );
+   
+
+   
+   
+   
+   
+   
+   
+   
+   wire [31:0] 	  oldest_sample_addr;
+   wire [31:0] 	  newest_sample_addr;
+   wire 	  capture_done;
+   wire 	  ff_40_overflow_sticky;
+   wire           ff_56_overflow_sticky;
+   
+   //PORT MAP THE CAPTURE TO MEMORY BLOCK
+   capture_to_memory capture_to_memory_inst
+     (
+      .clk166(clk166),
+      .reset(reset),
+      
+      //capture data from filter block
+      .capture_data32(CaptureFilterDataOut),
+      .capture_hdr4(CaptureFilterHdrOut),
+      .capture_ofst16(CaptureFilterOffsetOut),
+      .capture_en(CaptureFilterOutEn),
+      
+      //ddr3 avalon memory mapped interface
+      .avl_addr(avl_addr), 
+      .avl_size(avl_size), 
+      .avl_be(avl_be), 
+      .avl_ready(avl_ready), 
+      .avl_wdata(avl_wdata),
+      .avl_write_req(avl_write_req),
+      
+      //control and status
+      .arm(TriggerArmed),
+      .trigger(TriggerTriggered),
+      .trigger_position(TriggerPosition), 
+      
+      .oldest_sample_addr(oldest_sample_addr),
+      .newest_sample_addr(newest_sample_addr),
+      .capture_done(capture_done),
+      .ff_40_overflow_sticky(ff_40_overflow_sticky)
+      );
+   
+   wire 	  drip_fsm_finish;
+   wire 	  drip_fsm_idle;
+
+   wire 	  avl_str_sop_drip;
+   wire  	  avl_str_eop_drip;
+   wire [31:0] 	  avl_str_data_drip;
+   wire 	  avl_str_data_valid_drip;
+   wire [1:0] 	  avl_str_empty_drip;
+   wire 	  avl_str_error_drip;
+   
+   drip_data_stream drip_data_stream_inst
+     (
+      .clk166(clk166),
+      .reset(reset),
+      
+      .drip_fsm_finish(drip_fsm_finish),
+      .drip_fsm_idle(drip_fsm_idle),
+
+      .armed(TriggerArmed),
+      .triggered(TriggerTriggered),
+      
+      //drip filter data interface
+      .drip_data_out(DripFilterDataOut),
+      .drip_hdr_out(DripFilterHdrOut),
+      .drip_ofst_out(DripFilterOffsetOut), 
+      .drip_en_out(DripFilterOutEn), 
+      
+      //Ethernet Avalon Streaming source
+      .avl_str_sop(avl_str_sop_drip),
+      .avl_str_eop(avl_str_eop_drip),
+      .avl_str_data(avl_str_data_drip),
+      .avl_str_data_valid(avl_str_data_valid_drip),
+      .avl_str_empty(avl_str_empty_drip),
+      .avl_str_ready(avl_str_ready), 
+      .avl_str_error(avl_str_error_drip),
+      
+      .ff_56_overflow_sticky(ff_56_verflow_sticky)
+      );
+
+
+
+   wire [31:0] 	  avl_str_data_fsm;
+   wire 	  avl_str_sop_fsm;
+   wire 	  avl_str_eop_fsm;
+   wire 	  avl_str_data_valid_fsm;
+      
+   
+   TesterFpgaMainFsm 
+     #(0,16,16,16)
+   TesterFpgaMainFsmInst  
+     ( 
+       .RST(reset), // : in std_logic;
+       .CLK(clk166), // : in std_logic;
+      
+       // Data from ETH MAC
+       .EthDataIn(avl_sink_data),          // : in  std_logic_vector(31 downto 0);
+       .EthStartIn(avl_sink_sop),          // : in  std_logic;
+       .EthEndIn(avl_sink_eop),            // : in  std_logic;
+       .EthDataInEn(avl_sink_data_valid),  // : in  std_logic;
+       .EthDataInRdy(avl_sink_ready),      // : out std_logic;
+       .FpgaDipId(fpga_dip_id),                   // : in  std_logic_vector(3 downto 0) := (others=>'0'); -- DIP switches that determine board ID.
+      
+       // Data to ETH MAC
+       .EthDataOut(avl_str_data_fsm),         // : out std_logic_vector(31 downto 0);
+       .EthStartOut(avl_str_sop_fsm),         // : out std_logic;
+       .EthEndOut(avl_str_eop_fsm),           // : out std_logic;
+       .EthDataOutWr(avl_str_data_valid_fsm), // : out std_logic;
+       .EthDataOutRdy(avl_str_ready),     // : in  std_logic;
+      
+       // Drip filter configuration registers
+       .DripFilterConfigRegsIn(DripFilterConfigRegsIn),   // : out std_logic_vector(31 downto 0);
+       .DripFilterConfigRegsOut(DripFilterConfigRegsOut), // : in  std_logic_vector(31 downto 0);
+       .DripFilterConfigRegsEn(DripFilterConfigRegsEn),   // : out std_logic;
+       .DripFilterConfigRegsLd(DripFilterConfigRegsLd),   // : out std_logic;
+       .DripFilterConfigRegsSt(DripFilterConfigRegsSt),   // : out std_logic;
+      
+       // Capture filter configuration registers
+       .CaptureFilterConfigRegsIn(CaptureFilterConfigRegsIn),   // : out std_logic_vector(31 downto 0);
+       .CaptureFilterConfigRegsOut(CaptureFilterConfigRegsOut), // : in  std_logic_vector(31 downto 0);
+       .CaptureFilterConfigRegsEn(CaptureFilterConfigRegsEn),   // : out std_logic;
+       .CaptureFilterConfigRegsLd(CaptureFilterConfigRegsLd),   // : out std_logic;
+       .CaptureFilterConfigRegsSt(CaptureFilterConfigRegsSt),   // : out std_logic;
+      
+       // Trigger Elements
+       .TriggerConfigRegsIn(TriggerConfigRegsIn),   // : out std_logic_vector(31 downto 0);
+       .TriggerConfigRegsOut(TriggerConfigRegsOut), // : in  std_logic_vector(31 downto 0);
+       .TriggerConfigRegsEn(TriggerConfigRegsEn),   // : out std_logic;
+       .TriggerConfigRegsLd(TriggerConfigRegsLd),   // : out std_logic;
+       .TriggerConfigRegsSt(TriggerConfigRegsSt),   // : out std_logic;
+      
+       // Trigger FSM
+       .FSMConfigRegsIn(FSMConfigRegsIn),  // : out std_logic_vector(31 downto 0);
+       .FSMConfigRegsOut(FSMConfigRegsOut), // : in  std_logic_vector(31 downto 0);
+       .FSMConfigRegsEn(FSMConfigRegsEn),  // : out std_logic;
+       .FSMConfigRegsSt(FSMConfigRegsSt),  // : out std_logic;
+       .FSMConfigRegsLd(FSMConfigRegsLd),  // : out std_logic;
+      
+       // Read Memory I/F
+       .MemOldestPtr(oldest_sample_addr), // : in  std_logic_vector( 31 downto 0);
+       .MemNewestPtr(newest_sample_addr), // : in  std_logic_vector( 31 downto 0);
+       .MemAddrOut(avl_read_addr),        // : out std_logic_vector( 31 downto 0);
+       .MemDataIn(avl_read_rdata),        // : in  std_logic_vector(127 downto 0);
+       .MemRdReq(avl_read_read_req),      // : out std_logic;
+       .MemRdRdy(avl_read_ready),         // : in  std_logic
+       
+       // Drip-to-Eth Sync
+       .DripToEthIdle(drip_fsm_idle), //   : in  std_logic;
+       .DripToEthFinish(drip_fsm_finish) //: out std_logic
+       
+       );
+
+
+
+
+   
+   assign  	  avl_str_sop = avl_str_sop_drip | avl_str_sop_fsm;
+   assign 	  avl_str_eop = avl_str_eop_drip | avl_str_eop_fsm;
+   assign         avl_str_data = avl_str_data_drip | avl_str_data_fsm;   
+   assign 	  avl_str_data_valid = avl_str_data_valid_drip | avl_str_data_valid_fsm;   
+   assign         avl_str_empty = avl_str_empty_drip;
+   assign 	  avl_str_error = avl_str_error_drip;
+   
+endmodule 

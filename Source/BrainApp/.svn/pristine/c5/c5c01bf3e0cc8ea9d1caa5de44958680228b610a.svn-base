@@ -1,0 +1,149 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Feb 09 10:25:26 2013
+
+@author: yozturk
+"""
+# Import the modules QtCore (for low level Qt functions)
+# QtGui (for visual/GUI related Qt functions)
+from PyQt4 import QtCore, QtGui, Qt
+
+class triggerGroup(QtGui.QGroupBox): 
+     def __init__(self,master):       
+        self.container = master
+        self.addTriggerMain(master)
+        self.TriggerLines = []
+       
+     def addTriggerMain(self,master):
+        self.groupBox = QtGui.QGroupBox("Trigger")
+        self.groupBox.setCheckable(True)
+        self.groupBox.setChecked(True)
+        self.hbox = Qt.QGridLayout(self.groupBox)
+        self.groupBox.setLayout(self.hbox)
+        self.numLines = 0
+        master.addWidget(self.groupBox)
+
+     def deleteTrigger(self,master):
+        self.groupBox.deleteLater()
+        master.update()
+        del(self)
+        
+
+class triggerItem(QtGui.QGroupBox): 
+     def __init__(self,master,filterList,Line):    
+        self.hbox = master
+        self.numLines = Line
+        self.container = master
+        self.filterList =filterList
+        self.addTrigger()
+      
+ 
+       
+#     def addTriggerMain(self,master):
+#        self.groupBox = QtGui.QGroupBox("Trigger")
+#        self.groupBox.setCheckable(True)
+#        self.groupBox.setChecked(True)
+#        self.hbox = Qt.QGridLayout(self.groupBox)
+#        self.groupBox.setLayout(self.hbox)
+#        self.numLines = 0
+        
+#        master.addWidget(self.groupBox)
+
+        
+     def addTrigger(self):
+  #      self.groupBox = QtGui.QGroupBox("Trigger")
+  #      self.groupBox.setCheckable(False)
+  #      self.groupBox.setChecked(False)
+        
+        
+  #      self.groupBox.setFixedHeight(50)
+
+        #self.hbox = Qt.QHBoxLayout(self.groupBox)
+        
+        self.lineEdit1 = QtGui.QLineEdit()
+        self.lineEdit1.setFixedWidth(50)
+        
+        self.labelIF = QtGui.QLabel("IF")
+       
+        self.combo1 = QtGui.QComboBox()
+        self.combo1.setFixedWidth(300)
+        
+        self.combo2 = QtGui.QComboBox()
+        self.combo2.setFixedWidth(50)
+        self.combo2.addItems(["=",">=","<="])
+
+        self.combo3 = QtGui.QComboBox()
+        self.combo3.setFixedWidth(50)
+        self.combo3.addItems(["goto","trigger"])
+
+        self.combo4 = QtGui.QComboBox()
+        self.combo4.setFixedWidth(50)
+        self.combo4.addItems(["goto","trigger"])
+
+        
+        self.lineEdit2 = QtGui.QLineEdit()
+        self.lineEdit2.setFixedWidth(50)
+       
+        self.lineEdit3 = QtGui.QLineEdit()
+        self.lineEdit3.setFixedWidth(50)
+       
+        self.labeltimes = QtGui.QLabel("times. then")
+       
+        self.lineEdit4 = QtGui.QLineEdit()
+        self.lineEdit4.setFixedWidth(50)      
+       # self.combo3 = QtGui.QComboBox()
+        #self.combo3.setFixedWidth(75)
+
+        self.labelelse = QtGui.QLabel("else")
+
+        self.lineEdit5 = QtGui.QLineEdit()
+        self.lineEdit5.setFixedWidth(50)
+        #self.combo4 = QtGui.QComboBox()
+        #self.combo4.setFixedWidth(75)    
+   
+        self.checkBox = QtGui.QCheckBox("Select")
+        
+        self.hbox.addWidget(self.lineEdit1, self.numLines,0)
+        self.hbox.addWidget(self.labelIF, self.numLines,1)
+        self.hbox.addWidget(self.combo1, self.numLines,2)
+        self.hbox.addWidget(self.combo2, self.numLines,3)
+        self.hbox.addWidget(self.lineEdit2, self.numLines,4)
+        self.hbox.addWidget(self.lineEdit3, self.numLines,5)
+       
+        self.hbox.addWidget(self.labeltimes, self.numLines,6)
+
+        self.hbox.addWidget(self.combo3, self.numLines,7)
+        
+        #self.hbox.addWidget(self.combo3)
+        self.hbox.addWidget(self.lineEdit4, self.numLines,8)
+               
+        self.hbox.addWidget(self.labelelse, self.numLines,9)
+        self.hbox.addWidget(self.combo4, self.numLines,10)
+        #self.hbox.addWidget(self.combo4)
+        self.hbox.addWidget(self.lineEdit5, self.numLines,11)
+           
+        self.hbox.addWidget(self.checkBox, self.numLines,12)                
+        #self.groupBox.setLayout(self.hbox)
+        for filterElement in self.filterList:
+            self.combo1.addItem(filterElement[0]) 
+       
+        self.numLines = self.numLines + 1
+   #     master.addWidget(self.groupBox)
+
+     def deleteTrigger(self,master):
+        self.lineEdit1.deleteLater()
+        self.lineEdit2.deleteLater()
+        self.lineEdit3.deleteLater()
+        self.lineEdit4.deleteLater()
+        self.lineEdit5.deleteLater()
+        self.combo1.deleteLater()
+        self.combo2.deleteLater()
+        self.combo3.deleteLater()
+        self.combo4.deleteLater()
+        self.checkBox.deleteLater()
+        self.labelIF.deleteLater()
+        self.labeltimes.deleteLater()
+        self.labelelse.deleteLater()
+        master.update()
+        del(self)
+        

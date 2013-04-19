@@ -1,0 +1,515 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+
+
+entity TesterFpgaMainFsm is
+   generic (
+      FpgaVersion                : integer := 0;
+      NumOfTriggerElements       : integer := 64;
+      NumOfCaptureFilterElements : integer := 64;
+      NumOfDripFilterElements    : integer := 64
+   );
+   port( 
+      RST : in std_logic;
+      CLK : in std_logic;
+
+      -- Data from ETH MAC
+      EthDataIn      : in  std_logic_vector(31 downto 0);
+      EthStartIn     : in  std_logic;
+      EthEndIn       : in  std_logic;
+      EthDataInEn    : in  std_logic;
+      EthDataInRdy   : out std_logic;
+      FpgaDipId      : in  std_logic_vector(3 downto 0) := (others=>'0'); -- DIP switches that determine board ID.
+      
+      -- Data to ETH MAC
+      EthDataOut     : out std_logic_vector(31 downto 0);
+      EthStartOut    : out std_logic;
+      EthEndOut      : out std_logic;
+      EthDataOutWr   : out std_logic;
+      EthDataOutRdy  : in  std_logic;
+      
+      -- Drip filter configuration registers
+      DripFilterConfigRegsIn : out std_logic_vector(31 downto 0);
+      DripFilterConfigRegsOut: in  std_logic_vector(31 downto 0);
+      DripFilterConfigRegsEn : out std_logic;
+      DripFilterConfigRegsLd : out std_logic;
+      DripFilterConfigRegsSt : out std_logic;
+
+      -- Capture filter configuration registers
+      CaptureFilterConfigRegsIn : out std_logic_vector(31 downto 0);
+      CaptureFilterConfigRegsOut: in  std_logic_vector(31 downto 0);
+      CaptureFilterConfigRegsEn : out std_logic;
+      CaptureFilterConfigRegsLd : out std_logic;
+      CaptureFilterConfigRegsSt : out std_logic;
+
+      -- Trigger Elements
+      TriggerConfigRegsIn : out std_logic_vector(31 downto 0);
+      TriggerConfigRegsOut: in  std_logic_vector(31 downto 0);
+      TriggerConfigRegsEn : out std_logic;
+      TriggerConfigRegsLd : out std_logic;
+      TriggerConfigRegsSt : out std_logic;
+
+      -- Trigger FSM
+      FSMConfigRegsIn  : out std_logic_vector(31 downto 0);
+      FSMConfigRegsOut : in  std_logic_vector(31 downto 0);
+      FSMConfigRegsEn  : out std_logic;
+      FSMConfigRegsSt  : out std_logic;
+      FSMConfigRegsLd  : out std_logic;
+         
+      -- Read Memory I/F
+      MemOldestPtr   : in  std_logic_vector( 31 downto 0);
+      MemNewestPtr   : in  std_logic_vector( 31 downto 0);
+      MemAddrOut     : out std_logic_vector( 31 downto 0);
+      MemDataIn      : in  std_logic_vector(127 downto 0);
+      MemRdReq       : out std_logic;
+      MemRdRdy       : in  std_logic;
+      
+      -- Drip-to-Eth Sync
+      DripToEthIdle   : in  std_logic;
+      DripToEthFinish : out std_logic
+   );
+end TesterFpgaMainFsm;
+
+architecture RTL of TesterFpgaMainFsm is
+   function ConvertToDWord_1 (
+      DataIn     : std_logic_vector(127 downto 0);
+      DataOffset : std_logic_vector(  3 downto 0) ) return std_logic_vector is
+      
+      variable i : integer;
+      variable vDataIn : std_logic_vector(151 downto 0);
+   begin
+      i := conv_integer(DataOffset&"000");
+      vDataIn := X"000000" & DataIn;
+      return vDataIn(31+i downto i);
+   end ConvertToDWord_1;
+
+   function ConvertToDWord_2 (
+      DataIn     : std_logic_vector(127 downto 0);
+      DataOffset : std_logic_vector(  3 downto 0) ) return std_logic_vector is
+      
+      variable i : integer;
+   begin
+      i := conv_integer(DataOffset&"000");
+      if (i = 104) then
+         return DataIn( 7 downto 0) & X"000000";
+      elsif (i = 112) then
+         return DataIn(15 downto 0) & X"0000";
+      elsif (i = 120) then
+         return DataIn(23 downto 0) & X"00";
+      else
+         return X"00000000";
+      end if;
+   end ConvertToDWord_2;
+
+   -- Main FSM
+   type MainFSM_t is (idle, process_hdr, dispatch,
+                      config_regs, store_regs, 
+                      prepare_read_regs, read_regs,
+                      prepare_read_mem, read_mem);
+   signal MainFsmState, DispatchState : MainFSM_t;
+   signal EthInPktByteCntr  : integer range 0 to 2047; -- max eth pkt is < 1600
+   signal EthOutPktByteCntr : integer range 0 to 2047; -- max eth pkt is < 1600
+   signal DispatchNumElements, ElementsCntr    : integer range 0 to 255;
+   signal DispatchNumOfRegsPerElement, RegsCntr: integer range 0 to  15;
+   signal NeedToSendEth : boolean;
+   
+   signal RegsIn : std_logic_vector(31 downto 0);
+   signal RegsOut: std_logic_vector(31 downto 0);
+   signal RegsEn : std_logic;
+   signal RegsSt : std_logic;
+   signal RegsLd : std_logic;
+   signal CmdId  : std_logic_vector(7 downto 0);
+   signal MsgId  : std_logic_vector(7 downto 0);
+
+   signal FpgaMacAddr : std_logic_vector(47 downto 0); -- Fpga mac addr
+   signal PcMacAddr   : std_logic_vector(47 downto 0); -- PC mac addr
+   signal EthType     : std_logic_vector(15 downto 0); 
+   signal MemAddrMask : std_logic_vector(31 downto 0);
+   
+   signal MemReadStartAddr : std_logic_vector(31 downto 0);
+   signal MemStartAddress  : std_logic_vector(31 downto 0);
+   signal MemReadSize      : std_logic_vector(31 downto 0);
+   type   MemRdFsm_t is (idle, read_req, read_req_second, data_avail);
+   signal MemRdFsm    : MemRdFsm_t;
+   signal MemData     : std_logic_vector(31 downto 0);
+
+   signal EthStartOutSig  : std_logic;
+   signal EthEndOutSig    : std_logic;
+   signal EthDataOutWrSig : std_logic;
+   
+   signal sigEthDataInRdy : std_logic;
+   
+begin
+   -- Main FSM
+   DispatchState <= config_regs       when (CmdId = X"00") else -- Config FSM
+                    config_regs       when (CmdId = X"10") else -- Config Trigger
+                    config_regs       when (CmdId = X"20") else -- Config Capture Filter
+                    config_regs       when (CmdId = X"21") else -- Config Drip Filter
+                    prepare_read_mem  when (CmdId = X"30") else -- Read Mem
+                    prepare_read_regs when (CmdId = X"40") else -- Read FSM Regs
+                    prepare_read_regs when (CmdId = X"50") else -- Read Trigger Regs
+                    prepare_read_regs when (CmdId = X"60") else -- Read Capture Regs
+                    prepare_read_regs when (CmdId = X"61") else -- Read Drip Regs
+                    idle;
+   MsgId <= X"B0" when (CmdId = X"30") else -- Read Mem
+            X"80" when (CmdId = X"40") else -- Read FSM Regs
+            X"90" when (CmdId = X"50") else -- Read Trigger Regs
+            X"A0" when (CmdId = X"60") else -- Read Capture Regs
+            X"A1" when (CmdId = X"61") else -- Read Drip Regs
+            X"00";
+   NeedToSendEth <= true when (CmdId = X"30") else -- Read Mem
+                    true when (CmdId = X"40") else -- Read FSM Regs
+                    true when (CmdId = X"50") else -- Read Trigger Regs
+                    true when (CmdId = X"60") else -- Read Capture Regs
+                    true when (CmdId = X"61") else -- Read Drip Regs
+                    false;
+   DispatchNumElements <= NumOfCaptureFilterElements when (CmdId=X"20")or(CmdId=X"60") else -- Capture Filter
+                          NumOfDripFilterElements    when (CmdId=X"21")or(CmdId=X"61") else -- Drip Filter
+                          NumOfTriggerElements       when (CmdId=X"10")or(CmdId=X"50") else -- Trigger
+                          1                          when (CmdId=X"00")or(CmdId=X"40") else -- FSM
+                          1;
+   DispatchNumOfRegsPerElement <= 2  when (CmdId=X"20")or(CmdId=X"60") else -- Capture Filter
+                                  2  when (CmdId=X"21")or(CmdId=X"61") else -- Drip Filter
+                                  5  when (CmdId=X"10")or(CmdId=X"50") else -- Trigger
+                                  2  when (CmdId=X"00")or(CmdId=X"40") else -- FSM
+                                  1;
+   CaptureFilterConfigRegsIn <= RegsIn;
+   CaptureFilterConfigRegsEn <= RegsEn when (CmdId=X"20")or(CmdId=X"60") else '0'; -- Capture Filter
+   CaptureFilterConfigRegsSt <= RegsSt when (CmdId=X"20")or(CmdId=X"60") else '0'; -- Capture Filter
+   CaptureFilterConfigRegsLd <= RegsLd when (CmdId=X"20")or(CmdId=X"60") else '0'; -- Capture Filter
+   
+   DripFilterConfigRegsIn <= RegsIn;
+   DripFilterConfigRegsEn <= RegsEn when (CmdId=X"21")or(CmdId=X"61") else '0'; -- Drip Filter
+   DripFilterConfigRegsSt <= RegsSt when (CmdId=X"21")or(CmdId=X"61") else '0'; -- Drip Filter
+   DripFilterConfigRegsLd <= RegsLd when (CmdId=X"21")or(CmdId=X"61") else '0'; -- Drip Filter
+   
+   TriggerConfigRegsIn <= RegsIn;
+   TriggerConfigRegsEn <= RegsEn when (CmdId=X"10")or(CmdId=X"50") else '0'; -- Trigger 
+   TriggerConfigRegsSt <= RegsSt when (CmdId=X"10")or(CmdId=X"50") else '0'; -- Trigger 
+   TriggerConfigRegsLd <= RegsLd when (CmdId=X"10")or(CmdId=X"50") else '0'; -- Trigger 
+   
+   FSMConfigRegsIn <= RegsIn;
+   FSMConfigRegsEn <= RegsEn when (CmdId=X"00")or(CmdId=X"40") else '0'; -- FSM
+   FSMConfigRegsSt <= RegsSt when (CmdId=X"00")or(CmdId=X"40") else '0'; -- FSM
+   FSMConfigRegsLd <= RegsLd when (CmdId=X"00")or(CmdId=X"40") else '0'; -- FSM
+   
+   RegsOut <= FSMConfigRegsOut           when (CmdId = X"40") else -- Read FSM Regs
+              TriggerConfigRegsOut       when (CmdId = X"50") else -- Read Trigger Regs
+              CaptureFilterConfigRegsOut when (CmdId = X"60") else -- Read Capture Regs
+              DripFilterConfigRegsOut    when (CmdId = X"61") else -- Read Drip Regs
+              (others=>'0');
+
+   EthStartOut  <= EthStartOutSig;
+   EthEndOut    <= EthEndOutSig;
+   EthDataOutWr <= EthDataOutWrSig;
+
+   FpgaMacAddr <= X"01000101000" & FpgaDipId;
+   PcMacAddr   <= X"010001000000";
+   EthType     <= X"0500";
+   MemAddrMask <= X"0FFFFFFF";
+
+   process(CLK, RST)
+      variable PushData     : boolean;
+      variable vMemReadSize : std_logic_vector(31 downto 0);
+      variable vEthDataOut  : std_logic_vector(31 downto 0);
+   begin
+      if (RST = '1') then
+         sigEthDataInRdy  <= '0';
+         MainFsmState     <= idle;
+         EthInPktByteCntr <= 0;
+         RegsIn  <= (others=>'0');
+         RegsEn  <= '0';
+         RegsSt  <= '0';
+         RegsLd  <= '0';
+         EthDataOut        <= (others=>'0');
+         EthStartOutSig    <= '0';
+         EthEndOutSig      <= '0';
+         EthDataOutWrSig   <= '0';
+         MemReadStartAddr <= (others=>'0');
+         MemStartAddress  <= (others=>'0');
+         MemReadSize      <= (others=>'0');
+         MemRdFsm         <= idle;
+         DripToEthFinish  <= '0';
+         
+      elsif (CLK'event and CLK='1') then
+         RegsIn  <= (others=>'0');
+         RegsEn  <= '0';
+         RegsSt  <= '0';
+         RegsLd  <= '0';
+         sigEthDataInRdy <= '1';
+         EthStartOutSig  <= '0';
+         EthEndOutSig    <= '0';
+         EthDataOutWrSig <= '0';
+         MemRdReq        <= '0';
+
+         if (EthDataInEn='1' and EthStartIn='1' and sigEthDataInRdy='1') then 
+            if (EthDataIn = FpgaMacAddr(47 downto 16)) then
+               MainFsmState     <= process_hdr;
+               EthInPktByteCntr <= 4;
+            else
+               EthInPktByteCntr <= 0;
+               MainFsmState     <= idle;
+         end if;
+
+         else -- if not EthStartIn
+
+            case MainFsmState is
+               when idle =>
+                  DripToEthFinish <= '0';
+                  EthDataOut      <= (others=>'0');
+                  
+               when process_hdr =>
+                  if (EthDataInEn='1' and sigEthDataInRdy='1') then
+                     MainFsmState     <= idle;
+                     EthInPktByteCntr <= 0;
+                     
+                     if (EthEndIn='0') then
+--                        if ((EthInPktByteCntr=4) and (EthDataIn = FpgaMacAddr(15 downto 0)&PcMacAddr(47 downto 32))) then
+                        if ((EthInPktByteCntr=4) and (EthDataIn(31 downto 16) = FpgaMacAddr(15 downto 0))) then
+                           MainFsmState     <= process_hdr;
+                           EthInPktByteCntr <= EthInPktByteCntr + 4;
+
+--                        elsif ((EthInPktByteCntr=8) and (EthDataIn = PcMacAddr(31 downto 0))) then
+                        elsif (EthInPktByteCntr=8) then
+                           MainFsmState     <= process_hdr;
+                           EthInPktByteCntr <= EthInPktByteCntr + 4;
+
+                        elsif ((EthInPktByteCntr=12) and (EthDataIn(31 downto 16) = EthType)) then
+                           CmdId <= EthDataIn(15 downto 8);
+                           EthInPktByteCntr <= EthInPktByteCntr + 4;
+                           MainFsmState     <= dispatch;
+                           sigEthDataInRdy  <= '0';
+                        end if;
+                     end if;
+                  end if;
+
+               when dispatch =>
+                  sigEthDataInRdy <= '0';
+                  ElementsCntr    <= DispatchNumElements-1;
+                  RegsCntr        <= DispatchNumOfRegsPerElement-1;
+                  if (NeedToSendEth) then
+                     DripToEthFinish <= '1';
+                     if (DripToEthIdle = '1') then
+                        MainFsmState <= DispatchState;
+                     end if;
+                  else
+                     MainFsmState <= DispatchState;
+                  end if;
+                  
+               when config_regs =>
+                  if (EthDataInEn='1' and sigEthDataInRdy='1') then
+                     RegsEn <= '1';
+                     RegsIn <= EthDataIn;
+                     EthInPktByteCntr <= EthInPktByteCntr + 4;
+                     if (RegsCntr = 0) then
+                        RegsCntr     <= DispatchNumOfRegsPerElement-1;
+                        if (ElementsCntr = 0) then
+                           sigEthDataInRdy <= '0';
+                           MainFsmState <= store_regs;
+                        else
+                           ElementsCntr <= ElementsCntr - 1;
+                        end if;
+                     else
+                        RegsCntr <= RegsCntr - 1;
+                     end if;
+                  end if;
+                  
+               when store_regs =>
+                  RegsSt <= '1';
+                  MainFsmState <= idle;
+                  
+               when prepare_read_regs => 
+                  sigEthDataInRdy   <= '0';
+                  EthOutPktByteCntr <= 0;
+                  ElementsCntr      <= DispatchNumElements-1;
+                  RegsCntr          <= DispatchNumOfRegsPerElement-1;
+                  RegsLd            <= '1';
+                  MainFsmState      <= read_regs;
+               
+               when read_regs => 
+                  sigEthDataInRdy <= '0';
+                  EthDataOutWrSig <= '1';
+                  if (EthDataOutWrSig='1' and EthDataOutRdy='0') then
+                     -- do nothing, just wait for the EthWr cycle to complete.
+                     EthStartOutSig <= EthStartOutSig;
+                     EthEndOutSig   <= EthEndOutSig;                  
+                  else
+                     EthOutPktByteCntr <= EthOutPktByteCntr + 4;
+
+                     if (EthOutPktByteCntr=0) then
+                        EthDataOut <= PcMacAddr(47 downto 16);
+                        EthStartOutSig <= '1';
+
+                     elsif (EthOutPktByteCntr=4) then
+                        EthDataOut <= PcMacAddr(15 downto 0) & FpgaMacAddr(47 downto 32);
+
+                     elsif (EthOutPktByteCntr=8) then
+                        EthDataOut <= FpgaMacAddr(31 downto 0);
+
+                     elsif (EthOutPktByteCntr=12) then
+                        EthDataOut <= EthType & MsgId & X"00";
+                        RegsEn <= '1';
+
+                     else
+                        RegsEn <= '1';
+                        EthDataOut <= RegsOut;
+                        if (RegsCntr = 0) then
+                           RegsCntr     <= DispatchNumOfRegsPerElement-1;
+                           if (ElementsCntr = 0) then
+                              EthEndOutSig       <= '1';
+                              MainFsmState    <= idle;
+                           else
+                              ElementsCntr <= ElementsCntr - 1;
+                           end if;
+                        else
+                           RegsCntr <= RegsCntr - 1;
+                        end if;
+                     end if;
+                  end if;
+
+               when prepare_read_mem =>
+                  if (EthDataInEn='1' and sigEthDataInRdy='1') then
+                     MainFsmState     <= idle;
+                     EthInPktByteCntr <= 0;
+                     
+                     if (EthEndIn='0') then
+                        if (EthInPktByteCntr=16) then
+                           MainFsmState     <= prepare_read_mem;
+                           EthInPktByteCntr <= EthInPktByteCntr + 4;
+                           MemReadStartAddr <= (EthDataIn + MemOldestPtr) and MemAddrMask;
+                           MemStartAddress  <= EthDataIn;
+                        elsif (EthInPktByteCntr=20) then
+                           MainFsmState     <= read_mem;
+                           EthInPktByteCntr <= EthInPktByteCntr + 4;
+
+                           vMemReadSize      := EthDataIn;
+                           if vMemReadSize < 16 then 
+                              MemReadSize <= X"00000010";
+                           else
+                              MemReadSize <= vMemReadSize;
+                           end if;
+                              
+                           sigEthDataInRdy      <= '0';
+                           EthOutPktByteCntr <= 0;
+                        end if;
+                     end if;
+                  end if;
+
+               when read_mem =>
+                  sigEthDataInRdy <= '0';
+                  PushData := false;
+                  vEthDataOut := (others=>'0');
+
+                  if (EthOutPktByteCntr=0) then
+                     vEthDataOut := PcMacAddr(47 downto 16);
+                     PushData    := true;
+
+                  elsif (EthOutPktByteCntr=4) then
+                     vEthDataOut := PcMacAddr(15 downto 0) & FpgaMacAddr(47 downto 32);
+                     PushData    := true;
+
+                  elsif (EthOutPktByteCntr=8) then
+                     vEthDataOut := FpgaMacAddr(31 downto 0);
+                     PushData    := true;
+
+                  elsif (EthOutPktByteCntr=12) then
+                     vEthDataOut := EthType & MsgId & X"00";
+                     PushData    := true;
+
+                  elsif (EthOutPktByteCntr=16) then
+                     vEthDataOut := MemStartAddress;
+                     PushData    := true;
+                  
+                  elsif (EthOutPktByteCntr=20) then
+                     vEthDataOut := MemReadSize;
+                     PushData    := true;
+                     MemRdFsm    <= idle;
+
+                  elsif (MemRdFsm = idle) then
+                     if (MemReadSize = 0) then
+                        MainFsmState <= idle;
+                     else
+                        if (MemReadSize >= 4) then
+                           MemReadSize <= MemReadSize - 4;
+                        else
+                           MemReadSize <= (others=>'0');
+                        end if;
+                        MemAddrOut       <= MemReadStartAddr;
+                        MemRdReq         <= '1';
+                        MemRdFsm         <= read_req;
+                     end if;
+                     
+                  elsif (MemRdFsm = read_req) then
+                     if (MemRdRdy = '1') then 
+                        MemData   <= ConvertToDWord_1(MemDataIn, MemReadStartAddr(3 downto 0));
+                        if (MemReadStartAddr(3 downto 0) >= X"0D") then
+                           MemAddrOut <= MemReadStartAddr+X"10";
+                           MemRdReq   <= '1';
+                           MemRdFsm   <= read_req_second;
+
+                        else
+                           MemReadStartAddr <= (MemReadStartAddr + 4) and MemAddrMask;
+                           MemStartAddress  <= (MemStartAddress  + 4) and MemAddrMask;
+                           MemRdFsm  <= data_avail;
+                        end if;
+                     else
+                        MemRdReq   <= '1';
+                     end if;
+                     
+                  elsif (MemRdFsm = read_req_second) then
+                     if (MemRdRdy = '1') then 
+                        MemData <= MemData or ConvertToDWord_2(MemDataIn, MemReadStartAddr(3 downto 0));
+                        MemReadStartAddr <= (MemReadStartAddr + 4) and MemAddrMask;
+                        MemStartAddress  <= (MemStartAddress  + 4) and MemAddrMask;
+                        MemRdFsm  <= data_avail;
+                     else
+                        MemRdReq   <= '1';
+                     end if;
+
+                  elsif (MemRdFsm = data_avail) then
+                     vEthDataOut := MemData;
+                     PushData    := true;
+                  end if;
+
+                  if (EthDataOutWrSig='1' and EthDataOutRdy='0') then
+                     -- do nothing, just wait for the EthWr cycle to complete.
+                     EthEndOutSig    <= EthEndOutSig;
+                     EthStartOutSig  <= EthStartOutSig;
+                     EthDataOutWrSig <= EthDataOutWrSig;
+                  else
+                     if PushData then
+                        EthDataOutWrSig <= '1';
+                        if (EthOutPktByteCntr = 0) then
+                           EthStartOutSig <= '1';
+                        end if;
+                        EthDataOut <= vEthDataOut;
+                        if (MemRdFsm = data_avail) then
+                           MemRdFsm  <= idle;
+                        end if;
+                        if (MemReadSize = 0) then
+                           EthEndOutSig <= '1';
+                        
+                        elsif (EthOutPktByteCntr > 1400) then
+                           EthEndOutSig <= '1';
+                           EthOutPktByteCntr <= 0;
+                        
+                        end if;
+                     end if;
+                     if (EthDataOutRdy='1') and (EthDataOutWrSig='1') then
+                        EthOutPktByteCntr <= EthOutPktByteCntr + 4;
+                     end if;
+                  end if;
+               
+               when others =>
+                  MainFsmState <= idle;
+            end case;
+         end if;
+      end if;
+      
+   end process;
+
+   EthDataInRdy <= sigEthDataInRdy;
+   
+ end RTL;

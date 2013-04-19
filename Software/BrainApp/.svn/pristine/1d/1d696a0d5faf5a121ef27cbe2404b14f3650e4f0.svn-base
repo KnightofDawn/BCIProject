@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Feb 09 15:17:33 2013
+
+@author: yozturk
+"""
+from xml.etree import ElementTree
+with open('eventLogger.xml', 'rt') as eventfile:
+    print (eventfile)            
+    eventtree = ElementTree.parse(eventfile)
+    for eventnode in eventtree.iter('event'):
+        eventname = eventnode.attrib.get('name')
+        eventID = eventnode.get('id')     
+        
+        for rfile in eventnode.iter('data'):
+            rname = rfile.attrib.get('name')
+            print (eventname,eventID, rname)

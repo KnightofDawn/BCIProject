@@ -1,0 +1,47 @@
+	component nios2 is
+		port (
+			clk50_clk                     : in    std_logic                     := 'X';             -- clk
+			reset_reset_n                 : in    std_logic                     := 'X';             -- reset_n
+			memory_mem_a                  : out   std_logic_vector(12 downto 0);                    -- mem_a
+			memory_mem_ba                 : out   std_logic_vector(2 downto 0);                     -- mem_ba
+			memory_mem_ck                 : out   std_logic_vector(0 downto 0);                     -- mem_ck
+			memory_mem_ck_n               : out   std_logic_vector(0 downto 0);                     -- mem_ck_n
+			memory_mem_cke                : out   std_logic_vector(0 downto 0);                     -- mem_cke
+			memory_mem_cs_n               : out   std_logic_vector(0 downto 0);                     -- mem_cs_n
+			memory_mem_dm                 : out   std_logic_vector(3 downto 0);                     -- mem_dm
+			memory_mem_ras_n              : out   std_logic_vector(0 downto 0);                     -- mem_ras_n
+			memory_mem_cas_n              : out   std_logic_vector(0 downto 0);                     -- mem_cas_n
+			memory_mem_we_n               : out   std_logic_vector(0 downto 0);                     -- mem_we_n
+			memory_mem_reset_n            : out   std_logic;                                        -- mem_reset_n
+			memory_mem_dq                 : inout std_logic_vector(31 downto 0) := (others => 'X'); -- mem_dq
+			memory_mem_dqs                : inout std_logic_vector(3 downto 0)  := (others => 'X'); -- mem_dqs
+			memory_mem_dqs_n              : inout std_logic_vector(3 downto 0)  := (others => 'X'); -- mem_dqs_n
+			memory_mem_odt                : out   std_logic_vector(0 downto 0);                     -- mem_odt
+			oct_rzqin                     : in    std_logic                     := 'X';             -- rzqin
+			tse_mac_rgmii_in              : in    std_logic_vector(3 downto 0)  := (others => 'X'); -- rgmii_in
+			tse_mac_rgmii_out             : out   std_logic_vector(3 downto 0);                     -- rgmii_out
+			tse_mac_rx_control            : in    std_logic                     := 'X';             -- rx_control
+			tse_mac_tx_control            : out   std_logic;                                        -- tx_control
+			tse_mac_tx_clk                : in    std_logic                     := 'X';             -- tx_clk
+			tse_mac_rx_clk                : in    std_logic                     := 'X';             -- rx_clk
+			tse_mac_set_10                : in    std_logic                     := 'X';             -- set_10
+			tse_mac_set_1000              : in    std_logic                     := 'X';             -- set_1000
+			tse_mac_ena_10                : out   std_logic;                                        -- ena_10
+			tse_mac_eth_mode              : out   std_logic;                                        -- eth_mode
+			tse_mac_mdio_out              : out   std_logic;                                        -- mdio_out
+			tse_mac_mdio_oen              : out   std_logic;                                        -- mdio_oen
+			tse_mac_mdio_in               : in    std_logic                     := 'X';             -- mdio_in
+			tse_mac_mdc                   : out   std_logic;                                        -- mdc
+			clk166_clk                    : out   std_logic;                                        -- clk
+			tse_config_export             : out   std_logic;                                        -- export
+			pll_0_locked_export           : out   std_logic;                                        -- export
+			enet_pll_outclk3_clk          : out   std_logic;                                        -- clk
+			enet_pll_outclk2_clk          : out   std_logic;                                        -- clk
+			enet_pll_outclk1_clk          : out   std_logic;                                        -- clk
+			enet_pll_outclk0_clk          : out   std_logic;                                        -- clk
+			entropic_ip_top_data_36_valid : in    std_logic                     := 'X';             -- data_36_valid
+			entropic_ip_top_data_36       : in    std_logic_vector(35 downto 0) := (others => 'X'); -- data_36
+			entropic_ip_top_fpga_dip_id   : in    std_logic_vector(3 downto 0)  := (others => 'X')  -- fpga_dip_id
+		);
+	end component nios2;
+

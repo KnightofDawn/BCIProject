@@ -1,0 +1,17 @@
+transcript on
+if {[file exists rtl_work]} {
+	vdel -lib rtl_work -all
+}
+vlib rtl_work
+vmap work rtl_work
+
+vlog -vlog01compat -work work +incdir+C:/TestDebugApp/fpga/entropic_ip/tse_config {C:/TestDebugApp/fpga/entropic_ip/tse_config/tse_config.v}
+vlog -vlog01compat -work work +incdir+C:/TestDebugApp/fpga/entropic_ip/tse_config {C:/TestDebugApp/fpga/entropic_ip/tse_config/tse_config_tb.v}
+vlog -vlog01compat -work work +incdir+C:/TestDebugApp/fpga/entropic_ip/tse_config {C:/TestDebugApp/fpga/entropic_ip/tse_config/tse_config_rom.v}
+vlog -vlog01compat -work work +incdir+C:/altera/12.0/modelsim_ase/altera/verilog/src/ {C:/altera/12.0/modelsim_ase/altera/verilog/src/altera_mf.v}
+
+vsim work.tse_config_tb
+
+do wave.do
+
+run -all

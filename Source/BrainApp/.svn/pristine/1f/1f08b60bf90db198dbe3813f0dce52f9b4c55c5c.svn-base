@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <mode name="General Time-domain" id="1" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="18" LSB="9" name="Channel Time Counter [8:17] LSB's" type="u(32,31)" block="RX Controller" subsystem="CTC" />
+      <data MSB="8" LSB="8" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="7" LSB="7" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="6" LSB="6" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="5" LSB="5" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="4" LSB="4" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="packetEnd" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="17" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="16" LSB="8" name="digiGain" type="u(9,6)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="7" LSB="0" name="meanPktStartTime" type="s8" block="Burst Detection " subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="AGC Gain Adjusts" id="2" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="20" LSB="14" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="13" LSB="5" name="digiGain" type="u(9,6)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="4" LSB="4" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="18" name="satCounter" type="u6" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="17" LSB="4" name="digiEnergy" type="u(14,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="AGC Analog Gain Adjusts" id="3" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="21" name="Front-end Gain" type="u3" block="FE/BE Gain Separator" subsystem="AFE" />
+      <data MSB="20" LSB="16" name="Back-end Gain" type="u5" block="FE/BE Gain Separator" subsystem="AFE" />
+      <data MSB="15" LSB="15" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="14" LSB="14" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="13" LSB="13" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="12" LSB="6" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="5" LSB="5" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="4" LSB="4" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="18" name="satCounter" type="u6" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="17" LSB="4" name="analogEnergy" type="u(14,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="packetEnd" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="AGC Digital Gain Adjusts" id="4" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="20" LSB="14" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="13" LSB="5" name="digiGain" type="u(9,6)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="4" LSB="4" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="21" name="Front-end Gain" type="u3" block="FE/BE Gain Separator" subsystem="AFE" />
+      <data MSB="20" LSB="7" name="digiEnergy" type="u(14,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="6" LSB="6" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="5" LSB="5" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="4" LSB="4" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="packetEnd" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="AGC Sat &amp; LgSig Detect" id="5" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="21" LSB="16" name="satCounter" type="u6" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="15" LSB="2" name="analogEnergy" type="u(14,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="21" name="Front-end Gain" type="u3" block="FE/BE Gain Separator" subsystem="AFE" />
+      <data MSB="20" LSB="16" name="Back-end Gain" type="u5" block="FE/BE Gain Separator" subsystem="AFE" />
+      <data MSB="15" LSB="15" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="14" LSB="8" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="7" LSB="7" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="6" LSB="6" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="5" LSB="5" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="4" LSB="4" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="packetEnd" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="AGC SSeq Detect1" id="6" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="13" name="ssCorrelation MSB's" type="u(18,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="12" LSB="5" name="ssCorrelation LSB's" type="u(18,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="4" LSB="4" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="21" LSB="15" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="14" LSB="1" name="digiEnergy" type="u(14,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="AGC Sseq Detect2" id="7" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="10" name="analogEnergy" type="u(14,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="9" LSB="2" name="ssCorrelation LSB's" type="u(18,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="10" name="digiEnergy" type="u(14,8)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="9" LSB="0" name="ssCorrelation MSB's" type="u(18,8)" block="HW AGC " subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="BDet Correlation1" id="8" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="18" LSB="18" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="17" LSB="0" name="longSeqCorrelation (multiple LS)" type="u(18,15)" block="Burst Detection " subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="21" LSB="14" name="meanPktStartTime" type="s8" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="13" LSB="0" name="longSeqEnergy (multiple LS)" type="u(14,8)" block="Burst Detection " subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="BDet Correlation2" id="9" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="18" LSB="11" name="meanPktStartTime" type="s8" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="10" LSB="1" name="rotatorRestartTime" type="s10" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="18" LSB="1" name="longSeqCorrelation (multiple LS)" type="u(18,15)" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="BDet Correlation 1LS" id="10" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="18" LSB="18" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="17" LSB="0" name="lsCorrelation (1 LS)" type="u(18,15)" block="Burst Detection " subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="21" LSB="14" name="meanPktStartTime" type="s8" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="13" LSB="0" name="lsEnergy (1 LS)" type="u(14,8)" block="Burst Detection " subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="BDet with AGC" id="11" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="18" LSB="18" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="17" LSB="0" name="longSeqCorrelation (multiple LS)" type="u(18,15)" block="Burst Detection " subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="21" name="Front-end Gain" type="u3" block="FE/BE Gain Separator" subsystem="AFE" />
+      <data MSB="20" LSB="20" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="18" LSB="18" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="17" LSB="11" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="10" LSB="2" name="digiGain" type="u(9,6)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="FreqOffsetEst1" id="12" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="0" name="freqOffsetComp" type="s(22,0)" block="Frequency Estimator" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="18" LSB="18" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="17" LSB="17" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="16" LSB="3" name="sampOffsetComp (redundant = freqOffsetComp * RF_val)" type="s(14,-9)" block="Frequency Estimator" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="packetEnd" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="FreqOffsetEst2" id="13" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="21" LSB="0" name="freqOffsetComp" type="s(22,0)" block="Frequency Estimator" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="12" name="courseEstimate MSB's" type="s(14,1)" block="Frequency Estimator" subsystem="tdPhy" />
+      <data MSB="11" LSB="0" name="fineEstimate MSB's" type="s(14,1)" block="Frequency Estimator" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="FreqOffsetEst3" id="14" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="18" LSB="18" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="17" LSB="17" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="16" LSB="1" name="resolvedEstimate" type="s(16,-6)" block="Frequency Estimator" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="12" name="courseEstimate MSB's" type="s(14,1)" block="Frequency Estimator" subsystem="tdPhy" />
+      <data MSB="11" LSB="0" name="fineEstimate MSB's" type="s(14,1)" block="Frequency Estimator" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="Resampler" id="15" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="18" LSB="11" name="meanPktStartTime" type="s8" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="10" LSB="1" name="rotatorRestartTime" type="s10" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="19" LSB="10" name="digiGainScaler Output MSB's (I)" type="s(13,1)" block="Digital Gain Scaling" subsystem="tdPhy" />
+      <data MSB="9" LSB="0" name="digiGainScaler Output MSB's (Q)" type="s(13,1)" block="Digital Gain Scaling" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="TD Datapath" id="16" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="20" LSB="11" name="digiGainScaler Output MSB's (I)" type="s(13,1)" block="Digital Gain Scaling" subsystem="tdPhy" />
+      <data MSB="10" LSB="1" name="digiGainScaler Output MSB's (Q)" type="s(13,1)" block="Digital Gain Scaling" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="11" name="FFT Input MSB's (I)" type="s(16,1)" block="FFT" subsystem="tdPhy" />
+      <data MSB="10" LSB="1" name="FFT Input MSB's (Q)" type="s(16,1)" block="FFT" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="FFT Input Data Valid Signal" type="bool" block="FFT" subsystem="tdPhy" />
+    </secondary>
+  </mode>
+  <mode name="FD Datapath (FFT out/IQ out)" id="17" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="11" name="&quot;FFT Output s&lt;10,3&gt; bits (I)&quot;" type="s(17,7)" block="FFT" subsystem="tdPhy" />
+      <data MSB="10" LSB="1" name="&quot;FFT Output s&lt;10,3&gt; bits (Q)&quot;" type="s(17,7)" block="FFT" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="FFT Data Valid Signal" type="bool" block="FFT" subsystem="tdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="12" name="rxFDIQ Output MSB's (I)" type="s(13,3)" block="IQ Compensator" subsystem="fdPhy" />
+      <data MSB="11" LSB="1" name="rxFDIQ Output MSB's (Q)" type="s(13,3)" block="IQ Compensator" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="rxFDIQ Data Valid Signal" type="bool" block="IQ Compensator" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="ChanEst Noisy" id="18" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="chanEst1/2 Data Valid Signal" type="bool" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="18" LSB="3" name="chanAve MagnSq MSB's" type="u(27,5)" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="2" LSB="1" name="Interference Flag" type="u2" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="chanEst Data Valid Signal" type="bool" block="Channel Estimation" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="12" name="chanEst1/2 (I) MSB's" type="s(13,3)" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="11" LSB="0" name="chanEst1/2 (Q) MSB's" type="s(13,3)" block="Channel Estimation" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="Eq coefs" id="19" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="4" name="Eq Coeff (I)" type="s(18,7)" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="3" LSB="3" name="chanEst Data Valid Signal" type="bool" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="2" LSB="0" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="6" name="Eq Coeff (Q)" type="s(18,7)" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="5" LSB="4" name="Interference Flag" type="u2" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="3" LSB="0" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="EQ MagnSq" id="20" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="6" name="chanAve MagnSq MSB's" type="u(27,5)" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="5" LSB="4" name="Interference Flag" type="u2" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="3" LSB="3" name="chanEst Data Valid Signal" type="bool" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="2" LSB="0" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="17" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="16" LSB="8" name="digiGain" type="u(9,6)" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="7" LSB="7" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="6" LSB="6" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="5" LSB="5" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="4" LSB="4" name="pktError Event (for selected mode)" type="bool" block="FD_BERT" subsystem="fdPhy" />
+      <data MSB="3" LSB="0" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="FD Datapath (constScaler out)" id="21" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="8" name="Constellation Scaler Output (I)" type="s(13,7)" block="Constellation Scaling" subsystem="fdPhy" />
+      <data MSB="7" LSB="7" name="Constellatin Scaler Data Valid Signal" type="bool" block="Constellation Scaler" subsystem="fdPhy" />
+      <data MSB="6" LSB="4" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="3" LSB="0" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="18" LSB="18" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="17" LSB="17" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="16" LSB="16" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="15" LSB="15" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="14" LSB="14" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="13" LSB="13" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="12" LSB="0" name="Constellation Scaler Output (Q)" type="s(13,7)" block="Constellation Scaling" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="FD Datapath (slicerAGC out)" id="22" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="8" name="Slicer AGC Output (I)" type="s(13,7)" block="Slicer AGC (aka Zip2 Detector)" subsystem="fdPhy" />
+      <data MSB="7" LSB="7" name="Slicer AGC Data Valid Signal" type="bool" block="Slicer AGC (aka Zip2 Detector)" subsystem="fdPhy" />
+      <data MSB="6" LSB="4" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="3" LSB="0" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="agcDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="largeSignalDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="satDetect" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="agcTimeout" type="bool" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="19" LSB="19" name="mClear" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="18" LSB="18" name="mReset" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="17" LSB="17" name="acqError" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="16" LSB="16" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="15" LSB="15" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="14" LSB="14" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="13" LSB="13" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="12" LSB="0" name="Slicer AGC Output (Q)" type="s(13,7)" block="Slicer AGC (aka Zip2 Detector)" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="PhaseDetector" id="23" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="8" name="wtPhase" type="s(13,7)" block="Phase Detector" subsystem="fdPhy" />
+      <data MSB="7" LSB="7" name="Phase Detector Data Valid Signal" type="bool" block="Phase Detector" subsystem="fdPhy" />
+      <data MSB="6" LSB="4" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="3" LSB="0" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="13" name="weight" type="u(11,11)" block="Phase Detector" subsystem="fdPhy" />
+      <data MSB="12" LSB="4" name="CPE Output MSB's (8X)" type="s(12,1)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="3" LSB="1" name="CPE Output LSB's (8X)" type="s(12,1)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="Phase Detector CPE Valid" type="bool" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="Tracking Loops" id="24" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="rotatorRestart" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="19" LSB="17" name="CPE Output LSB's (8X)" type="s(12,1)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="16" LSB="3" name="Freq Tracking Output (8X)" type="s(14,-2)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="2" LSB="2" name="Tracking Loop Data Valid Signal" type="bool" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="1" LSB="1" name="pktError Event (for selected mode)" type="bool" block="FD_BERT" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="pktError" type="bool" block="DLL BERT" subsystem="dll" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="15" name="CPE Output MSB's (8X)" type="s(12,1)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="14" LSB="14" name="Phase Detector CPE Valid" type="bool" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="13" LSB="0" name="Time Tracking Output (8X)" type="s(14,-2)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="NVE - General" id="25" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="13" name="Noise Variance Estimate" type="u(9,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="12" LSB="2" name="interfEst MSB's" type="F(6,5;5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="1" LSB="1" name="interfEst Sign Bit" type="u1" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="interfEst Write Enable" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="20" LSB="19" name="Interference Flag" type="u2" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="18" LSB="11" name="Input EVM" type="F(4,3;4)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="10" LSB="8" name="Loop Filter Case Select" type="u3" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="7" LSB="5" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="4" LSB="1" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="pktError" type="bool" block="DLL BERT" subsystem="dll" />
+    </secondary>
+  </mode>
+  <mode name="NVE - w/ Error Metrics" id="26" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="13" name="Noise Variance Estimate" type="u(9,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="12" LSB="5" name="errorMetric LSB's" type="s(32,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="4" LSB="2" name="Loop Filter Case Select" type="u3" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="1" LSB="1" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="pktError" type="bool" block="DLL BERT" subsystem="dll" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="0" name="errorMetric MSB's" type="s(32,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="NVE - w/ Feedback Signal" id="27" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="13" name="Noise Variance Estimate" type="u(9,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="12" LSB="5" name="NVE Feedback Signal LSB's" type="s(32,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="4" LSB="2" name="Loop Filter Case Select" type="u3" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="1" LSB="1" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="pktError" type="bool" block="DLL BERT" subsystem="dll" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="0" name="NVE Feedback Signal MSB's" type="s(32,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="Slicer input (24-bits)" id="28" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="11" name="Slicer Input MSB's (I)" type="s(13,7)" block="Common Phase Error Rotator" subsystem="fdPhy" />
+      <data MSB="10" LSB="1" name="Slicer Input MSB's (Q)" type="s(13,7)" block="Common Phase Error Rotator" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="Slicer Data Valid Signal" type="bool" block="Common Phase Error Rotator" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="15" name="Noise Variance Estimate" type="u(9,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="14" LSB="13" name="Interference Flag" type="u2" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="12" LSB="10" name="Loop Filter Case Select" type="u3" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="9" LSB="9" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="8" LSB="8" name="pktError Event (for selected mode)" type="bool" block="FD_BERT" subsystem="fdPhy" />
+      <data MSB="7" LSB="5" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="4" LSB="1" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="pktError" type="bool" block="DLL BERT" subsystem="dll" />
+    </secondary>
+  </mode>
+  <mode name="Slicer input" id="29" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="8" name="Slicer Input (I)" type="s(13,7)" block="Common Phase Error Rotator" subsystem="fdPhy" />
+      <data MSB="7" LSB="7" name="Slicer Data Valid Signal" type="bool" block="Common Phase Error Rotator" subsystem="fdPhy" />
+      <data MSB="6" LSB="5" name="Interference Flag" type="u2" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="4" LSB="1" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="pktError" type="bool" block="DLL BERT" subsystem="dll" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="packetEnd" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="21" LSB="9" name="Slicer Input (Q)" type="s(13,7)" block="Common Phase Error Rotator" subsystem="fdPhy" />
+      <data MSB="8" LSB="0" name="Noise Variance Estimate" type="u(9,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="Subcarrier BERT" id="30" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="19" name="Interference Flag" type="u2" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="18" LSB="18" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="17" LSB="17" name="Subcarrier In Error" type="bool" block="FD_BERT" subsystem="fdPhy" />
+      <data MSB="16" LSB="8" name="Subcarrier Index" type="bool" block="FD_BERT" subsystem="fdPhy" />
+      <data MSB="7" LSB="7" name="BERT Valid Signal" type="bool" block="FD_BERT" subsystem="fdPhy" />
+      <data MSB="6" LSB="4" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="3" LSB="0" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="22" LSB="12" name="Slicer Input MSB's (I)" type="s(13,7)" block="Common Phase Error Rotator" subsystem="fdPhy" />
+      <data MSB="11" LSB="1" name="Slicer Input MSB's (Q)" type="s(13,7)" block="Common Phase Error Rotator" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="Slicer Data Valid Signal" type="bool" block="Common Phase Error Rotator" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="EPP Avg" id="31" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="20" LSB="20" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="19" LSB="18" name="Interference Flag" type="u2" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="17" LSB="17" name="chanEst Data Valid Signal" type="bool" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="16" LSB="1" name="EPP Output (per-carrier accum) (I)" type="s(16,1)" block="EPP Averager" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="EPP Data Valid Signal" type="bool" block="EPP Averager" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="16" name="meanPktStartTime" type="s8" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="15" LSB="0" name="EPP Output (per-carrier accum) (Q)" type="s(16,1)" block="EPP Averager" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="EVM Avg w/ AGC" id="32" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="1" name="EVM Output 0:19 (per symbol accum input)" type="u(33,21)" block="EVM Averager" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="EVM Data Valid Signal" type="bool" block="EVM Averager" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="17" name="analogGain (total or BE)" type="u7" block="HW AGC " subsystem="tdPhy" />
+      <data MSB="16" LSB="16" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="15" LSB="14" name="Interference Flag" type="u2" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="13" LSB="13" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="12" LSB="0" name="EVM Output 20:32 (per symbol accum input)" type="u(33,21)" block="EVM Averager" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="EVM Avg w/ CPE" id="33" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="1" name="EVM Output 0:19 (per symbol accum input)" type="u(33,21)" block="EVM Averager" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="EVM Data Valid Signal" type="bool" block="EVM Averager" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="peakDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="burstAcqFinished" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="20" LSB="13" name="meanPktStartTime" type="s8" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="12" LSB="4" name="CPE Output MSB's (8X)" type="s(12,1)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="3" LSB="1" name="CPE Output LSB's (8X)" type="s(12,1)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="Phase Detector CPE Valid" type="bool" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="EVM Avg w/ CE Est" id="34" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="1" name="EVM Output 0:19 (per symbol accum input)" type="u(33,21)" block="EVM Averager" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="EVM Data Valid Signal" type="bool" block="EVM Averager" subsystem="fdPhy" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="22" LSB="7" name="chanAve MagnSq MSB's" type="u(27,5)" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="6" LSB="5" name="Interference Flag" type="u2" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="4" LSB="4" name="chanEst Data Valid Signal" type="bool" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="3" LSB="0" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+    </secondary>
+  </mode>
+  <mode name="LDPC with CE Est" id="35" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="6" name="chanAve MagnSq MSB's" type="u(27,5)" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="5" LSB="5" name="chanEst Data Valid Signal" type="bool" block="Channel Estimation" subsystem="fdPhy" />
+      <data MSB="4" LSB="4" name="ldpcStartOfDecode" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="3" LSB="3" name="ldpcBadOrEndOfLayer" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="2" LSB="2" name="ldpcGoodLayer" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="1" LSB="1" name="ldpcConverged" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="0" LSB="0" name="ldpcAborted" type="bool" block="LDPC Decoder" subsystem="dll" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="burstDetect" type="bool" block="Burst Detection " subsystem="tdPhy" />
+      <data MSB="22" LSB="14" name="Noise Variance Estimate" type="u(9,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="13" LSB="12" name="Interference Flag" type="u2" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="11" LSB="9" name="Loop Filter Case Select" type="u3" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="8" LSB="8" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="7" LSB="5" name="context ID" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="4" LSB="1" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="ldpcDetectingShortPacket????" type="bool" block="LDPC Decoder" subsystem="dll" />
+    </secondary>
+  </mode>
+  <mode name="LDPC with CPE" id="36" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="12" name="CPE Output MSB's (8X)" type="s(12,1)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="11" LSB="9" name="CPE Output LSB's (8X)" type="s(12,1)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="8" LSB="8" name="Phase Detector CPE Valid" type="bool" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="7" LSB="6" name="Interference Flag" type="u2" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="5" LSB="5" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="4" LSB="4" name="ldpcStartOfDecode" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="3" LSB="3" name="ldpcBadOrEndOfLayer" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="2" LSB="2" name="ldpcGoodLayer" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="1" LSB="1" name="ldpcConverged" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="0" LSB="0" name="ldpcAborted" type="bool" block="LDPC Decoder" subsystem="dll" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="10" name="Freq Tracking Output (8X)" type="s(14,-2)" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="9" LSB="9" name="Tracking Loop Data Valid Signal" type="bool" block="Frequency/Timing Tracking " subsystem="fdPhy" />
+      <data MSB="8" LSB="6" name="Loop Filter Case Select" type="u3" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="5" LSB="2" name="Constellation ID's" type="uint" block="Module Specific" subsystem="fdPhy" />
+      <data MSB="1" LSB="1" name="ldpcDetectingShortPacket????" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="0" LSB="0" name="pktError" type="bool" block="DLL BERT" subsystem="dll" />
+    </secondary>
+  </mode>
+  <mode name="LDPC with NVE" id="37" txrx="rx">
+    <primary name="Primary">
+      <data MSB="23" LSB="23" name="Descriptor Trigger (at window open)" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="22" LSB="22" name="adcInterfaceEnable" type="bool" block="RX Controller" subsystem="tdPhy" />
+      <data MSB="21" LSB="21" name="OFDM Symbol Marker" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="20" LSB="12" name="Noise Variance Estimate" type="u(9,5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="11" LSB="10" name="Interference Flag" type="u2" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="9" LSB="7" name="Loop Filter Case Select" type="u3" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="6" LSB="6" name="NVE Data Valid Signal" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="5" LSB="5" name="ldpcStartOfDecode" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="4" LSB="4" name="ldpcBadOrEndOfLayer" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="3" LSB="3" name="ldpcGoodLayer" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="2" LSB="2" name="ldpcConverged" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="1" LSB="1" name="ldpcAborted" type="bool" block="LDPC Decoder" subsystem="dll" />
+      <data MSB="0" LSB="0" name="ldpcDetectingShortPacket????" type="bool" block="LDPC Decoder" subsystem="dll" />
+    </primary>
+    <secondary  name="Secondary">
+      <data MSB="23" LSB="23" name="packetEnd" type="bool" block="OFDM Symbol Framer" subsystem="tdPhy" />
+      <data MSB="22" LSB="12" name="interfEst MSB's" type="F(6,5;5)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="11" LSB="11" name="interfEst Sign Bit" type="u1" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="10" LSB="10" name="interfEst Write Enable" type="bool" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="9" LSB="2" name="Input EVM" type="F(4,3;4)" block="Noise Variance Estimator " subsystem="fdPhy" />
+      <data MSB="1" LSB="1" name="pktError Event (for selected mode)" type="bool" block="FD_BERT" subsystem="fdPhy" />
+      <data MSB="0" LSB="0" name="pktError" type="bool" block="DLL BERT" subsystem="dll" />
+    </secondary>
+  </mode>
+  <mode name="Encryptor Test" id="48" txrx="tx">
+    <primary name="Primary">
+      <data MSB="18" LSB="11" name="Signal Name" type="Byte" block="Encryption" subsystem="PSDU" />
+      <data MSB="10" LSB="3" name="Encryptor Input" type="Byte" block="Encryption" subsystem="PSDU" />
+      <data MSB="2" LSB="2" name="Encryptor Output" type="Bool" block="Encryption" subsystem="PSDU" />
+      <data MSB="1" LSB="1" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="FEC Encoder Input Test" id="49" txrx="tx">
+    <primary name="Primary">
+      <data MSB="19" LSB="12" name="Encryptor Data Valid" type="Byte" block="Payload Select Mux" subsystem="DLL" />
+      <data MSB="11" LSB="4" name="Payload Select Mux Output (even)" type="Byte" block="Payload Select Mux" subsystem="DLL" />
+      <data MSB="3" LSB="3" name="Payload Select Mux Output (odd)" type="Bool" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="2" LSB="2" name="Payload Select Data Valid (even)" type="Bool" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="1" LSB="1" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="FEC Encoder Output Test" id="50" txrx="tx">
+    <primary name="Primary">
+      <data MSB="19" LSB="12" name="Payload Select Data Valid (odd)" type="Byte" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="11" LSB="4" name="Byte Scrambler Input (even)" type="Byte" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="3" LSB="3" name="Byte Scrambler Input (odd)" type="Bool" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="2" LSB="2" name="Byte Scrambler Data Valid (even)" type="Bool" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="1" LSB="1" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="Byte Scrambler Output Test" id="51" txrx="tx">
+    <primary name="Primary">
+      <data MSB="19" LSB="12" name="Byte Scrambler Data Valid (odd)" type="Byte" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="11" LSB="4" name="Byte Scrambler Output (even)" type="Byte" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="3" LSB="3" name="Byte Scrambler Output (odd)" type="Bool" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="2" LSB="2" name="Byte Scrambler Data Valid (even)" type="Bool" block="Data Scrambler" subsystem="DLL" />
+      <data MSB="1" LSB="1" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="Mapper Assignment Test" id="52" txrx="tx">
+    <primary name="Primary">
+      <data MSB="16" LSB="13" name="Byte Scrambler Data Valid (odd)" type="u4" block="OFDM Mapper" subsystem="fdPhy" />
+      <data MSB="12" LSB="3" name="Constellation ID's" type="u10" block="OFDM Mapper" subsystem="fdPhy" />
+      <data MSB="2" LSB="2" name="Mapper Input Words" type="Bool" block="OFDM Mapper" subsystem="fdPhy" />
+      <data MSB="1" LSB="1" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="Mapper Output" id="53" txrx="tx">
+    <primary name="Primary">
+      <data MSB="23" LSB="14" name="Mapper Input Data Valid" type="s(12,2)" block="OFDM Mapper" subsystem="fdPhy" />
+      <data MSB="13" LSB="4" name="Mapper Output MSB's (I)" type="s(12,2)" block="OFDM Mapper" subsystem="fdPhy" />
+      <data MSB="3" LSB="3" name="Mapper Output MSB's (Q)" type="Bool" block="OFDM Mapper" subsystem="fdPhy" />
+      <data MSB="2" LSB="2" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="Packet Start (Gate)" type="Bool" block="CP Inserter" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="Powerload Output" id="54" txrx="tx">
+    <primary name="Primary">
+      <data MSB="23" LSB="14" name="Mapper Output Data Valid" type="s(12,2)" block="Power Loading" subsystem="fdPhy" />
+      <data MSB="13" LSB="4" name="Powerload Output MSB's (I)" type="s(12,2)" block="Power Loading" subsystem="fdPhy" />
+      <data MSB="3" LSB="3" name="Powerload Output MSB's (Q)" type="Bool" block="Power Loading" subsystem="fdPhy" />
+      <data MSB="2" LSB="2" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="Packet Start (Gate)" type="Bool" block="CP Inserter" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="IFFT Input" id="55" txrx="tx">
+    <primary name="Primary">
+      <data MSB="23" LSB="14" name="Powerload Data Valid" type="s(13,3)" block="IFFT" subsystem="tdPhy" />
+      <data MSB="12" LSB="3" name="IFFT Input MSB's (I)" type="s(13,3)" block="IFFT" subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="IFFT Input MSB's (Q)" type="Bool" block="IFFT" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="Packet Start (Gate)" type="Bool" block="CP Inserter" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="IFFT Output (I)" id="56" txrx="tx">
+    <primary name="Primary">
+      <data MSB="13" LSB="4" name="IFFT Input Data Valid" type="s(13,1)" block="IFFT" subsystem="tdPhy" />
+      <data MSB="13" LSB="4" name="IFFT Output MSB's @ 200MHz even (I)" type="s(13,1)" block="IFFT" subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="IFFT Output MSB's @ 200MHz odd (Q)" type="Bool" block="IFFT" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="Packet Start (Gate)" type="Bool" block="CP Inserter" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="IFFT Output (Q)" id="57" txrx="tx">
+    <primary name="Primary">
+      <data MSB="12" LSB="3" name="IFFT Output MSB's @ 200MHz odd (I)" type="s(13,1)" block="IFFT" subsystem="tdPhy" />
+      <data MSB="12" LSB="3" name="IFFT Output MSB's @ 200MHz even (Q)" type="s(13,1)" block="IFFT" subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="IFFT Output MSB's @ 200MHz odd (Q)" type="Bool" block="IFFT" subsystem="tdPhy" />
+      <data MSB="2" LSB="2" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="Packet Start (Gate)" type="Bool" block="CP Inserter" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+  <mode name="PAR Output Test" id="58" txrx="tx">
+    <primary name="Primary">
+      <data MSB="23" LSB="14" name="IFFT Output Data Valid" type="s(13,1)" block="CP Inserter" subsystem="tdPhy" />
+      <data MSB="13" LSB="4" name="CP Inserter Output MSB's (I)" type="s(13,1)" block="CP Inserter" subsystem="tdPhy" />
+      <data MSB="3" LSB="3" name="CP Inserter Output MSB's (Q)" type="Bool" block="PAR Reduction" subsystem="fdPhy" />
+      <data MSB="2" LSB="2" name="PAR Applied" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+      <data MSB="1" LSB="1" name="Packet Start (Gate)" type="Bool" block="CP Inserter" subsystem="tdPhy" />
+      <data MSB="0" LSB="0" name="OFDM Symbol" type="Bool" block="CTC Pkt Gate" subsystem="tdPhy" />
+    </primary>
+    <secondary />
+  </mode>
+</root>
+

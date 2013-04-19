@@ -1,0 +1,1932 @@
+
+#LA_RESULTS_PATH = "Z:/Documents and Settings/Administrator/My Documents/Agilent Technologies/Logic Analyzer/Export Files/Standard_Veeresh/"
+#LA_RESULTS_PATH = "S:/users/vtaranalli/vtaranalli_fusion2_revA_4/c_model/src/phy_model_for_vlsi/TDInterface/GUI_App/data/"
+
+LA_SAMPLING_RATE = 100*1e6
+
+#GENVEC_RESULTS_PATH = "S:/users/vtaranalli/vtaranalli_fusion2_revA_4/c_model/src/phy_model_for_vlsi/validation/rtlBitmatchFusion2/testCfgs/Results/"
+
+GENVEC_SAMPLING_RATE = 160*1e6
+
+GENVEC_TESTMUX_MAPPING = {  "ADC_I":                        "afe_adc.out",
+                            "ADC_Q":                        "afe_adc.out",
+                            "agcDetect":                    "tdPhy_agcSS_agcDetector.out3",
+                            "largeSignalDetect":            "tdPhy_agcSS_agcDetector.out2",
+                            "satDetect":                    "tdPhy_agcSS_agcDetector.out1",
+                            "satCounter":                   "tdPhy_agcSS_analogEnergyEst.out2",
+                            "analogGain":                   "tdPhy_agcSS_gainController.out1",
+                            "digiGain":                     "tdPhy_agcSS_gainController.out2",
+                            "analogEnergy":                 "tdPhy_agcSS_analogEnergyEst.out1",
+                            "digiEnergy":                   "tdPhy_agcSS_digitalEnergyEst.out",
+                            "ssCorrelationMSBs":            "tdPhy_agcSS_ssCorr.out",
+                            "ssCorrelationLSBs":            "tdPhy_agcSS_ssCorr.out",
+                            "agcTimeOut":                   "tdPhy_agcSS_agcController.out",
+                            "ChannelTimeCounter":           "tdPhy_rxController.in1",
+                            "adcInterfaceEnable":           "tdPhy_rxController.out1", 
+                            "mClear":                       "tdPhy_rxController.out2",
+                            "mReset":                       "tdPhy_rxController.out3",
+                            "acqError":                     "tdPhy_burstAcqSS_burstDetector.out3",
+                            "peakDetect":                   "tdPhy_burstAcqSS_burstDetector.out1",
+                            "burstDetect":                  "tdPhy_burstAcqSS_burstDetector.out4",
+                            "burstAcqFinished":             "tdPhy_burstAcqSS_burstDetector.out5",
+                            "meanPktStartTime":             "tdPhy_burstAcqSS_burstDetector.out2",
+                            "longSeqEnergy":                "tdPhy_burstAcqSS_burstDetector.in2",
+                            "longSeqCorrelation":           "tdPhy_burstAcqSS_longSeqCorr.out1",
+                            "digiGainScalerOutputMSBsI":    "tdPhy_digiGainScaler.out",
+                            "digiGainScalerOutputMSBsQ":    "tdPhy_digiGainScaler.out",
+                            "OFDMSymbolMarker":             "tdPhy_ofdmSymFramer.out2",
+                            "rotatorRestartTime":           "tdPhy_ofdmSymFramer.out4",
+                            "rotatorRestart":               "tdPhy_ofdmSymFramer.out3",
+                            "packetEnd":                    "tdPhy_ofdmSymFramer.out5",
+                            "FFTInputMSBsI":                "tdPhy_fft.in1",
+                            "FFTInputMSBsQ":                "tdPhy_fft.in1",
+                            "FFTInputDataValidSignal":      "tdPhy_fft.in2",
+                            "FFTOutputBitsI":               "tdPhy_fft.out",
+                            "FFTOutputBitsQ":               "tdPhy_fft.out",
+                            "SlicerInputMSBsI":             "fdPhy_rotatorCpe.out",
+                            "SlicerInputMSBsQ":             "fdPhy_rotatorCpe.out"
+                         }
+                    
+
+
+# ============================================================================
+# Test Mux Config 01 - General Time Domain
+TEST_MUX_RESULTS_FILE_1 = "testMux_01.csv"
+TEST_MUX_CONFIG_1 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                                ("largeSignalDetect", []),
+                                ("satDetect", []),
+                                ("agcTimeOut", [])
+                            ]),
+                            ("RX Controller", [
+                                ("DescrTrigger", []),
+                                ("ChannelTimeCounter", []),
+                                ("adcInterfaceEnable", []),
+                                ("mClear", []),
+                                ("mReset", [])
+                            ]),
+                            ("Burst Detection", [
+                                ("acqError", []),
+                                ("peakDetect", []),
+                                ("burstDetect", []),
+                                ("burstAcqFinished", [])
+                            ]),
+                            ("OFDM Symbol Framer", [
+                                ("OFDMSymbolMarker", []),
+                                ("packetEnd", [])
+                            ])
+                        ])
+                    ]),
+                    ("Secondary", [
+                        ("tdPhy", [
+                            ("HW AGC", [
+                                ("analogGain", []),
+                                ("digiGain", [])
+                            ])
+                        ]),
+                        ("Burst Detection", [
+                            ("meanPktStartTime", [])
+                        ])
+                    ])
+                ]          
+
+# ============================================================================
+# Test Mux Config 02 - AGC Gain Adjusts
+TEST_MUX_RESULTS_FILE_2 = "testMux_02.csv"
+TEST_MUX_CONFIG_2 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                            ("largeSignalDetect", []),
+                            ("satDetect", []),
+                            ("analogGain", []),
+                            ("digiGain", []),
+                            ("agcTimeOut", [])
+                        ]),
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("mClear", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("satCounter", []),
+                            ("digiEnergy", [])
+                        ]),
+                        ("RX Controller", [
+                            ("adcInterfaceEnable", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", []),
+                            ("burstAcqFinished", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 03 - AGC Analog Gain Adjusts
+TEST_MUX_RESULTS_FILE_3 = "testMux_03.csv"
+TEST_MUX_CONFIG_3 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("AFE", [
+                        ("FE/BE Gain Separator", [
+                            ("frontEndGain", []),
+                            ("backEndGain", [])
+                        ])
+                    ]),
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                            ("largeSignalDetect", []),
+                            ("satDetect", []),
+                            ("analogGain", []),
+                            ("agcTimeout", [])
+                        ]),
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("satCounter", []),
+                            ("analogEnergy", [])
+                        ]),
+                        ("RX Controller", [
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstAcqFinished", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("rotatorRestart", []),
+                            ("packetEnd", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 04 - AGC Digital Gain Adjusts
+TEST_MUX_RESULTS_FILE_4 = "testMux_04.csv"
+TEST_MUX_CONFIG_4 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                            ("largeSignalDetect", []),
+                            ("satDetect", []),
+                            ("analogGain", []),
+                            ("digiGain", [])
+                        ]),
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("AFE", [
+                        ("FE/BE Gain Separator", [
+                            ("frontEndGain", [])
+                        ])
+                    ]),
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("digiEnergy", []),
+                            ("agcTimeout", [])
+                        ]),
+                        ("RX Controller", [
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", []),
+                            ("burstAcqFinished", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                            ("rotatorRestart", []),
+                            ("packetEnd", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 05 - AGC Sat and LgSig Detect
+TEST_MUX_RESULTS_FILE_5 = "testMux_05.csv"
+TEST_MUX_CONFIG_5 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                     ("tdPhy", [
+                        ("HW AGC", [
+                            ("largeSignalDetect", []),
+                            ("satDetect", []),
+                            ("satCounter", []),
+                            ("analogEnergy", [])
+                        ]),
+                        ("RX Controller", [
+                            ("DescrTrigger", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("AFE", [
+                        ("FE/BE Gain Separator", [
+                            ("frontEndGain", []),
+                            ("backEndGain", [])
+                        ])
+                    ]),
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                            ("analogGain", []),
+                            ("agcTimeout", [])
+                        ]),
+                        ("RX Controller", [
+                            ("adcInterfaceEnable", []),
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstAcqFinished", []),
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("rotatorRestart", []),
+                            ("packetEnd", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 06 - AGC SSeq Detect1
+TEST_MUX_RESULTS_FILE_6 = "testMux_06.csv"
+TEST_MUX_CONFIG_6 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                            ("ssCorrelationMSBs", []),
+                            ("ssCorrelationLSBs", [])
+                        ]),
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("largeSignalDetect", []),
+                            ("satDetect", []),
+                            ("analogGain", []),
+                            ("digiEnergy", []),
+                            ("agcTimeout", [])
+                        ])
+                    ])
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 07 - AGC SSeq Detect2
+TEST_MUX_RESULTS_FILE_7 = "testMux_07.csv"
+TEST_MUX_CONFIG_7 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("analogEnergy", []),
+                            ("ssCorrelationLSBs", [])
+                        ]),
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("digiEnergy", []),
+                            ("ssCorrelationMSBs", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 08 - BDet Correlation 1
+#TEST_MUX_RESULTS_FILE_8 = "beacon-search_Veeresh.csv"
+TEST_MUX_RESULTS_FILE_8 = "testMux_08.csv"
+TEST_MUX_CONFIG_8 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", []),
+                            ("mClear", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                            ("burstAcqFinished", []),
+                            ("longSeqCorrelation", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", []),
+                            ("meanPktStartTime", []),
+                            ("longSeqEnergy", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 09 - BDet Correlation 2
+TEST_MUX_RESULTS_FILE_9 = "testMux_09.csv"
+TEST_MUX_CONFIG_9 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", [])
+                        ]),
+                        ("RX Controller", [
+                            ("adcInterfaceEnable", []),
+                            ("mClear", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstAcqFinished", []),
+                            ("meankPktStartTime", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("rotatorRestartTime", []),
+                            ("rotatorRestart", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcTimeout", [])
+                        ]),
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", []),
+                            ("burstDetect", []),
+                            ("longSeqCorrelation", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", [])
+                        ])
+                    ])
+                ])
+            ]
+
+
+
+# ============================================================================
+# Test Mux Config 10 - BDet Correlation 1LS
+TEST_MUX_RESULTS_FILE_10 = "testMux_10.csv"
+TEST_MUX_CONFIG_10 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", []),
+                            ("mClear", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                            ("burstAcqFinished", []),
+                            ("lsCorrelation", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", []),
+                            ("meanPktStartTime", []),
+                            ("lsEnergy", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 11 - BDet with AGC
+TEST_MUX_RESULTS_FILE_11 = "testMux_11.csv"
+TEST_MUX_CONFIG_11 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("RX Controller", [
+                        ("DescrTrigger", []),
+                        ("adcInterfaceEnable", []),
+                        ("mClear", [])
+                    ]),
+                    ("Burst Detection", [
+                        ("acqError", []),
+                        ("peakDetect", []),
+                        ("burstDetect", []),
+                        ("longSeqCorrelation", [])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("AFE", [
+                        ("FE/BE Gain Separator", [
+                            ("frontEndGain", [])
+                        ])
+                    ]),
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                            ("largeSignalDetect", []),
+                            ("satDetect", []),
+                            ("analogGain", []),
+                            ("digiGain", []),
+                            ("agcTimeout", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstAcqFinished", []),
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 12 - FreqOffsetEst1
+TEST_MUX_RESULTS_FILE_12 = "testMux_12.csv"
+TEST_MUX_CONFIG_12 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Frequency Estimator", [
+                            ("freqOffsetComp", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", []),
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                            ("burstAcqFinished", [])
+                        ]),
+                        ("Frequency Estimator", [
+                            ("sampOffsetComp", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                            ("rotatorRestart", []),
+                            ("packetEnd", [])
+                        ])
+                    ])
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 13 - FreqOffsetEst2
+TEST_MUX_RESULTS_FILE_13 = "testMux_13.csv"
+TEST_MUX_CONFIG_13 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", [])
+                        ]),
+                        ("Frequency Estimator", [
+                            ("freqOffsetComp", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Frequency Estimator", [
+                            ("coarseEstimateMSBs", []),
+                            ("fineEstimateMSBs", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 14 - FreqOffsetEst3
+TEST_MUX_RESULTS_FILE_14 = "testMux_14.csv"
+TEST_MUX_CONFIG_14 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", [])
+                        ]),
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", []),
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", [])
+                        ]),
+                        ("Frequency Estimator", [
+                            ("resolvedEstimate", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Frequency Estimator", [
+                            ("coarseEstimateMSBs", []),
+                            ("fineEstimateMSBs", [])
+                        ])
+                    ])
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 15 - Resampler
+TEST_MUX_RESULTS_FILE_15 = "testMux_15.csv"
+TEST_MUX_CONFIG_15 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                            ("burstAcqFinished", []),
+                            ("meanPktStartTime", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("rotatorRestartTime", []),
+                            ("rotatorRestart", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", [])
+                        ]),
+                        ("RX Controller", [
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", [])
+                        ])
+                    ])
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 16 - TD Datapath
+TEST_MUX_RESULTS_FILE_16 = "testMux_16.csv"
+TEST_MUX_CONFIG_16 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ]),
+                        ("Digital Gain Scaling", [
+                            ("digiGainScalerOutputMSBsI", []),
+                            ("digiGainScalerOutputMSBsQ", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("rotatorRestart", [])
+                        ]),
+                        ("FFT", [
+                            ("FFTInputMSBsI", []),
+                            ("FFTInputMSBsQ", []),
+                            ("FFTInputDataValidSignal", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 17 - FD Datapath (FFT out/IQ out)
+TEST_MUX_RESULTS_FILE_17 = "testMux_17.csv"
+TEST_MUX_CONFIG_17 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", [])
+                        ]),
+                        ("FFT", [
+                            ("FFTOutputBitsI", []),
+                            ("FFTOutputBitsQ", []),
+                            ("FFTDataValidSignal", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("IQ Compensator", [
+                            ("rxFDIQOutputMSBsI", []),
+                            ("rxFDIQOutputMSBsQ", []),
+                            ("rxFDIQDataValidSignal", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 18 - ChanEst Noisy
+TEST_MUX_RESULTS_FILE_18 = "testMux_18.csv"
+TEST_MUX_CONFIG_18 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", [])
+                        ]),
+                        ("Channel Estimation", [
+                            ("chanAveMagnSqMSBs", []),
+                            ("InterferenceFlag", []),
+                            ("chanEstDataValidSignal", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Channel Estimation", [
+                            ("chanEstMSBsI", []),
+                            ("chanEstMSBsQ", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 19 - Eq Coeffs
+TEST_MUX_RESULTS_FILE_19 = "testMux_19.csv"
+TEST_MUX_CONFIG_19 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Channel Estimation", [
+                            ("EqCoeffI", []),
+                            ("chanEstDataValidSignal", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Module Specific", [
+                            ("contextID", [])
+                        ]),
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Channel Estimation", [
+                            ("EqCoeffQ", []),
+                            ("InterferenceFlag", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Module Specific", [
+                            ("ConstellationIDs", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 20 - Eq MagnSq
+TEST_MUX_RESULTS_FILE_20 = "testMux_20.csv"
+TEST_MUX_CONFIG_20 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Channel Estimation", [
+                            ("chanAveMagnSqMSBs", []),
+                            ("InterferenceFlag", []),
+                            ("chanEstDataValidSignal", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Module Specific", [
+                            ("contextID", [])
+                        ]),
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("analogGain", []),
+                            ("digiGain", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                            ("rotatorRestart", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("FD_BERT", [
+                            ("pktErrorEvent", [])
+                        ]),
+                        ("Module Specific", [
+                            ("ConstellationIDs", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 21 - FD Datapath (constScaler out)
+TEST_MUX_RESULTS_FILE_21 = "testMux_21.csv"
+TEST_MUX_CONFIG_21 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("OFDM Symbol Marker", [
+                            ("OFDMSymbolMarker", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Constellation Scaler", [
+                            ("ConstellationScalerOutputI", []),
+                            ("ConstellatonScalerDataValidSignal", [])
+                        ]),
+                        ("Module Specific", [
+                            ("contextID", []),
+                            ("ConstellationIDs", [])
+                        ]),
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                            ("largeSignalDetect", []),
+                            ("satDetect", []),
+                            ("agcTimeout", [])
+                        ]),
+                        ("RX Controller", [
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", []),
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                            ("burstAcqFinished", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("rotatorRestart", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Constellation Scaler", [
+                            ("ConstellationScalerOutputQ", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 22 - FD Datapath (slicerAGC out)
+TEST_MUX_RESULTS_FILE_22 = "testMux_22.csv"
+TEST_MUX_CONFIG_22 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("OFDM Symbol Marker", [
+                            ("OFDMSymbolMarker", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Slicer AGC", [
+                            ("SlicerAGCOutputI", []),
+                            ("SlicerAGCDataValidSignal", [])
+                        ]),
+                        ("Module Specific", [
+                            ("contextID", []),
+                            ("ConstellationIDs", [])
+                        ]),
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("agcDetect", []),
+                            ("largeSignalDetect", []),
+                            ("satDetect", []),
+                            ("agcTimeout", [])
+                        ]),
+                        ("RX Controller", [
+                            ("mClear", []),
+                            ("mReset", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("acqError", []),
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                            ("burstAcqFinished", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("rotatorRestart", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Slicer AGC", [
+                            ("SlicerAGCOutputQ", [])
+                        ])
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 23 - Phase Detector
+TEST_MUX_RESULTS_FILE_22 = "testMux_23.csv"
+TEST_MUX_CONFIG_22 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ]),
+                        ("OFDM Symbol Marker", [
+                            ("OFDMSymbolMarker", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Phase Detector", [
+                            ("wtPhase", []),
+                            ("PhaseDetectorDataValidSignal", [])
+                        ]),
+                        ("Module Specific", [
+                            ("contextID", []),
+                            ("ConstellationIDs", [])
+                        ]),
+                    ])
+                ]),
+                ("Secondary", [
+                    ("fdPhy", [
+                        ("Phase Detector", [
+                            ("weight", [])
+                        ]),
+                        ("Frequency/Timing Tracking", [
+                            ("CPEOutputMSBs", []),
+                            ("CPEOutputLSBs", []),
+                            ("PhaseDetectorCPEValid", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 24 - Tracking Loops
+TEST_MUX_RESULTS_FILE_24 = "testMux_24.csv"
+TEST_MUX_CONFIG_24 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("OFDM Symbol Marker", [
+                            ("OFDMSymbolMarker", []),
+                            ("rotatorRestart", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Frequency/Timing Tracking", [
+                            ("CPEOutputLSBs", []),
+                            ("FreqTrackingOutput", []),
+                            ("TrackingLoopDataValidSignal", [])
+                        ]),
+                        ("FD_BERT", [
+                            ("pktErrorEvent", [])
+                        ]),
+                        ("DLL BERT", [
+                            ("pktError", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("fdPhy", [
+                        ("Frequency/Timing Tracking", [
+                            ("CPEOutputMSBs", []),
+                            ("PhaseDetectorCPEValid", []),
+                            ("TimeTrackingOutput", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 25 - NVE General
+TEST_MUX_RESULTS_FILE_25 = "testMux_25.csv"
+TEST_MUX_CONFIG_25 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("NoiseVarianceEstimate", []),
+                            ("interfEstMSBs", []),
+                            ("interfEstSignBit", []),
+                            ("NVEDataValidSignal", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDM Symbol Marker", []),
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("interfEstWriteEnable", []),
+                            ("interferenceFlag", []),
+                            ("InputEVM", []),
+                            ("LoopFilterCaseSelect", []),
+                            ("PhaseDetectorCPEValid", [])
+                        ]),
+                        ("Module Specific", [
+                            ("contextID", []),
+                            ("ConstellationIDs", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("DLL BERT", [
+                            ("pktError", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 26 - NVE - w/Error Metrics
+TEST_MUX_RESULTS_FILE_26 = "testMux_26.csv"
+TEST_MUX_CONFIG_26 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("NoiseVarianceEstimate", []),
+                            ("errorMetricLSBs", []),
+                            ("LoopFilterCaseSelect", []),
+                            ("NVEDataValidSignal", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("DLL BERT", [
+                            ("pktError", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("errorMetricMSBs", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 27 - NVE - w/Feedback Signal
+TEST_MUX_RESULTS_FILE_27 = "testMux_27.csv"
+TEST_MUX_CONFIG_27 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("NoiseVarianceEstimate", []),
+                            ("NVEFeedbackSignalLSBs", []),
+                            ("LoopFilterCaseSelect", []),
+                            ("NVEDataValidSignal", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("DLL BERT", [
+                            ("pktError", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("NVEFeedbackSignalMSBs", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 28 - Slicer Input (24-bits)
+TEST_MUX_RESULTS_FILE_28 = "testMux_28.csv"
+TEST_MUX_CONFIG_28 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Common Phase Error Rotator", [
+                            ("SlicerInputMSBsI", []),
+                            ("SlicerInputMSBsQ", []),
+                            ("SlicerDataValidSignal", [])
+                        ])
+                    ]),
+                ]),
+                ("Secondary", [
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("NoiseVarianceEstimate", []),
+                            ("InterferenceFlag", []),
+                            ("LoopFilterCaseSelect", []),
+                            ("NVEDataValidSignal", [])
+                        ]),
+                        ("FD_BERT", [
+                            ("pktErrorEvent", []),
+                        ]),
+                        ("Module Specific", [
+                            ("contextID", []),
+                            ("ConstellationIDs", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("DLL BERT", [
+                            ("pktError", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 29 - Slicer Input
+TEST_MUX_RESULTS_FILE_29 = "testMux_29.csv"
+TEST_MUX_CONFIG_29 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Common Phase Error Rotator", [
+                            ("SlicerInputI", []),
+                            ("SlicerDataValidSignal", [])
+                        ]),
+                        ("Noise Variance Estimator", [
+                            ("Interference Flag", [])
+                        ]),
+                        ("Module Specific", [
+                            ("ConstellationIDs", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("DLL BERT", [
+                            ("pktError", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("packetEnd", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Common Phase Error Rotator", [
+                            ("SlicerInputQ", [])
+                        ]),
+                        ("Noise Variance Estimator", [
+                            ("NoiseVarianceEstimate", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 30 - Subcarrier BERT
+TEST_MUX_RESULTS_FILE_30 = "testMux_30.csv"
+TEST_MUX_CONFIG_30 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("Interference Flag", []),
+                            ("NVEDataValidSignal", [])
+                        ]),
+                        ("FD_BERT", [
+                            ("SubcarrierInError", []),
+                            ("SubcarrierIndex", []),
+                            ("BERTValidSignal", [])
+                        ]),
+                        ("Module Specific", [
+                            ("contextID", []),
+                            ("ConstellationIDs", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Common Phase Error Rotator", [
+                            ("SlicerInputMSBsI", []),
+                            ("SlicerInputMSBsQ", []),
+                            ("SlicerDataValidSignal", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 31 - EPP Avg
+TEST_MUX_RESULTS_FILE_31 = "testMux_31.csv"
+TEST_MUX_CONFIG_31 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("peakDetect", [])
+                        ]),    
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                        ]),
+                        ("Channel Estimation", [
+                            ("InterferenceFlag", []),
+                            ("chanEstDataValidSignal", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("EPP Averager", [
+                            ("EPPOutputI", []),
+                            ("EPPDataValidSignal", []),
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Burst Detection", [
+                            ("meanPktStartTime", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("EPP Averager", [
+                            ("EPPOutputQ", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 32 - EVM Avg w/ AGC
+TEST_MUX_RESULTS_FILE_32 = "testMux_32.csv"
+TEST_MUX_CONFIG_32 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),  
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                        ]),
+                        ("Channel Estimation", [
+                            ("InterferenceFlag", []),
+                            ("chanEstDataValidSignal", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("EVM Averager", [
+                            ("EVMOutput019", []),
+                            ("EVMDataValidSignal", []),
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("HW AGC", [
+                            ("analogGain", [])
+                        ]),
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("Interference Flag", []),
+                            ("NVEDataValidSignal", [])
+                        ]),
+                        ("EVM Averager", [
+                            ("EVMOutput2032", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 33 - EVM Avg w/ CPE
+TEST_MUX_RESULTS_FILE_33 = "testMux_33.csv"
+TEST_MUX_CONFIG_33 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),  
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("EVM Averager", [
+                            ("EVMOutput019", []),
+                            ("EVMDataValidSignal", []),
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Burst Detection", [
+                            ("peakDetect", []),
+                            ("burstDetect", []),
+                            ("burstAcqFinished", []),
+                            ("meanPktStartTime", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Frequency/Timing Tracking", [
+                            ("CPEOutputMSBs", []),
+                            ("CPEOutputLSBs", []),
+                            ("PhaseDetectorCPEValid", []),
+                        ])
+                    ])      
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 34 - EVM Avg w/ CE Est
+TEST_MUX_RESULTS_FILE_34 = "testMux_34.csv"
+TEST_MUX_CONFIG_34 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),  
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", []),
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("EVM Averager", [
+                            ("EVMOutput019", []),
+                            ("EVMDataValidSignal", []),
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Burst Detection", [
+                            ("peakDetect", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Channel Estimation", [
+                            ("chanAveMagnSqMSBs", []),
+                            ("InterferenceFlag", []),
+                            ("chanEstDataValidSignal", [])
+                        ]),
+                        ("Module Specific", [
+                            ("ConstellationIDs", [])
+                        ])
+                    ])      
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 35 - LDPC w/ CE Est
+TEST_MUX_RESULTS_FILE_35 = "testMux_35.csv"
+TEST_MUX_CONFIG_35 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Channel Estimation", [
+                            ("chanAveMagnSqMSBs", []),
+                            ("chanEstDataValidSignal", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("LDPC Decoder", [
+                            ("ldpcStartOfDecode", []),
+                            ("ldpcBadOrEndofLayer", []),
+                            ("ldpcGoodLayer", []),
+                            ("ldpcConverged", []),
+                            ("ldpcAborted", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("Burst Detection", [
+                            ("burstDetect", [])
+                        ]),
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("NoiseVarianceEstimate", []),
+                            ("InterferenceFlag", []),
+                            ("LoopFilterCaseSelect", []),
+                            ("NVEDataValidSignal", [])
+                        ]),
+                        ("Module Specific", [
+                            ("contextID", []),
+                            ("ConstellationIDs", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("LDPCDecoder", [
+                            ("ldpcDetectingShortPacket", [])
+                        ])
+                    ])
+                ])
+            ]
+
+
+# ============================================================================
+# Test Mux Config 36 - LDPC w/ CPE
+TEST_MUX_RESULTS_FILE_36 = "testMux_36.csv"
+TEST_MUX_CONFIG_36 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Frequency/Timing Tracking", [
+                            ("CPEOutputMSBs", []),
+                            ("CPEOutputLSBs", []),
+                            ("PhaseDetectorCPEValid", []),
+                        ]),
+                        ("Noise Variance Estimator", [
+                            ("InterferenceFlag", []),
+                            ("NVEDataValidSignal", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("LDPC Decoder", [
+                            ("ldpcStartOfDecode", []),
+                            ("ldpcBadOrEndofLayer", []),
+                            ("ldpcGoodLayer", []),
+                            ("ldpcConverged", []),
+                            ("ldpcAborted", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("fdPhy", [
+                        ("Frequency/Timing Tracking", [
+                            ("FreqTrackingOutput", []),
+                            ("TrackingLoopDataValidSignal", [])
+                        ]),
+                        ("Noise Variance Estimator", [
+                            ("LoopFilterCaseSelect", [])
+                        ]),
+                        ("Module Specific", [
+                            ("ConstellationIDs", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("LDPCDecoder", [
+                            ("ldpcDetectingShortPacket", [])
+                        ]),
+                        ("DLL BERT", [
+                            ("pktError", [])
+                        ]),
+                    ])
+                ])
+            ]
+
+# ============================================================================
+# Test Mux Config 37 - LDPC w/ NVE
+TEST_MUX_RESULTS_FILE_37 = "testMux_37.csv"
+TEST_MUX_CONFIG_37 = [
+                ("DAC Data", [
+                    ("DAC_I", []),
+                    ("DAC_Q", []),
+                ]),
+                ("ADC Data", [
+                    ("ADC_I", []),
+                    ("ADC_Q", []),
+                ]),
+                ("Primary", [
+                    ("tdPhy", [
+                        ("RX Controller", [
+                            ("DescrTrigger", []),
+                            ("adcInterfaceEnable", [])
+                        ]),
+                        ("OFDM Symbol Framer", [
+                            ("OFDMSymbolMarker", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("NoiseVarianceEstimate", []),
+                            ("InterferenceFlag", []),
+                            ("LoopFilterCaseSelect", []),
+                            ("NVEDataValidSignal", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("LDPC Decoder", [
+                            ("ldpcStartOfDecode", []),
+                            ("ldpcBadOrEndofLayer", []),
+                            ("ldpcGoodLayer", []),
+                            ("ldpcConverged", []),
+                            ("ldpcAborted", []),
+                            ("ldpcDetectingShortPacket", [])
+                        ])
+                    ])
+                ]),
+                ("Secondary", [
+                    ("tdPhy", [
+                        ("OFDMSymbolFramer", [
+                            ("packetEnd", [])
+                        ])
+                    ]),
+                    ("fdPhy", [
+                        ("Noise Variance Estimator", [
+                            ("interfEstMSBs", []),
+                            ("interfEstSignBit", []),
+                            ("interEstWriteEnable", []),
+                            ("InputEVM", [])
+                        ]),
+                        ("FD_BERT", [
+                            ("pktErrorEvent", [])
+                        ])
+                    ]),
+                    ("dll", [
+                        ("DLL BERT", [
+                            ("pktError", [])
+                        ]),
+                    ])
+                ])
+            ]

@@ -1,0 +1,669 @@
+
+import numpy as np
+import scipy.signal
+import scipy.fftpack
+import matplotlib.pyplot as plt
+import sys
+from numpy import Inf, NaN
+
+__all__ = ["get_correlation_signals"]
+
+def piby4_BPSK(in_symbols, scaling_factor):
+    """ Pi/4 BPSK Modulation """
+
+    out_symbols = scaling_factor * np.array(map(lambda x: 1-2*x + 1j*(1-2*x), in_symbols))
+    return out_symbols
+
+def get_moca1x_SS_symbol():
+    """ Generate MoCA 1.x Short Sequence (SS) Symbols """
+
+    moca1x_SS = np.array([0,1,1,1,0,0,0,0,1,0,0,0,0,1,1,1,1,1,0,0,0,1,0,0,1,1,1,1,1,0])
+    K_mod = 1/np.sqrt(2)
+    SS_piby4_bpsk_symbols = piby4_BPSK(moca1x_SS, K_mod)
+    return SS_piby4_bpsk_symbols
+
+def get_moca1x_LS_symbol(ls_num):
+    """ Generate MoCA 1.x Long Sequence (LS) Symbols """
+
+    moca1x_LS_array = np.array([[0,0,0,0,0,0,1,0,1,0,1,0,0,1,1,0,0,1,0,0,0,1,0,0,1,0,1,1,0,1,1,0,0,0,1,1,1,0,1,0,0,0,0,1,1,0,1,0,1,1,1,0,0,1,1,1,1,0,1,1,1,1,1,0],
+                                [1,0,1,1,1,0,0,1,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,1,0,1,0,1,0,0,1,1,0,0,1,0,0,0,1,0,0,1,0,1,1,0,1,1,0,0,0,1,1,1,0,1,0,0,0,0,1,1,0,1],
+                                [1,1,0,1,0,1,0,1,1,1,0,0,1,1,0,0,0,0,1,0,0,0,1,0,1,0,0,1,0,1,1,0,0,1,0,0,1,1,1,0,1,1,0,1,1,1,1,0,0,0,1,1,1,1,1,0,1,0,0,0,0,0,0,1],
+                                [1,0,0,1,0,1,1,1,0,1,1,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,1,1,0,0,0,0,1,1,1,1,1,0,0,1,0,0,0,1,1,0,0,1,1,1,0,0,0,1,0,1,0,0,0,0,0,0,1]])
+    moca1x_LS = moca1x_LS_array[ls_num-1]
+    K_mod = 1/np.sqrt(2)
+    LS_piby4_bpsk_symbols = piby4_BPSK(moca1x_LS, K_mod)
+    return LS_piby4_bpsk_symbols
+
+def get_moca1x_CE_symbol():
+    """ Generate MoCA 1.x Channel Estimation (CE) time-domain symbol """
+
+    moca1x_CE = np.array([1,0,1,0, 1,0,1,1, 1,1,0,1, 0,0,1,0, 1,1,1,1, 0,1,0,0, 0,1,0,1, 0,0,0,1, 1,0,0,1, 0,0,0,0, 1,0,1,0, 1,1,1,0, 0,1,1,0, 0,0,0,1, 1,1,1,0, 0,0,0,1,
+                          1,1,0,1, 0,1,1,0, 0,1,1,0, 0,0,0,0, 1,1,0,1, 0,1,1,1, 0,0,1,1, 0,1,1,1, 0,0,1,1, 1,0,0,0, 0,1,0,1, 0,0,0,1, 0,0,1,0, 0,0,1,0, 0,1,1,1, 0,0,1,1,
+                          0,1,1,0, 1,1,0,1, 1,1,1,0, 1,0,0,1, 1,0,0,0, 0,1,1,0, 1,1,1,0, 0,1,0,1, 1,0,1,1, 0,1,0,0, 0,0,0,0, 0,0,0,1, 1,1,0,0, 1,1,0,0, 1,1,0,0, 0,1,1,0,
+                          1,0,0,0, 1,1,0,1, 1,1,0,0, 0,0,0,1, 0,0,1,0, 0,1,1,0, 0,0,0,1, 0,0,1,1, 1,1,1,0, 0,0,0,1, 0,0,0,1, 0,1,1,0, 0,0,0,0, 1,1,1,0, 0,0,1,0, 1,1,1,0])
+    FFT_size = 256
+    num_unallocated_sc = 32
+    CE_bpsk_symbols = 1 - (2*moca1x_CE)
+    CE_bpsk_symbols[0:4] = 0
+    CE_bpsk_symbols[116:141] = 0
+    CE_bpsk_symbols[253:256] = 0
+    CE_td_symbol = np.sqrt(FFT_size)*np.fft.ifft(CE_bpsk_symbols*np.sqrt(float(FFT_size)/(FFT_size - num_unallocated_sc)), FFT_size)
+    return CE_td_symbol
+
+def get_moca2x_SS_symbol():
+    """ Generate MoCA 2.x Short Sequence (SS) time-domain Symbols """
+    
+    FFT_size = 64
+    num_unallocated_sc = 4
+    moca2_SS = np.array([2,0,0,1,0,0,0,0,1,1,1,1,1,0,1,0,1,1,0,1,0,0,0,1,0,0,1,1,1,0,1,2,2,2,0,0,0,1,0,1,1,1,1,0,0,0,1,0,1,1,0,1,1,0,1,0,0,0,0,1,0,0,0,0])
+    moca2_SS_bpsk_symbols = np.zeros(FFT_size)
+    for i in np.arange(FFT_size):
+        if moca2_SS[i] == 0:
+            moca2_SS_bpsk_symbols[i] = 1
+        elif moca2_SS[i] == 1:
+            moca2_SS_bpsk_symbols[i] = -1
+        else:
+            pass
+
+    #moca2_SS_bpsk_symbols = scipy.fftpack.fftshift(moca2_SS_bpsk_symbols)
+    SS_td_symbol = np.sqrt(FFT_size)*scipy.fftpack.ifft(moca2_SS_bpsk_symbols*np.sqrt(float(FFT_size)/(FFT_size-num_unallocated_sc)), FFT_size)
+    return SS_td_symbol
+
+def get_moca2x_LS_symbol(ls_num):
+    """ Generate MoCA 2.x Long Sequence (LS) time-domain symbols """
+    
+    FFT_size = 128
+    num_unallocated_sc = 8
+    moca2_LS_bpsk_symbols = np.zeros(FFT_size)
+    moca2_LS = np.array([[2,0,1,0, 1,0,1,1, 1,0,0,1, 0,0,1,0, 1,0,1,0, 1,0,1,1, 1,0,0,0, 1,0,0,1, 0,0,1,1, 1,0,0,1, 0,1,1,1, 1,1,0,0, 1,1,0,0, 1,0,0,1, 0,1,1,0, 1,2,2,2, 
+                          2,2,2,2, 1,1,1,1, 0,0,0,0, 0,1,1,0, 1,0,0,0, 0,0,0,1, 1,1,1,1, 1,1,0,0, 1,1,0,1, 0,1,0,1, 1,1,1,0, 1,1,1,1, 1,0,1,0, 0,0,1,1, 0,0,0,1, 0,0,0,0],
+                         [2,1,0,1, 1,1,0,0, 0,0,0,1, 1,0,1,0, 0,1,0,0, 1,0,1,1, 1,0,1,1, 1,0,0,1, 0,0,1,1, 0,1,0,1, 1,1,0,1, 0,0,0,0, 1,0,0,0, 0,1,0,1, 0,0,1,1, 0,2,2,2, 
+                          2,2,2,2, 1,1,1,1, 0,0,1,0, 1,0,0,0, 0,1,1,1, 0,0,1,1, 0,0,1,1, 0,1,1,1, 0,1,0,1, 0,1,1,0, 1,0,0,1, 1,1,1,1, 0,0,1,1, 1,0,1,1, 1,0,0,0, 1,0,0,0]])
+    LS_symbols = moca2_LS[ls_num-1]
+    for i in np.arange(FFT_size):
+        if LS_symbols[i] == 0:
+            moca2_LS_bpsk_symbols[i] = 1
+        elif LS_symbols[i] == 1:
+            moca2_LS_bpsk_symbols[i] = -1
+        else:
+            pass
+    #plt.figure()
+    #plt.plot(abs(moca2_LS_bpsk_symbols))
+    #plt.show()
+    #moca2_LS_bpsk_symbols = scipy.fftpack.fftshift(moca2_LS_bpsk_symbols)
+    LS_td_symbol = np.sqrt(FFT_size)*scipy.fftpack.ifft(moca2_LS_bpsk_symbols*np.sqrt(float(FFT_size)/(FFT_size-num_unallocated_sc)), FFT_size)
+    return LS_td_symbol
+
+def get_moca2x_CE_symbol():
+    """ Generate MoCA 2.x Channel Estimation (CE) time-domain symbols """
+    
+    FFT_size = 512
+    num_unallocated_sc = 32
+    moca2_CE = np.array([2,2,2,2, 1,0,1,1, 1,1,0,1, 0,0,1,0, 1,1,1,1, 0,1,0,0, 0,1,0,1, 0,0,0,1, 1,0,0,1, 0,0,0,0, 1,0,1,0, 1,1,1,0, 0,1,1,0, 0,0,0,1, 1,1,1,0, 0,0,0,1,
+                         1,1,0,1, 0,1,1,0, 0,1,1,0, 0,0,0,0, 1,1,0,1, 0,1,1,1, 0,0,1,1, 0,1,1,1, 0,0,1,1, 1,0,0,0, 0,1,0,1, 0,0,0,1, 0,0,1,0, 0,0,1,0, 0,1,1,1, 0,0,1,1,
+                         1,1,1,1, 0,0,1,1, 0,0,0,0, 1,1,1,0, 1,0,1,1, 1,1,0,0, 0,0,0,1, 0,0,1,0, 0,0,1,0, 0,1,0,1, 1,0,1,0, 1,1,1,0, 1,0,0,1, 1,1,0,0, 1,0,0,0, 1,1,1,0,
+                         0,0,0,0, 0,0,1,1, 1,0,1,0, 1,0,0,0, 0,1,1,1, 1,0,1,1, 0,1,0,1, 1,1,1,0, 1,1,1,0, 0,0,1,1, 1,1,0,0, 0,1,0,0, 1,0,1,1, 2,2,2,2, 2,2,2,2, 2,2,2,2,
+                         2,2,2,2, 2,2,2,2, 2,2,2,2, 2,0,0,1, 0,0,1,0, 1,0,1,1, 0,1,0,0, 1,0,0,0, 1,0,0,1, 0,0,1,0, 0,0,0,0, 0,0,1,1, 1,1,1,1, 1,0,0,1, 0,1,0,0, 0,1,1,1,
+                         0,0,1,0, 1,1,0,0, 0,0,1,0, 1,0,0,1, 1,1,0,1, 1,1,0,0, 1,1,0,0, 0,1,1,1, 0,1,1,0, 0,0,0,0, 1,1,0,0, 0,1,1,1, 0,0,1,0, 0,1,1,0, 0,1,1,0, 1,1,0,0,
+                         0,1,1,0, 1,1,0,1, 1,1,1,0, 1,0,0,1, 1,0,0,0, 0,1,1,0, 1,1,1,0, 0,1,0,1, 1,0,1,1, 0,1,0,0, 0,0,0,0, 0,0,0,1, 1,1,0,0, 1,1,0,0, 1,1,0,0, 0,1,1,0,
+                         1,0,0,0, 1,1,0,1, 1,1,0,0, 0,0,0,1, 0,0,1,0, 0,1,1,0, 0,0,0,1, 0,0,1,1, 1,1,1,0, 0,0,0,1, 0,0,0,1, 0,1,1,0, 0,0,0,0, 1,1,1,0, 0,0,1,0, 1,2,2,2])
+    moca2_CE_bpsk_symbols = np.zeros(FFT_size, complex)
+    for i in np.arange(FFT_size):
+        if moca2_CE[i] == 0:
+            moca2_CE_bpsk_symbols[i] = 1+0j
+        elif moca2_CE[i] == 1:
+            moca2_CE_bpsk_symbols[i] = -1+0j
+        else:
+            pass
+    #moca2_CE_bpsk_symbols = scipy.fftpack.fftshift(moca2_CE_bpsk_symbols)
+    #plt.figure()
+    #plt.plot(abs(moca2_CE_bpsk_symbols))
+    #plt.show()
+    CE_td_symbol = np.sqrt(FFT_size)*scipy.fftpack.ifft(moca2_CE_bpsk_symbols*np.sqrt(float(FFT_size)/(FFT_size-num_unallocated_sc)), FFT_size)
+    return CE_td_symbol
+    
+
+def get_moca_preamble(preamble_type, moca_version):
+    """ Generates the MoCA standard compliant preamble """
+
+    moca1_SS = get_moca1x_SS_symbol()
+    moca1_LS1 = get_moca1x_LS_symbol(1)
+    moca1_LS2 = get_moca1x_LS_symbol(2)
+    moca1_LS3 = get_moca1x_LS_symbol(3)
+    moca1_LS4 = get_moca1x_LS_symbol(4)
+    moca1_CE = get_moca1x_CE_symbol()
+
+    moca2_SS = get_moca2x_SS_symbol()
+    moca2_LS1 = get_moca2x_LS_symbol(1)
+    moca2_LS2 = get_moca2x_LS_symbol(2)
+    moca2_CE = get_moca2x_CE_symbol()
+
+    if moca_version == '1.1':
+        # Preamble Type: P1
+        if preamble_type == 'P1':
+            ce_cp_length = 64
+            SS_seq = np.tile(moca1_SS, 12)
+            LS_seq = np.concatenate((np.tile(moca1_LS1, 4), -1*np.tile(moca1_LS1, 4)))
+            access_seq = np.concatenate((moca1_SS, np.zeros(32, dtype='complex'), moca1_LS4))
+            CE_seq = np.concatenate((moca1_CE[-ce_cp_length:], moca1_CE, moca1_CE))
+            preamble_seq = np.concatenate((SS_seq, LS_seq, access_seq, CE_seq))
+        # Preamble Type: P2-FD
+        elif preamble_type == 'P2-FD':
+            ce_cp_length = 64
+            SS_seq = np.tile(moca1_SS, 12)
+            LS_seq = np.concatenate((np.tile(moca1_LS1, 4), -1*np.tile(moca1_LS1, 4)))
+            CE_seq = np.concatenate((moca1_CE[-ce_cp_length:], moca1_CE, moca1_CE))
+            preamble_seq = np.concatenate((SS_seq, LS_seq, CE_seq))
+        # Preamble Type: P2-TD
+        elif preamble_type == 'P2-TD':
+            SS_seq = np.tile(moca1_SS, 8)
+            LS_seq = np.concatenate((np.tile(moca1_LS1, 4), -1*np.tile(moca1_LS1, 4)))
+            preamble_seq = np.concatenate((SS_seq, LS_seq))
+        # Preamble Type: P3
+        elif preamble_type == 'P3':
+            ce_cp_length = 100
+            SS_seq = moca1_SS
+            LS_seq = np.concatenate((np.tile(moca1_LS1, 2), -1*np.tile(moca1_LS1, 2)))
+            CE_seq = np.concatenate((moca1_CE[-ce_cp_length:], moca1_CE, moca1_CE))
+            preamble_seq = np.concatenate((SS_seq, LS_seq, CE_seq))
+        # Preamble Type: P4
+        elif preamble_type == 'P4':
+            ce_cp_length = 100
+            LS_seq = moca1_LS2
+            CE_seq = np.concatenate((moca1_CE[-ce_cp_length:], moca1_CE, moca1_CE))
+            preamble_seq = np.concatenate((LS_seq, CE_seq))
+        else:
+            preamble_seq = 0
+    elif moca_version == '2.0':
+        # Preamble Type: P5
+        if preamble_type == 'P5':
+            ce_cp_length = 192
+            CE_seq = np.concatenate((moca2_CE[-ce_cp_length:], moca2_CE))
+            preamble_seq = CE_seq
+        # Preamble Type: P6 or P7
+        elif preamble_type == 'P6' or preamble_type == 'P7':
+            ce_cp_length = 192
+            CE_seq = np.concatenate((moca2_CE[-ce_cp_length:], moca2_CE, moca2_CE))
+            preamble_seq = CE_seq
+        # Preamble Type: P8
+        elif preamble_type == 'P8':
+            ce_cp_length = 192
+            LS_seq = np.tile(moca2_LS2, 4)
+            CE_seq = np.concatenate((moca2_CE[-ce_cp_length:], moca2_CE, moca2_CE))
+            preamble_seq = np.concatenate((LS_seq, CE_seq))
+        # Preamble Type: P9
+        elif preamble_type == 'P9':
+            ce_cp_length = 192
+            LS_seq = np.tile(moca2_LS1, 4)
+            CE_seq = np.concatenate((moca2_CE[-ce_cp_length:], moca2_CE, moca2_CE))
+            preamble_seq = np.concatenate((LS_seq, CE_seq))
+        # Preamble Type: P10
+        elif preamble_type == 'P10':
+            ce_cp_length = 192
+            SS_seq = np.tile(moca2_SS, 12)
+            LS_seq = np.tile(moca2_LS1, 8)
+            CE_seq = np.concatenate((moca2_CE[-ce_cp_length:], moca2_CE, moca2_CE))
+            preamble_seq = np.concatenate((SS_seq, LS_seq, CE_seq))
+        else:
+            preamble_seq = 0    
+    else:
+        preamble_seq = 0
+
+    return preamble_seq
+
+def peakdet(v, delta, x = None):
+    """
+    Converted from MATLAB script at http://billauer.co.il/peakdet.html
+    
+    Currently returns two lists of tuples, but maybe arrays would be better
+    
+    function [maxtab, mintab]=peakdet(v, delta, x)
+    %PEAKDET Detect peaks in a vector
+    %        [MAXTAB, MINTAB] = PEAKDET(V, DELTA) finds the local
+    %        maxima and minima ("peaks") in the vector V.
+    %        MAXTAB and MINTAB consists of two columns. Column 1
+    %        contains indices in V, and column 2 the found values.
+    %      
+    %        With [MAXTAB, MINTAB] = PEAKDET(V, DELTA, X) the indices
+    %        in MAXTAB and MINTAB are replaced with the corresponding
+    %        X-values.
+    %
+    %        A point is considered a maximum peak if it has the maximal
+    %        value, and was preceded (to the left) by a value lower by
+    %        DELTA.
+    
+    % Eli Billauer, 3.4.05 (Explicitly not copyrighted).
+    % This function is released to the public domain; Any use is allowed.
+    
+    """
+    maxtab = []
+    mintab = []
+       
+    if x is None:
+        x = np.arange(len(v))
+    
+    v = np.asarray(v)
+    
+    if len(v) != len(x):
+        sys.exit('Input vectors v and x must have same length')
+    
+    if not np.isscalar(delta):
+        sys.exit('Input argument delta must be a scalar')
+    
+    if delta <= 0:
+        sys.exit('Input argument delta must be positive')
+    
+    mn, mx = Inf, -Inf
+    mnpos, mxpos = NaN, NaN
+    
+    lookformax = True
+    
+    for i in np.arange(len(v)):
+        this = v[i]
+        if this > mx:
+            mx = this
+            mxpos = x[i]
+        if this < mn:
+            mn = this
+            mnpos = x[i]
+        
+        if lookformax:
+            if this < mx-delta:
+                maxtab.append((mxpos, mx))
+                mn = this
+                mnpos = x[i]
+                lookformax = False
+        else:
+            if this > mn+delta:
+                mintab.append((mnpos, mn))
+                mx = this
+                mxpos = x[i]
+                lookformax = True
+    
+    peaks_idx_array = []
+    for i in np.arange(len(maxtab)):
+        peaks_idx_array.append(maxtab[i][0])
+    peaks_idx_array = np.array(peaks_idx_array)
+    
+    valleys_idx_array = []
+    for i in np.arange(len(mintab)):
+        valleys_idx_array.append(mintab[i][0])
+    valleys_idx_array = np.array(valleys_idx_array)
+
+    return peaks_idx_array, valleys_idx_array
+
+def get_correlations(in_signal, sampling_rate, version, lstype):
+
+    # Resample to appopriate sample rate for processing
+    downsampling_factor_moca1 = float(sampling_rate)/(50e6)
+    downsampling_factor_moca2 = float(sampling_rate)/(100e6)
+    #in_signal = scipy.signal.decimate(in_signal, downsampling_factor)
+    in_signal_moca1 = scipy.signal.resample(in_signal, int(len(in_signal)/downsampling_factor_moca1))
+    in_signal_moca2 = scipy.signal.resample(in_signal, int(len(in_signal)/downsampling_factor_moca2))
+
+    if version == '1.1':
+        ssseq = get_moca1x_SS_symbol()
+        ceseq = get_moca1x_CE_symbol()
+        if lstype == 'LS1':
+            lsseq = get_moca1x_LS_symbol(1)
+        elif lstype == 'LS2':
+            lsseq = get_moca1x_LS_symbol(2)
+        elif lstype == 'LS3':
+            lsseq = get_moca1x_LS_symbol(3)
+        elif lstype == 'LS4':
+            lsseq = get_moca1x_LS_symbol(4)
+        scale_factor = np.sqrt(np.mean(abs(in_signal_moca1)**2))*len(ssseq)
+        ss_corr = scipy.signal.correlate(in_signal_moca1, ssseq)/scale_factor
+        scale_factor = np.sqrt(np.mean(abs(in_signal_moca1)**2))*len(lsseq)
+        ls_corr = scipy.signal.correlate(in_signal_moca1, lsseq)/scale_factor
+        scale_factor = np.sqrt(np.mean(abs(in_signal_moca1)**2))*len(ceseq)
+        ce_corr = scipy.signal.correlate(in_signal_moca1, ceseq)/scale_factor
+    elif version == '2.0':
+        ssseq = get_moca2x_SS_symbol()
+        ceseq = get_moca2x_CE_symbol()
+        if lstype == 'LS1':
+            lsseq = get_moca2x_LS_symbol(1)
+        elif lstype == 'LS2':
+            lsseq = get_moca2x_LS_symbol(2)
+        else:
+            pass
+        scale_factor = np.sqrt(np.mean(abs(in_signal_moca2)**2))*len(ssseq)
+        ss_corr = scipy.signal.correlate(in_signal_moca2, ssseq)/scale_factor
+        scale_factor = np.sqrt(np.mean(abs(in_signal_moca2)**2))*len(lsseq)
+        ls_corr = scipy.signal.correlate(in_signal_moca2, lsseq)/scale_factor
+        scale_factor = np.sqrt(np.mean(abs(in_signal_moca2)**2))*len(ceseq)
+        ce_corr = scipy.signal.correlate(in_signal_moca2, ceseq)/scale_factor
+    else:
+        pass
+
+    return [ss_corr, ls_corr, ce_corr]
+
+def detect_MoCA_packets(in_signal, sampling_rate):
+
+    in_signal = np.concatenate((np.zeros(1024, dtype=complex), in_signal, np.zeros(1024, dtype=complex)))
+
+    # Clean the input signal of extreme garbage spikes
+    #in_signal_real = np.real(in_signal)
+    #in_signal_imag = np.imag(in_signal)
+    #in_signal_real[in_signal_real > 300] = 0
+    #in_signal_real[in_signal_real < -300] = 0
+    #in_signal_imag[in_signal_imag > 300] = 0
+    #in_signal_imag[in_signal_imag < -300] = 0
+    #in_signal = in_signal_real + 1j*in_signal_imag
+    
+    #plt.figure()
+    #plt.plot(np.real(in_signal))
+    #plt.show()
+
+    # Resample to appopriate sample rate for processing
+    downsampling_factor_moca1 = float(sampling_rate)/(50*1e6)
+    downsampling_factor_moca2 = float(sampling_rate)/(100*1e6)
+    #print downsampling_factor_moca1
+    #print downsampling_factor_moca2
+    #in_signal = scipy.signal.decimate(in_signal, downsampling_factor)
+    #print len(in_signal)
+    in_signal_moca1 = scipy.signal.resample(in_signal, int(len(in_signal)/downsampling_factor_moca1))
+    in_signal_moca2 = scipy.signal.resample(in_signal, int(len(in_signal)/downsampling_factor_moca2))
+    #print len(in_signal_moca2)
+
+    #in_signal_new = scipy.signal.resample(in_signal_moca2, int(len(in_signal_moca2)*downsampling_factor_moca2)+1)
+
+    #print np.sqrt(np.mean(abs(in_signal_new - in_signal)**2))
+
+    in_signal_moca1 = np.concatenate((np.zeros(1024, dtype=complex), in_signal_moca1, np.zeros(1024, dtype=complex)))
+    in_signal_moca2 = np.concatenate((np.zeros(1024, dtype=complex), in_signal_moca2, np.zeros(1024, dtype=complex)))
+   
+
+    
+    #plt.figure()
+    #plt.psd(in_signal, NFFT=512, Fs=160000000)
+    #plt.psd(in_signal_moca2, NFFT=512, Fs=100000000)
+    #plt.psd(in_signal_moca1, NFFT=512, Fs=50000000)
+    #plt.show()
+
+    #plt.figure()
+    #plt.plot(np.real(in_signal))
+    #plt.plot(np.real(in_signal_new))
+    #plt.show()
+
+
+
+    # Find the energy signal and segment packets
+    #win_size = 512.0
+    #overlap = 8
+    #energy_sig = find_energy(in_signal, win_size, overlap)
+    #energy_sig = energy_sig/np.max(energy_sig)
+    #diff_energy_sig = energy_sig - np.roll(energy_sig, int(win_size/overlap)) 
+    #plt.figure()
+    #plt.plot(energy_sig)
+    #plt.plot(diff_energy_sig)
+    #plt.show()
+    #delta = 0.4
+    #[energy_peaks, energy_valleys] = peakdet(diff_energy_sig, delta)
+   
+    #print energy_peaks
+    #print energy_valleys
+
+    #if len(energy_peaks) != len(energy_valleys):
+        #raise ValueError
+    
+    #moca_packets = { }
+    #num_packets = len(energy_peaks)
+    num_packets = 1
+    #for i in np.arange(len(energy_peaks)):
+    #    moca_packets[str(i)] = in_signal[energy_peaks[i]*overlap:(energy_valleys[i]+5)*overlap]
+
+    #plt.figure()
+    #plt.plot(np.real(moca_packets['0']))
+    
+    #plt.figure()
+    #plt.plot(np.real(moca_packets['1']))
+    #plt.show()
+    # MoCA1.1 LS1
+    moca2_LS1_real = np.array([0, 0, 1, 1, 0, 1, -1, -1, 1, 1, 1, 0, 1, -1, 1, -1, -1, 0, -1, 1, 1, 0, -1, 0, 0, 0, -1, 0, -1, -1, 1, 1, -1, 0, 0, 1, 0, -1, 
+                               0, 1, -1, 1, 1, 1, 1, -1, 0, -1, 1, -1, 1, 0, 1, -1, 0, 1, -1, -1, -1, 0, 1, 1, -1, -1,  -1, -1, -1, 1, 1, 0, -1, -1, -1, 1, 0, 
+                               -1, 1, 0, 1, -1, 1, -1, 0, -1, 1, 1, 1, 1, -1, 1, 0, -1, 0, 1, 0, 0, -1, 1, 1, -1, -1, 0, -1, 0, 0, 0, -1, 0, 1, 1, -1, 0, -1, 
+                               -1, 1, -1, 1, 0, 1, 1, 1, -1, -1, 1, 0, 1, 1, 0])
+
+    moca2_LS1_imag = np.array([0, 0, 1, -1, -1, 0, -1, -1, 0, -1, -1, 1, -1, -1, 1, 0, 0, 1, 1, -1, 0, 0, -1, -1, -1, -1, 0, -1, 0, 1, 0, 1, 1, 1, 0, -1, 1, -1, 
+                               -1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 1, 1, -1, -1, 0, 1, 1, 1, 1, 1, 1, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, -1, -1, -1, -1, -1, -1, -1, 
+                               0, 1, 1, -1, -1, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1, 1, -1, 1, 0, -1, -1, -1, 0, -1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, -1, -1, 0, 0, -1, 
+                               1, 1, -1, 1, 1, 0, 1, 1, 0, 1, 1, -1, 0]) 
+    
+    # MoCA2 LS2
+    moca2_LS2_real = np.array([ 0, 0, 1, 1, -1, 1, -1, 0, 1, -1, 0, -1, 0, 0, 0, 0, 1, 1, 1, -1, 0, 1, -1, 1, -1, 1, 0, 0, -1, -1, -1, -1, 0, -1, -1, 1, 1, 
+                                -1, -1, 1, 1, 1, 0, 1, -1, -1, 0, 1, 0, 0, 1, 1, 0, -1, -1, 1, 1, 1, 0, -1, 1, 1, -1, -1, 1, -1, -1, 1, 1, -1, 0, 1, 1, 1, 
+                                -1, -1,  0,  1,  1,  0,  0,  1,  0, -1, -1, 1, 0, 1, 1, 1, -1, -1, 1, 1, -1, -1, 0, -1, -1, -1, -1, 0, 0, 1, -1, 1, -1, 1, 0, 
+                                -1, 1, 1, 1, 0, 0, 0, 0, -1, 0, -1, 1, 0, -1, 1, -1, 1, 1, 0])
+
+    moca2_LS2_imag = np.array([0, 1, 0, 1, 0, 0, -1, -1, -1, 1, -1, -1, -1, -1, -1, 1, 0, 0, 0, -1, 1, 1, 1, 0, -1, -1, -1, -1, 1, 0, -1, 1, 1, -1, 0, 0, -1, 
+                                0, 0, 0, -1, 1, -1, 1, 1, 1, -1, -1, 0, -1, 1, -1, 0, 0, -1, 1, -1, -1, 0, -1, -1, -1, 1, 0, 0, 0, -1, 1, 1, 1, 0, 1, 1, -1, 1, 
+                                0, 0, 1, -1, 1, 0, 1, 1, -1, -1, -1, 1, -1, 1, 0, 0, 0, 1, 0, 0, 1, -1, -1,  1,  0, -1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 0, 0, 0, 
+                                -1, 1, 1, 1, 1, 1, -1, 1, 1, 1, 0, 0, -1, 0, -1])
+
+    moca2_CE_real = np.array([1, 1, 0, -1, 1, 0, -1, 0, 0, -1, 1, 1, 0, 1, -1, -1, 1, 1, -1, 1, 0, 1, 1, 0, 0, 0, -1, -1, -1, 1, -1, 0, 1, -1, 1, 0, 0, 0, 0, 1, 
+                              -1, 0, 1, 0, -1, -1, -1, 0, 0, 0, 1, -1, 0, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, 0, -1, -1, -1, 0, 0, 0, 1, 0, 0, -1, -1, 0, 1, -1, 1, -1,
+                              0, 0, -1, 0, -1, 1, 1, 1, 1, 0, 0, 0, 1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, -1, 0, 1, 0, 0, 0, -1, 1, 1, -1, 0, 0, -1, -1, 
+                              0, 0, 0, -1, 0, 0, 0])
+
+    moca2_CE_imag = np.array([1, 1, 0, 0, -1, -1, 0, 1, 1, 1, 1, 0, -1, 1, 1, -1, -1, -1, -1, 0, -1, 1, 0, 0, 1, 0, -1, 0, 1, 0, 1, -1, -1, -1, 1, 1, 0, 1, -1, 1, 
+                              -1, 0, -1, 0, 1, 1, -1, 1, 1, -1, 0, 1, 1, -1, 1, 1, 0, -1, 0, 1, 0, 0, 0, -1, 0, 1, -1, -1, 0, -1, 0, 0, 0, -1, -1, -1, 0, -1, -1, 1,
+                              -1, 1, -1, -1, 1, 0, 0, 1, 0, 1, 0, 1, 0, -1, 1, 0, 1, 0, 0, 1, 0, -1, 1, 1, 1, -1, 0, -1, -1, 0, 0, 0, -1, 1, 0, 1, 1, -1, 0, 0, 1, 1,
+                              -1, 1, -1, 1, 0, 0])
+
+    moca2_LS2_new = moca2_LS2_real + 1j*moca2_LS2_imag
+    moca2_LS1_new = moca2_LS1_real + 1j*moca2_LS1_imag
+    moca2_CE_new = moca2_CE_real + 1j*moca2_CE_imag
+    moca2_LS2 = get_moca2x_LS_symbol(2)
+    moca2_LS1 = get_moca2x_LS_symbol(1)
+    moca2_CE = get_moca2x_CE_symbol()
+    #plt.figure()
+    #plt.plot(np.real(moca2_LS1), np.imag(moca2_LS1), 'or')
+    #plt.plot(np.real(moca2_LS1_new), np.imag(moca2_LS1_new), '-ob')
+    #plt.show()
+    #moca2_LS2_corr = scipy.signal.correlate(in_signal, moca2_CE_new)
+    #moca2_LS_corr = scipy.signal.correlate(moca2_LS1, moca2_LS1_new)
+    #plt.figure()
+    #plt.plot(abs(moca2_LS2_corr))
+    #plt.plot(abs(moca2_LS_corr))
+    #plt.show()
+
+    preamble_list = ['P1', 'P2-FD', 'P2-TD', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10']
+    version_list = ['1.1', '1.1',   '1.1',  '1.1', '1.1', '2.0', '2.0', '2.0', '2.0', '2.0', '2.0']
+
+    preamble_types = []
+    for pkt_num in np.arange(num_packets):
+        maxcorrvals = np.zeros(len(preamble_list))
+        for preamble_num in np.arange(len(preamble_list)):
+            preamble_seq = get_moca_preamble(preamble_list[preamble_num], version_list[preamble_num])
+            #preamble_corr = scipy.signal.correlate(moca_packets[str(pkt_num)], preamble_seq)
+            if version_list[preamble_num] == '1.1':
+                preamble_corr = scipy.signal.correlate(in_signal_moca1, preamble_seq)
+            elif version_list[preamble_num] == '2.0':
+                preamble_corr = scipy.signal.correlate(in_signal_moca2, preamble_seq)            
+            #plt.figure(preamble_num + 1)
+            #plt.plot(abs(preamble_corr))
+            #plt.show()
+            maxcorrvals[preamble_num] = max(abs(preamble_corr))
+        #print maxcorrvals
+        
+       
+        is_valid = False
+        preamble_config = ' '
+        mocaversion = ' '
+        while (not is_valid) and len(maxcorrvals):
+            idx = maxcorrvals.argmax()
+            p_type = preamble_list[idx]
+
+            #print p_type
+            if p_type == 'P1':
+                moca1_LS3 = get_moca1x_LS_symbol(3)
+                moca1_LS4 = get_moca1x_LS_symbol(4)
+                in_signal_lspart = in_signal_moca1[(12*30)+(8*64)+1024:(12*30)+(8*64)+3024]
+                scale_factor = np.sqrt(np.mean(abs(in_signal_lspart)**2))*len(moca1_LS3)
+                moca1_LS3_corr = scipy.signal.correlate(in_signal_lspart, moca1_LS3)/scale_factor
+                moca1_LS4_corr = scipy.signal.correlate(in_signal_lspart, moca1_LS4)/scale_factor
+                [LS3_peaks, LS3_valleys] = peakdet(abs(moca1_LS3_corr), 0.6)
+                [LS4_peaks, LS4_valleys] = peakdet(abs(moca1_LS4_corr), 0.6)
+                #print 'LS4 peaks:'
+                #print len(LS4_peaks)
+                #plt.figure()
+                #plt.plot(abs(moca1_LS4_corr))
+                #plt.plot(LS4_peaks, abs(moca1_LS4_corr[LS4_peaks]), 'or')
+                #plt.show()
+                if len(LS3_peaks) == 1 or len(LS4_peaks) == 1:
+                    preamble_types.append('P1') 
+                    is_valid = True
+                    preamble_config = '#SS:13; #LS1:8; #LS3/LS4:1; #CE:2'
+                    mocaversion = '1.1'
+            
+            elif p_type == 'P2-FD' or p_type == 'P2-TD':
+                moca1_CE = get_moca1x_CE_symbol()
+                in_signal_cepart = in_signal_moca1[(12*30)+(8*64)+1024:(12*30)+(8*64)+6024]
+                scale_factor = np.sqrt(np.mean(abs(in_signal_cepart)**2))*len(moca1_CE)
+                moca1_CE_corr = scipy.signal.correlate(in_signal_cepart, moca1_CE)/scale_factor
+                [CE_peaks, CE_valleys] = peakdet(abs(moca1_CE_corr), 0.7)
+                #print 'CE peaks:'
+                #print len(CE_peaks)
+                #plt.figure()
+                #plt.plot(abs(moca1_CE_corr))
+                #plt.plot(CE_peaks, abs(moca1_CE_corr[CE_peaks]), 'or')
+                #plt.show()
+                if len(CE_peaks) >= 2:
+                    preamble_types.append('P2-FD')
+                    is_valid = True
+                    preamble_config = '#SS:12; #LS1:8; #CE:2'
+                    mocaversion = '1.1'
+                else:
+                    moca1_LS1 = get_moca1x_LS_symbol(1)
+                    scale_factor = np.sqrt(np.mean(abs(in_signal_moca1)**2))*len(moca1_LS1)
+                    moca1_LS1_corr = scipy.signal.correlate(in_signal_moca1, moca1_LS1)/scale_factor
+                    [LS1_peaks, LS1_valleys] = peakdet(abs(moca1_LS1_corr), 0.7)
+                    if len(LS1_peaks) == 8:
+                        preamble_types.append('P2-TD')
+                        is_valid = True
+                        preamble_config = '#SS:8; #LS1:8; #CE:0'
+                        mocaversion = '1.1'
+            
+            elif p_type == 'P3':
+                moca1_LS1 = get_moca1x_LS_symbol(1)
+                in_signal_lspart = in_signal_moca1[30+1024:30+3024]
+                scale_factor = np.sqrt(np.mean(abs(in_signal_lspart)**2))*len(moca1_LS1)
+                moca1_LS1_corr = scipy.signal.correlate(in_signal_lspart, moca1_LS1)/scale_factor
+                [LS1_peaks, LS1_valleys] = peakdet(abs(moca1_LS1_corr), 0.8)
+                if len(LS1_peaks) == 4:
+                    preamble_types.append('P3')
+                    is_valid = True
+                    preamble_config = '#SS:1; #LS1:4; #CE:2'
+                    mocaversion = '1.1'
+    
+            elif p_type == 'P4':
+                moca1_LS2 = get_moca1x_LS_symbol(2)
+                scale_factor = np.sqrt(np.mean(abs(in_signal_moca1)**2))*len(moca1_LS2)
+                moca1_LS2_corr = scipy.signal.correlate(in_signal_moca1, moca1_LS2)/scale_factor
+                [LS2_peaks, LS2_valleys] = peakdet(abs(moca1_LS2_corr), 0.8)
+                #plt.figure()
+                #plt.plot(abs(moca1_LS2_corr))
+                #plt.plot(LS2_peaks, abs(moca1_LS2_corr[LS2_peaks]), 'or')
+                #plt.show()
+                if len(LS2_peaks) == 1:
+                    preamble_types.append('P4')
+                    is_valid = True
+                    preamble_config = '#SS:0; #LS2:1; #CE:2'
+                    mocaversion = '1.1'
+           
+            elif p_type == 'P5':
+                moca2_CE = get_moca2x_CE_symbol()
+                scale_factor = np.sqrt(np.mean(abs(in_signal_moca2)**2))
+                moca2_CE_corr = scipy.signal.correlate(in_signal_moca2, moca2_CE)/scale_factor
+                [CE_peaks, CE_valleys] = peakdet(abs(moca2_CE_corr), 0.8)
+                #plt.figure()
+                #plt.plot(abs(moca2_CE_corr))
+                #plt.plot(CE_peaks, abs(moca2_CE_corr[CE_peaks]), 'or')
+                #plt.show()
+                if len(CE_peaks) == 1:
+                    preamble_types.append('P5')
+                    is_valid = True
+                    preamble_config = '#SS:0; #LS:0; #CE:1'
+                    mocaversion = '2.0'
+
+
+            maxcorrvals = np.delete(maxcorrvals, idx)
+            preamble_list.pop(idx)
+    
+    if is_valid is False:
+        preamble_types = ['Unable to detect']
+
+    #print preamble_types
+    return mocaversion, preamble_types, preamble_config 
+
+
+    #preambleconfigs = { }
+
+    #delta = 0.6
+    # Short Sequence (SS) Detection
+    #for i in np.arange(num_packets):
+    #    moca1x_ss_corr_signal = np.abs(moca1x_SS_correlation(moca_packets[str(i)]))
+    #    moca2_ss_corr_signal = np.abs(moca2_SS_correlation(moca_packets[str(i)]))
+    #    [moca1x_ss_peaks, moca1x_ss_valleys] = peakdet(moca1x_ss_corr_signal, delta)
+    #    [moca2_ss_peaks, moca2_ss_valleys] = peakdet(moca2_ss_corr_signal, delta)
+        
+    #    moca1x_ce_corr_signal = np.abs(moca1x_CE_correlation(moca_packets[str(i)]))
+    #    moca2_ce_corr_signal = np.abs(moca2_CE_correlation(moca_packets[str(i)]))
+    #    moca1x_ls_corr_signal = np.abs(moca1x_LS_correlation(moca_packets[str(i)], 1))
+
+        #plt.figure()
+        #plt.plot(moca1x_ss_corr_signal)
+
+        #plt.figure()
+        #plt.plot(moca1x_ls_corr_signal)
+
+        #plt.figure()
+        #plt.plot(moca1x_ce_corr_signal)
+        
+        #plt.figure()
+        #plt.plot(moca2_ss_corr_signal)
+        
+        #plt.show()
+
+    #    preambleconfigs[str(i)] = ''
+    #    for peak in moca1x_ss_peaks:
+    #        preambleconfigs[str(i)] += '|SS'
+    #    preambleconfigs[str(i)] += '|'
+    
+    #print preambleconfigs
+
+if __name__ == "__main__":
+    
+    def time_formatter(s):
+        """
+        Custom formatter for reading the 
+        time data from the .csv files
+        """
+
+        if s[-3:] == ' ms':
+            return float(s[:-3])
+        elif s[-3:] == ' us':
+            return float(s[:-3])*1e-3
+        elif s[-3:] == ' ns':
+            return float(s[:-3])*1e-6
+        else:
+            return 0
+
+    print "Reading from file ... "
+    #filepath = "S:/users/vtaranalli/vtaranalli_fusion2_revA_4/c_model/src/phy_model_for_vlsi/TDInterface/GUI_App/data/testMux_08_BDet_Correlation1.csv"
+    #filepath = "S:/users/vtaranalli/vtaranalli_fusion2_revA_4/c_model/src/phy_model_for_vlsi/TDInterface/GUI_App/data/testMux_03_AGC_Analog_Gain_Adjusts.csv"
+    #filedata = np.genfromtxt(filepath, delimiter=',', names=True, converters = {'Time': lambda s: time_formatter(s), 'ADC_I': lambda s: int(s)-512, 'ADC_Q':  lambda s: int(s)-512})
+    filepath = "S:/users/vtaranalli/vtaranalli_fusion2_revA_4/c_model/src/phy_model_for_vlsi/TDInterface/GUI_App/data/p8_afe_adc_out.csv"
+    filedata = np.genfromtxt(filepath, skiprows=1, usecols=(1,2))
+    
+    #print filedata
+
+    in_signal = filedata[:,0] + 1j*filedata[:,1]
+    
+    
+    plt.figure()
+    plt.plot(np.real(in_signal))
+    plt.show()
+    detect_MoCA_packets(in_signal, 160e6) 
+

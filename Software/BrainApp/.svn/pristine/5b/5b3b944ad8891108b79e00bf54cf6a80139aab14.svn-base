@@ -1,0 +1,466 @@
+module TesterFpgaPFTAvalonWrapper
+  (input 	     clk166,
+   input 	      reset,
+   
+   //export datapath signals
+   input [35:0]       data_36,
+   input 	      data_36_valid,
+   
+   //avalon slave port
+   input 	      write,
+   input 	      read,
+   input [3:0] 	      address,
+   input [31:0]       write_data,
+   output reg [31:0]  read_data,
+   
+   //DDR Avalon Write master
+   output reg [31:0]  avl_addr, 
+   output [2:0]       avl_size, 
+   output [15:0]      avl_be, 
+   input 	      avl_ready, 
+   output reg [127:0] avl_wdata,
+   output reg 	      avl_write_req,
+   
+   //Ethernet Avalon Streaming source
+   output 	      avl_str_sop,
+   output 	      avl_str_eop,
+   output [31:0]      avl_str_data,
+   output 	      avl_str_data_valid,
+   output [1:0]       avl_str_empty,
+   input 	      avl_str_ready,
+   output 	      avl_str_error
+   
+   //Ethernet Avalon Streaming sink
+   //input 	      avl_sink_sop,
+   //input 	      avl_sink_eop,
+   //input [31:0]     avl_sink_data,
+   //input 	      avl_sink_data_valid,   
+   //input [1:0]      avl_sink_empty,
+   //output 	      avl_sink_ready,
+   //input [5:0]      avl_sing_error
+   
+   );
+   
+   
+`define DRIP_FILTER_DATA_IN_REG_OFST 4'h0
+`define DRIP_FILTER_DATA_OUT_REG_OFST 4'h1
+`define DRIP_FILTER_LOAD_REG_OFST 4'h2
+`define DRIP_FILTER_STORE_REG_OFST 4'h3
+`define CAPTURE_FILTER_DATA_IN_REG_OFST 4'h4
+`define CAPTURE_FILTER_DATA_OUT_REG_OFST 4'h5
+`define CAPTURE_FILTER_LOAD_REG_OFST 4'h6
+`define CAPTURE_FILTER_STORE_REG_OFST 4'h7
+`define TRIGGER_DATA_IN_REG_OFST 4'h8
+`define TRIGGER_DATA_OUT_REG_OFST 4'h9
+`define TRIGGER_LOAD_REG_OFST 4'hA
+`define TRIGGER_STORE_REG_OFST 4'hB
+`define ARMED_TRIGGERED_STATUS_REG_OFST 4'hC
+
+   wire               drip_filter_avl_read;
+   reg 		      drip_filter_avl_read_delayed;
+   wire               drip_filter_en;
+   reg 		      drip_filter_en_read;
+   wire 	      drip_filter_en_write;
+   wire 	      drip_filter_load;
+   wire 	      drip_filter_store;
+   wire [31:0] 	      drip_filter_read_data;
+
+   wire               capture_filter_avl_read;
+   reg 		      capture_filter_avl_read_delayed;   
+   wire 	      capture_filter_en;
+   reg 		      capture_filter_en_read;   
+   wire 	      capture_filter_en_write;
+   wire 	      capture_filter_load;
+   wire 	      capture_filter_store;
+   wire [31:0] 	      capture_filter_read_data;
+
+   wire               trigger_avl_read;
+   reg 		      trigger_avl_read_delayed;   
+   wire 	      trigger_en;
+   reg 		      trigger_en_read;   
+   wire 	      trigger_en_write;
+   wire 	      trigger_load;
+   wire 	      trigger_store;
+   wire [31:0] 	      trigger_read_data;
+   
+   wire 	      armed;
+   wire 	      triggered;
+
+   assign drip_filter_avl_read  = read  && (address == `DRIP_FILTER_DATA_OUT_REG_OFST);
+   assign drip_filter_en_write = write && (address == `DRIP_FILTER_DATA_IN_REG_OFST);
+   assign drip_filter_load = write && (address == `DRIP_FILTER_LOAD_REG_OFST);
+   assign drip_filter_store = write && (address == `DRIP_FILTER_STORE_REG_OFST);
+   
+   assign capture_filter_avl_read = read && (address == `CAPTURE_FILTER_DATA_OUT_REG_OFST);
+   assign capture_filter_en_write = write && (address == `CAPTURE_FILTER_DATA_IN_REG_OFST);
+   assign capture_filter_load = write && (address == `CAPTURE_FILTER_LOAD_REG_OFST);
+   assign capture_filter_store = write && (address == `CAPTURE_FILTER_STORE_REG_OFST);
+
+   assign trigger_avl_read = read && (address == `TRIGGER_DATA_OUT_REG_OFST);   
+   assign trigger_en_write = write && (address == `TRIGGER_DATA_IN_REG_OFST);
+   assign trigger_load = write && (address == `TRIGGER_LOAD_REG_OFST); 
+   assign trigger_store = write && (address == `TRIGGER_STORE_REG_OFST);
+   
+   wire [31:0] 	      capture_data32;
+   wire [3:0] 	      capture_hdr4;
+   wire [15:0] 	      capture_ofst16;
+   wire               capture_en;
+
+
+   //avalon slave read port logic for reading config registers
+   always @(posedge clk166)
+     begin
+	if(reset)
+	  begin
+	     read_data <= 32'h00000000;
+	     drip_filter_avl_read_delayed <= 1'b0;
+	     capture_filter_avl_read_delayed <= 1'b0;
+	     trigger_avl_read_delayed <= 1'b0;
+	     drip_filter_en_read <= 1'b0;
+	     capture_filter_en_read <= 1'b0;
+	     trigger_en_read <= 1'b0;
+	  end
+	else
+	  begin
+	     drip_filter_avl_read_delayed    <= drip_filter_avl_read;
+	     capture_filter_avl_read_delayed <= capture_filter_avl_read;
+	     trigger_avl_read_delayed        <= trigger_avl_read;
+	     
+	     drip_filter_en_read    <= ~drip_filter_avl_read_delayed & drip_filter_avl_read;
+	     capture_filter_en_read <= ~capture_filter_avl_read_delayed & capture_filter_avl_read;
+	     trigger_en_read        <= ~trigger_avl_read_delayed & trigger_avl_read;
+	     
+	     if(read)
+	       begin
+		  case(address)
+		    `DRIP_FILTER_DATA_OUT_REG_OFST:
+		      begin
+			 read_data <= drip_filter_read_data;
+		      end
+		    `CAPTURE_FILTER_DATA_OUT_REG_OFST:
+		      begin
+			 read_data <= capture_filter_read_data;
+		      end
+		    `TRIGGER_STORE_REG_OFST:
+		      begin
+			 read_data <= trigger_read_data;
+		      end
+		    default:
+		      begin
+			 read_data <= 32'h00000000;
+		      end
+		  endcase
+	       end
+	  end
+     end
+   
+   assign drip_filter_en    = drip_filter_en_read | drip_filter_en_write;
+   assign capture_filter_en = capture_filter_en_read | capture_filter_en_write;
+   assign trigger_en        = trigger_en_read | trigger_en_write;
+   
+   TesterFpgaPFT TesterFpgaPFT_inst(                            
+				  .RST(reset),
+				  .CLK(clk166),
+								
+                                  // Data from DUT
+                                  .DutData(data_36),
+                                  .DutDataEn(data_36_valid),
+      
+                                  //Drip filter configuration registers
+                                  .DripFilterConfigRegsIn(write_data), // : in std_logic_vector(31 downto 0);
+                                  .DripFilterConfigRegsOut(drip_filter_read_data), // : out std_logic_vector(31 downto 0);
+                                  .DripFilterConfigRegsEn(drip_filter_en), // : in std_logic;
+                                  .DripFilterConfigRegsLd(drip_filter_load), // : in std_logic;
+                                  .DripFilterConfigRegsSt(drip_filter_store), // : in std_logic;
+      
+                                  //Drip filter data out
+                                  .DripFilterDataOut(drip_data_out), //   : out std_logic_vector(31 downto 0);
+                                  .DripFilterHdrOut(drip_hdr_out), //    : out std_logic_vector( 3 downto 0);
+                                  .DripFilterOffsetOut(drip_ofst_out), // : out std_logic_vector(15 downto 0);
+                                  .DripFilterOutEn(drip_en_out), //     : out std_logic;
+      
+                                  //Capture filter configuration registers
+                                  .CaptureFilterConfigRegsIn(write_data), // : in std_logic_vector(31 downto 0);
+                                  .CaptureFilterConfigRegsOut(capture_filter_read_data), //: out std_logic_vector(31 downto 0);
+                                  .CaptureFilterConfigRegsEn(capture_filter_en), // : in std_logic;
+                                  .CaptureFilterConfigRegsLd(capture_filter_load), // : in std_logic;
+                                  .CaptureFilterConfigRegsSt(capture_filter_store), // : in std_logic;
+      
+				  //Capture Filter data out
+                                  .CaptureFilterDataOut(capture_data32), //   : out std_logic_vector(31 downto 0);
+                                  .CaptureFilterHdrOut(capture_hdr4), //    : out std_logic_vector( 3 downto 0);
+                                  .CaptureFilterOffsetOut(capture_ofst16), // : out std_logic_vector(15 downto 0);
+                                  .CaptureFilterOutEn(capture_en), //     : out std_logic;
+								
+                                  // Trigger Module configuration registers
+                                  .TriggerConfigRegsIn(write_data), // : in std_logic_vector(31 downto 0);
+                                  .TriggerConfigRegsOut(trigger_read_data), //: out std_logic_vector(31 downto 0);
+                                  .TriggerConfigRegsEn(trigger_en), // : in std_logic;
+                                  .TriggerConfigRegsLd(trigger_load), // : in std_logic;
+                                  .TriggerConfigRegsSt(trigger_store), // : in std_logic;
+
+				  .TriggerArmed(armed), //     : out std_logic;
+                                  .TriggerTriggered(triggered) // : out std_logic
+                                  );
+
+
+
+   //process to write the 40bit capture data to the 128 bit memory
+   
+   wire [39:0] 	      capture_data40;
+   assign capture_data40 = {capture_ofst16[3:0],capture_hdr4,capture_data32};
+   
+   reg 		      ff_rd_req;
+   wire 	      ddr_data40_valid;
+   wire [39:0] 	      ddr_data40;
+   
+   reg [7:0] 	      ram[0:639];
+   
+   
+   reg [9:0] 	      wr_ptr;
+   reg [9:0] 	      rd_ptr;
+   reg [9:0] 	      size;
+   reg 		      ff_40_overflow_sticky;
+   reg [127:0] 	      data128;
+
+   wire 	      ff_wr_req;
+   
+   
+   assign ff_wr_req = capture_en;
+
+   //Process that takes 40bit data and converts to a 128bit interface.
+   always @ (posedge clk166)
+     begin
+	if(reset)
+	  begin
+	     wr_ptr <= 10'h000;
+	     rd_ptr <= 10'h000;
+	     size   <= 10'h000;
+	     ff_40_overflow_sticky <= 1'b0;
+	  end
+	else
+	  begin //if 
+	     if((ff_rd_req==1'b0)&&(ff_wr_req==1'b1))
+	       begin
+		  ram[wr_ptr]   <= capture_data40[7:0];
+		  ram[wr_ptr+1] <= capture_data40[15:8];
+		  ram[wr_ptr+2] <= capture_data40[23:16];
+		  ram[wr_ptr+3] <= capture_data40[31:24];
+		  
+		  size <= size + 10'h004;
+
+		  if(size >= 10'h270)
+		    begin
+		       ff_40_overflow_sticky <= 1'b1;
+		    end
+		  
+		  if(wr_ptr >= 10'h27c)  //if 636 wrap around
+		    begin
+		       wr_ptr <= 10'h000;
+		    end
+		  else
+		    begin
+		       wr_ptr <= wr_ptr + 10'h004;
+		    end
+	       end
+	     else if((ff_rd_req==1'b1)&&(ff_wr_req==1'b0))
+	       begin
+		  data128[7:0] <= ram[rd_ptr];
+		  data128[15:8] <= ram[rd_ptr+1];
+		  data128[23:16] <= ram[rd_ptr+2];
+		  data128[31:24] <= ram[rd_ptr+3];
+		  data128[39:32] <= ram[rd_ptr+4];
+		  data128[47:40] <= ram[rd_ptr+5];
+		  data128[55:48] <= ram[rd_ptr+6];
+		  data128[63:56] <= ram[rd_ptr+7];
+		  data128[71:64] <= ram[rd_ptr+8];
+		  data128[79:72] <= ram[rd_ptr+9];
+		  data128[87:80] <= ram[rd_ptr+10];
+		  data128[95:88] <= ram[rd_ptr+11];
+		  data128[103:96] <= ram[rd_ptr+12];
+		  data128[111:104] <= ram[rd_ptr+13];
+		  data128[119:112] <= ram[rd_ptr+14];
+		  data128[127:120] <= ram[rd_ptr+15];
+
+		  size <= size - 10'h010;
+		  
+		  if(rd_ptr >= 10'h270)  //if 636 wrap around
+		    begin
+		       rd_ptr <= 10'h000;
+		    end
+		  else
+		    begin
+		       rd_ptr <= wr_ptr + 10'h010;
+		    end
+	       end
+ 	     else if((ff_rd_req==1'b1)&&(ff_wr_req==1'b1))
+	       begin
+		  ram[wr_ptr]   <= capture_data40[7:0];
+		  ram[wr_ptr+1] <= capture_data40[15:8];
+		  ram[wr_ptr+2] <= capture_data40[23:16];
+		  ram[wr_ptr+3] <= capture_data40[31:24];
+		  
+		  if(wr_ptr >= 10'h27c)  //if 636 wrap around
+		    begin
+		       wr_ptr <= 10'h000;
+		    end
+		  else
+		    begin
+		       wr_ptr <= wr_ptr + 10'h004;
+		    end
+		  
+	       	  data128[7:0]     <= ram[rd_ptr];
+		  data128[15:8]    <= ram[rd_ptr+1];
+		  data128[23:16]   <= ram[rd_ptr+2];
+		  data128[31:24]   <= ram[rd_ptr+3];
+		  data128[39:32]   <= ram[rd_ptr+4];
+		  data128[47:40]   <= ram[rd_ptr+5];
+		  data128[55:48]   <= ram[rd_ptr+6];
+		  data128[63:56]   <= ram[rd_ptr+7];
+		  data128[71:64]   <= ram[rd_ptr+8];
+		  data128[79:72]   <= ram[rd_ptr+9];
+		  data128[87:80]   <= ram[rd_ptr+10];
+		  data128[95:88]   <= ram[rd_ptr+11];
+		  data128[103:96]  <= ram[rd_ptr+12];
+		  data128[111:104] <= ram[rd_ptr+13];
+		  data128[119:112] <= ram[rd_ptr+14];
+		  data128[127:120] <= ram[rd_ptr+15];
+		  
+		  if(rd_ptr >= 10'h270)  //if 636 wrap around
+		    begin
+		       rd_ptr <= 10'h000;
+		    end
+		  else
+		    begin
+		       rd_ptr <= wr_ptr + 10'h010;
+		    end
+		  
+		  size <= size - 10'h00C;
+	       end
+	  end
+     end
+
+
+   wire ff_ready;
+   
+   assign ff_ready = (size >= 10'h010);
+   
+`define STATE_IDLE 2'b00
+`define STATE_RD_FF 2'b01
+`define STATE_WRITE_HOLD 2'b10
+   
+   assign avl_be = 16'hFFFF;
+   assign avl_size = 3'h1;
+   
+   reg [1:0] state;
+   
+   //buffer the 128 bit samples to the DDR3
+   always @(posedge clk166)
+     begin
+        if(reset)
+          begin
+             avl_addr       <= 32'h00000000;
+             avl_wdata      <= 128'h0000000000000000;
+             avl_write_req  <= 1'b0;
+	     ff_rd_req      <= 1'b0;
+             state          <= `STATE_IDLE;
+	  end
+        else
+          begin
+             case(state)
+               `STATE_IDLE:
+                 begin
+		    avl_addr       <= avl_addr;
+		    avl_wdata      <= avl_wdata;
+		    avl_write_req  <= 1'b0;
+
+		    if(ff_ready) //assert the ff_rd_request if there is something in the fifo
+		      begin
+			 ff_rd_req      <= 1'b1;
+			 state          <= `STATE_RD_FF;			 
+                      end
+		    else
+		      begin
+			 ff_rd_req      <= 1'b0;
+			 state          <= `STATE_IDLE;			 
+		      end
+		 end
+	       `STATE_RD_FF:
+		 begin
+                    avl_addr       <= avl_addr;
+                    avl_wdata      <= data128;
+                    avl_write_req  <= 1'b1;
+                    ff_rd_req      <= 1'b0;
+		    state          <= `STATE_WRITE_HOLD;
+		 end
+	       `STATE_WRITE_HOLD:
+                 begin
+                    if(avl_ready)
+                      begin
+			 if(avl_addr == 32'h0fffffff)
+			   begin
+			      avl_addr <= 32'h00000000;			      
+			   end
+			 else
+			   begin
+			      avl_addr <= avl_addr + 32'h00000010;
+			   end
+
+                         avl_wdata      <= avl_wdata;
+                         avl_write_req  <= 1'b0;
+			 
+			 if(ff_ready)
+			   begin
+			      ff_rd_req      <= 1'b1;
+			      state          <= `STATE_RD_FF;
+			   end
+			 else 
+			   begin
+			      ff_rd_req      <= 1'b0;
+			      state          <= `STATE_IDLE;
+			   end			 
+                      end
+                    else
+                      begin
+                         avl_addr       <= avl_addr;
+                         avl_wdata      <= avl_wdata;
+                         avl_write_req  <= avl_write_req;
+			 ff_rd_req      <= 1'b0;
+                         state          <= `STATE_WRITE_HOLD;
+                      end // else: !if(avl_ready)
+                 end
+             endcase // case (state)
+          end // else: !if(reset)
+     end // always @ (posedge clk166)
+
+
+
+
+
+   
+   //the drip data stream contains a fifo used to buffer drip data and then streams avalon streaming ethernet pkts
+   drip_data_stream  drip_data_stream_inst
+     (
+      .clk166(clk166),
+      .reset(reset),
+      
+      .drip_fsm_finish(1'b0),
+      .drip_fsm_idle(),
+      
+      //drip filter data interface
+      .drip_data_out(drip_data_out),
+      .drip_hdr_out(drip_hdr_out),
+      .drip_ofst_out(drip_ofst_out), 
+      .drip_en_out(drip_en_out), 
+      
+      //Ethernet Avalon Streaming source
+      .avl_str_sop(avl_str_sop),
+      .avl_str_eop(avl_str_eop),
+      .avl_str_data(avl_str_data),
+      .avl_str_data_valid(avl_str_data_valid),
+      .avl_str_empty(avl_str_empty),
+      .avl_str_ready(avl_str_ready),
+      .avl_str_error(avl_str_error)
+      );
+   
+endmodule 

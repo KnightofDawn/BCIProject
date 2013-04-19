@@ -1,0 +1,169 @@
+library ieee ;
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all ;
+use ieee.std_logic_unsigned.all ;
+use ieee.numeric_std.all;    
+
+entity TesterFpgaTriggerElement is
+   port (
+      RST       : in std_logic;
+      CLK       : in std_logic;
+      MyBlockId : in std_logic_vector(7 downto 0);
+      
+      StartIn   : in std_logic;  -- Pulse reloads counter to its initial values.
+      EnableIn  : in std_logic;
+
+      DataIn    : in std_logic_vector(31 downto 0);
+      HdrIn     : in std_logic_vector( 3 downto 0);
+      OffsetIn  : in std_logic_vector(15 downto 0);
+      DataInEn  : in std_logic;
+
+      ConfigRegsIn   : in std_logic_vector(31 downto 0);
+      ConfigRegsOut  : out std_logic_vector(31 downto 0);
+      ConfigRegsEn   : in std_logic;
+      ConfigRegsLd   : in std_logic;
+      ConfigRegsSt   : in std_logic;
+      
+      NextBlock      : out std_logic_vector(7 downto 0) := (others=>'0');
+      TriggerOut     : out std_logic := '0';
+      CompDone       : out std_logic
+   );
+end TesterFpgaTriggerElement;
+
+architecture RTL of TesterFpgaTriggerElement is
+   type RegisterBank_t is array (0 to 4) of std_logic_vector(31 downto 0);
+
+   -- Reg 0	Find Data in stream
+   -- |                         [31:24]              |                        [15:0]                     |
+   -- |                      Header Type             |                    Offset in Block                |
+   -- Reg 1	Data Mask
+   -- |                                            [31:0]                                                |
+   -- |                                             Mask                                                 |
+   -- Reg 2 Compare Data
+   -- |                                            [31:0]                                                |
+   -- |                                             Data                                                 |
+   -- Reg 3	Counter
+   -- |                          [31:16]             |                        [15:0]                     |
+   -- |                      Initial Value           |                      Current Value                |
+   -- Reg 4		Block functionality  
+   -- |   [31] |[30] |[  29]   | [28] |[27]   |  [26] | [25]  | [24:20]  |   [15:8]    |    [7:0]       |
+   -- | Trigger|Equal|Not Equal|Bigger|Smaller| Reset | 2'€™S   | Sign Ext | NegNextBlock| PosNextBlock   |
+   -- |        |     |         | than |  than |Counter| Comp  | for 2's  | (immediate) | (when cntr==0) |
+
+   signal RegisterBank       : RegisterBank_t;
+   signal RegisterBankStatic : RegisterBank_t;
+   
+   signal DecCntr   : std_logic;
+   signal ResetCntr : std_logic;
+   
+begin
+
+   -- Trigger
+   process(CLK, RST)
+      variable DataAndMask : std_logic_vector(31 downto 0);
+      variable CompData    : std_logic_vector(31 downto 0);
+      variable CompRslt    : boolean;
+      variable SignExt     : integer range 0 to 31;
+      variable CurCntr     : std_logic_vector(15 downto 0);
+   begin
+      if RST = '1' then
+         CompDone   <= '0';
+         NextBlock  <= (others => '0');
+         TriggerOut <= '0';
+         DecCntr    <= '0';
+         ResetCntr  <= '0';
+
+      elsif CLK'event and CLK = '1' then
+         CompDone   <= '0';
+         TriggerOut <= '0';
+         DecCntr    <= '0';
+         ResetCntr  <= '0';
+         NextBlock  <= MyBlockId;
+
+         CompRslt    := false;
+         CurCntr     := RegisterBank(3)(15 downto 0);
+         CompData    := RegisterBank(2);
+         SignExt     := conv_integer(RegisterBank(4)(24 downto 20));
+         DataAndMask := DataIn and RegisterBank(1);
+
+         if (RegisterBank(4)(25)='1') then
+            -- 2's complement
+            DataAndMask(30 downto SignExt+1) := (others => DataAndMask(SignExt));
+            DataAndMask(31)                  := not DataAndMask(SignExt);
+            CompData(30 downto SignExt+1) := (others => CompData(SignExt));
+            CompData(31)                  := not CompData(SignExt);
+         end if;
+
+         if (HdrIn    = RegisterBank(0)(27 downto 24)) and 
+            ((OffsetIn = RegisterBank(0)(15 downto  0)) or (RegisterBank(0)(15 downto 0)="1111111111111111")) and 
+            (DataInEn = '1') and (EnableIn='1') then 
+            -- equal
+            if (RegisterBank(4)(30)='1' and  DataAndMask=CompData) then
+               CompRslt := true;
+            end if;
+            
+            -- not equal
+            if (RegisterBank(4)(29)='1' and  DataAndMask/=CompData) then 
+               CompRslt := true;
+            end if;
+            
+            -- Bigger than
+            if (RegisterBank(4)(28)='1' and  DataAndMask>=CompData) then 
+              CompRslt := true;
+            end if;
+            
+            -- Less than
+            if (RegisterBank(4)(27)='1' and  DataAndMask<=CompData) then 
+               CompRslt := true;
+            end if;
+            
+            if (CompRslt = true) then
+               if (CurCntr = std_logic_vector(to_unsigned(0,16))) then 
+                  NextBlock  <= RegisterBank(4)(7 downto 0);
+                  TriggerOut <= RegisterBank(4)(31);
+                  CompDone   <= '1';
+                  ResetCntr  <= '1';
+               else
+                  DecCntr    <= '1';
+               end if;
+            else 
+               NextBlock  <= RegisterBank(4)(15 downto 8);
+               CompDone   <= '1';
+            end if;
+         
+         elsif (EnableIn='0') then
+           NextBlock <= (others=>'0');
+           
+         end if;
+      end if;
+   end process;
+
+   
+   -- Config Registers 
+   process (RST, CLK)
+   begin
+      if RST = '1' then
+         RegisterBank       <= (others=>(others=>'1'));
+         RegisterBankStatic <= (others=>(others=>'1'));
+      elsif CLK'event and CLK='1' then
+         if (ConfigRegsSt = '1') then
+            RegisterBank <= RegisterBankStatic;
+         elsif (DecCntr = '1') then
+            RegisterBank(3)(15 downto 0) <= RegisterBank(3)(15 downto 0) - 1;
+         elsif (ResetCntr='1' or (StartIn='1' and RegisterBank(4)(26)='1')) then 
+            RegisterBank(3)(15 downto 0) <= RegisterBank(3)(31 downto 16);
+         end if;
+         if (ConfigRegsLd = '1') then 
+            RegisterBankStatic <= RegisterBank;
+         end if;
+         if (ConfigRegsEn = '1') then
+            RegisterBankStatic(4) <= ConfigRegsIn;
+            for i in 0 to 3 loop
+               RegisterBankStatic(i) <= RegisterBankStatic(i+1);
+            end loop;
+         end if;
+      end if;
+   end process;
+   ConfigRegsOut <= RegisterBankStatic(0);
+   
+end RTL;
