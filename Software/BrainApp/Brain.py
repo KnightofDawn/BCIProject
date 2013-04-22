@@ -17,12 +17,13 @@ import time
 import random
 import json
 import pickle
+import serial
 
 # Import the modules QtCore (for low level Qt functions)
 # QtGui (for visual/GUI related Qt functions)
 from PyQt4 import QtCore, QtGui, Qt
 from PyQt4.QtNetwork import *
-from PyQt4.QtCore import pyqtSignal 
+from PyQt4.QtCore import pyqtSignal
 
 
 
@@ -61,7 +62,6 @@ from numpy.random import randint
 
 
 
-
 # FFT functions from SciPy
 #from scipy.signal import fftconvolve
 #from scipy.fftpack import fftshift, fft
@@ -79,8 +79,8 @@ from  BrainGUI  import Ui_MainWindow
 # Currently includes preamble type detection and correlation functions.
 #import testdebuglib as tdlib
 from  mplwidget import * 
-import serial
 
+    
 if platform.python_version()[0] == "3":
     raw_input=input
 
@@ -214,7 +214,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.confRegSetup()
         self.GlobalRegSetup()
         self.AnalysisDTSetup()
-#        self.RegisterMapSetup()
+        self.RegisterMapSetup()
 
            
 #*************************************************************************************************        
@@ -353,6 +353,10 @@ class BrainInterface(QtGui.QMainWindow):
         self.Ch8Select.setGeometry(QtCore.QRect(50, 30, 70, 27))
         self.Ch8Select.setChecked(True)
         
+
+        
+
+        
 ###########################channel 3################################   
         self.frameCh3 = QtGui.QGroupBox(self.confReg)
         self.frameCh3.setGeometry(QtCore.QRect(90, 180, 521, 65))
@@ -386,6 +390,8 @@ class BrainInterface(QtGui.QMainWindow):
         self.label_13 = QtGui.QLabel(self.frameCh3)
         self.label_13.setGeometry(QtCore.QRect(20, 10, 81, 26))
         self.label_13.setText("Channel Select")
+        
+
         
 #############################channel 4###############################
         self.frameCh4 = QtGui.QGroupBox(self.confReg)
@@ -569,6 +575,9 @@ class BrainInterface(QtGui.QMainWindow):
         self.Ch2Select = QtGui.QCheckBox(self.frameCh2)
         self.Ch2Select.setGeometry(QtCore.QRect(50, 30, 70, 27))
         self.Ch2Select.setChecked(True)
+
+
+        
         
 #############################Edit ComboBox############################
         listGain = [
@@ -623,6 +632,96 @@ class BrainInterface(QtGui.QMainWindow):
         self.ChanInCh6.addItems(listChnInput)
         self.ChanInCh7.addItems(listChnInput)
         self.ChanInCh8.addItems(listChnInput)
+        
+        self.Ch8Select.stateChanged.connect(self.changeCh8Status)
+        self.Ch3Select.stateChanged.connect(self.changeCh3Status)
+        self.Ch1Select.stateChanged.connect(self.changeCh1Status)
+        self.Ch2Select.stateChanged.connect(self.changeCh2Status)
+        self.Ch4Select.stateChanged.connect(self.changeCh4Status)
+        self.Ch5Select.stateChanged.connect(self.changeCh5Status)
+        self.Ch6Select.stateChanged.connect(self.changeCh6Status)
+        self.Ch7Select.stateChanged.connect(self.changeCh7Status)
+        
+    def changeCh8Status(self):
+        if self.Ch8Select.isChecked():
+            self.GainCh8.setDisabled(False)
+            self.ChanInCh8.setDisabled(False)
+            self.SRB2Ch8.setDisabled(False)
+        else:
+            self.GainCh8.setDisabled(True)  
+            self.ChanInCh8.setDisabled(True)
+            self.SRB2Ch8.setDisabled(True)
+            
+    def changeCh3Status(self):
+        if self.Ch3Select.isChecked():
+            self.GainCh3.setDisabled(False)
+            self.ChanInCh3.setDisabled(False)
+            self.SRB2Ch3.setDisabled(False)
+        else:
+            self.GainCh3.setDisabled(True)
+            self.ChanInCh3.setDisabled(True)
+            self.SRB2Ch3.setDisabled(True)
+
+    def changeCh1Status(self):
+        if self.Ch1Select.isChecked():
+            self.GainCh1.setDisabled(False)
+            self.ChanInCh1.setDisabled(False)
+            self.SRB2Ch1.setDisabled(False)
+        else:
+            self.GainCh1.setDisabled(True)
+            self.ChanInCh1.setDisabled(True)
+            self.SRB2Ch1.setDisabled(True)
+            
+    def changeCh2Status(self):
+        if self.Ch2Select.isChecked():
+            self.GainCh2.setDisabled(False)
+            self.ChanInCh2.setDisabled(False)
+            self.SRB2Ch2.setDisabled(False)
+        else:
+            self.GainCh2.setDisabled(True)
+            self.ChanInCh2.setDisabled(True)
+            self.SRB2Ch2.setDisabled(True)
+                        
+    def changeCh4Status(self):
+        if self.Ch4Select.isChecked():
+            self.GainCh4.setDisabled(False)
+            self.ChanInCh4.setDisabled(False)
+            self.SRB2Ch4.setDisabled(False)
+        else:
+            self.GainCh4.setDisabled(True)
+            self.ChanInCh4.setDisabled(True)
+            self.SRB2Ch4.setDisabled(True)
+            
+    def changeCh5Status(self):
+        if self.Ch5Select.isChecked():
+            self.GainCh5.setDisabled(False)
+            self.ChanInCh5.setDisabled(False)
+            self.SRB2Ch5.setDisabled(False)
+        else:
+            self.GainCh5.setDisabled(True)
+            self.ChanInCh5.setDisabled(True)
+            self.SRB2Ch5.setDisabled(True)
+            
+    def changeCh6Status(self):
+        if self.Ch6Select.isChecked():
+            self.GainCh6.setDisabled(False)
+            self.ChanInCh6.setDisabled(False)
+            self.SRB2Ch6.setDisabled(False)
+        else:
+            self.GainCh6.setDisabled(True)
+            self.ChanInCh6.setDisabled(True)
+            self.SRB2Ch6.setDisabled(True)
+            
+    def changeCh7Status(self):
+        if self.Ch7Select.isChecked():
+            self.GainCh7.setDisabled(False)
+            self.ChanInCh7.setDisabled(False)
+            self.SRB2Ch7.setDisabled(False)
+        else:
+            self.GainCh7.setDisabled(True)
+            self.ChanInCh7.setDisabled(True)
+            self.SRB2Ch7.setDisabled(True)
+
         
 ##################################Tab2 setting#############################        
     def GlobalRegSetup(self):
@@ -898,13 +997,21 @@ class BrainInterface(QtGui.QMainWindow):
         
 ###############################LOFF&BIAS Detection Control registers#####
         self.LOFFPNFLIP = QtGui.QGroupBox(self.GlobalReg)
-        self.LOFFPNFLIP.setGeometry(QtCore.QRect(90, 670, 791, 191))
+        self.LOFFPNFLIP.setGeometry(QtCore.QRect(90, 660, 700, 175))
+        self.LOFFPNFLIP.setTitle("Lead-off Detection and Current Direction Control Registers")
         self.widget = QtGui.QWidget(self.LOFFPNFLIP)
         self.widget.setGeometry(QtCore.QRect(130, 40, 604, 19))
 
         self.horizontalLayout = QtGui.QHBoxLayout(self.widget)
         self.horizontalLayout.setMargin(0)
 
+        self.pushButton = QtGui.QPushButton(self.LOFFPNFLIP)
+        self.pushButton.setGeometry(QtCore.QRect(20, 40, 75, 23))
+        self.pushButton_2 = QtGui.QPushButton(self.LOFFPNFLIP)
+        self.pushButton_2.setGeometry(QtCore.QRect(20, 90, 75, 23))
+        self.pushButton_3 = QtGui.QPushButton(self.LOFFPNFLIP)
+        self.pushButton_3.setGeometry(QtCore.QRect(20, 140, 75, 23))
+        
         self.LOFFP8 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP8)
         self.LOFFP7 = QtGui.QCheckBox(self.widget)
@@ -912,89 +1019,70 @@ class BrainInterface(QtGui.QMainWindow):
         self.LOFFP6 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP6)
         self.LOFFP5 = QtGui.QCheckBox(self.widget)
-#        self.LOFFP5.setObjectName(_fromUtf8("LOFFP5"))
         self.horizontalLayout.addWidget(self.LOFFP5)
         self.LOFFP4 = QtGui.QCheckBox(self.widget)
-#        self.LOFFP4.setObjectName(_fromUtf8("LOFFP4"))
         self.horizontalLayout.addWidget(self.LOFFP4)
         self.LOFFP3 = QtGui.QCheckBox(self.widget)
-#        self.LOFFP3.setObjectName(_fromUtf8("LOFFP3"))
         self.horizontalLayout.addWidget(self.LOFFP3)
         self.LOFFP2 = QtGui.QCheckBox(self.widget)
-#        self.LOFFP2.setObjectName(_fromUtf8("LOFFP2"))
         self.horizontalLayout.addWidget(self.LOFFP2)
         self.LOFFP1 = QtGui.QCheckBox(self.widget)
-#        self.LOFFP1.setObjectName(_fromUtf8("LOFFP1"))
         self.horizontalLayout.addWidget(self.LOFFP1)
         self.widget1 = QtGui.QWidget(self.LOFFPNFLIP)
         self.widget1.setGeometry(QtCore.QRect(130, 90, 604, 19))
-#        self.widget1.setObjectName(_fromUtf8("widget1"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.widget1)
         self.horizontalLayout_2.setMargin(0)
-#        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.LOFFN8 = QtGui.QCheckBox(self.widget1)
-#        self.LOFFN8.setObjectName(_fromUtf8("LOFFN8"))
         self.horizontalLayout_2.addWidget(self.LOFFN8)
         self.LOFFN7 = QtGui.QCheckBox(self.widget1)
-#        self.LOFFN7.setObjectName(_fromUtf8("LOFFN7"))
         self.horizontalLayout_2.addWidget(self.LOFFN7)
         self.LOFFN6 = QtGui.QCheckBox(self.widget1)
-#        self.LOFFN6.setObjectName(_fromUtf8("LOFFN6"))
         self.horizontalLayout_2.addWidget(self.LOFFN6)
         self.LOFFN5 = QtGui.QCheckBox(self.widget1)
-#        self.LOFFN5.setObjectName(_fromUtf8("LOFFN5"))
         self.horizontalLayout_2.addWidget(self.LOFFN5)
         self.LOFFN4 = QtGui.QCheckBox(self.widget1)
-#        self.LOFFN4.setObjectName(_fromUtf8("LOFFN4"))
         self.horizontalLayout_2.addWidget(self.LOFFN4)
         self.LOFFN3 = QtGui.QCheckBox(self.widget1)
-#        self.LOFFN3.setObjectName(_fromUtf8("LOFFN3"))
         self.horizontalLayout_2.addWidget(self.LOFFN3)
         self.LOFFN2 = QtGui.QCheckBox(self.widget1)
-#        self.LOFFN2.setObjectName(_fromUtf8("LOFFN2"))
         self.horizontalLayout_2.addWidget(self.LOFFN2)
         self.LOFFN1 = QtGui.QCheckBox(self.widget1)
-#        self.LOFFN1.setObjectName(_fromUtf8("LOFFN1"))
         self.horizontalLayout_2.addWidget(self.LOFFN1)
         self.widget2 = QtGui.QWidget(self.LOFFPNFLIP)
         self.widget2.setGeometry(QtCore.QRect(130, 140, 604, 19))
-#        self.widget2.setObjectName(_fromUtf8("widget2"))
         self.horizontalLayout_3 = QtGui.QHBoxLayout(self.widget2)
         self.horizontalLayout_3.setMargin(0)
-#        self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
         self.LOFF_FLIP8 = QtGui.QCheckBox(self.widget2)
-#        self.LOFF_FLIP8.setObjectName(_fromUtf8("LOFF_FLIP8"))
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP8)
         self.LOFF_FLIP7 = QtGui.QCheckBox(self.widget2)
-#        self.LOFF_FLIP7.setObjectName(_fromUtf8("LOFF_FLIP7"))
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP7)
         self.LOFF_FLIP6 = QtGui.QCheckBox(self.widget2)
-#        self.LOFF_FLIP6.setObjectName(_fromUtf8("LOFF_FLIP6"))
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP6)
         self.LOFF_FLIP5 = QtGui.QCheckBox(self.widget2)
-#        self.LOFF_FLIP5.setObjectName(_fromUtf8("LOFF_FLIP5"))
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP5)
         self.LOFF_FLIP4 = QtGui.QCheckBox(self.widget2)
-#        self.LOFF_FLIP4.setObjectName(_fromUtf8("LOFF_FLIP4"))
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP4)
         self.LOFF_FLIP3 = QtGui.QCheckBox(self.widget2)
-#        self.LOFF_FLIP3.setObjectName(_fromUtf8("LOFF_FLIP3"))
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP3)
         self.LOFF_FLIP2 = QtGui.QCheckBox(self.widget2)
-#        self.LOFF_FLIP2.setObjectName(_fromUtf8("LOFF_FLIP2"))
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP2)
         self.LOFF_FLIP1 = QtGui.QCheckBox(self.widget2)
-#        self.LOFFP1_3.setObjectName(_fromUtf8("LOFFP1_3"))
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP1)
         
 ################################BIAS###################################
         self.BIASControl = QtGui.QGroupBox(self.GlobalReg)
-        self.BIASControl.setGeometry(QtCore.QRect(90, 880, 791, 140))
+        self.BIASControl.setGeometry(QtCore.QRect(90, 845, 700, 126))
+        self.BIASControl.setTitle("BIAS Control Registers")
         self.widget3 = QtGui.QWidget(self.BIASControl)
         self.widget3.setGeometry(QtCore.QRect(130, 40, 604, 19))
 
         self.horizontalLayout3 = QtGui.QHBoxLayout(self.widget3)
         self.horizontalLayout3.setMargin(0)
+        
+        self.pushButton4 = QtGui.QPushButton(self.BIASControl)
+        self.pushButton4.setGeometry(QtCore.QRect(20, 40, 75, 23))
+        self.pushButton5 = QtGui.QPushButton(self.BIASControl)
+        self.pushButton5.setGeometry(QtCore.QRect(20, 90, 75, 23))
 
         self.BIASP8 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP8)
@@ -1003,67 +1091,113 @@ class BrainInterface(QtGui.QMainWindow):
         self.BIASP6 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP6)
         self.BIASP5 = QtGui.QCheckBox(self.widget3)
-#        self.LOFFP5.setObjectName(_fromUtf8("LOFFP5"))
         self.horizontalLayout3.addWidget(self.BIASP5)
         self.BIASP4 = QtGui.QCheckBox(self.widget3)
-#        self.LOFFP4.setObjectName(_fromUtf8("LOFFP4"))
         self.horizontalLayout3.addWidget(self.BIASP4)
         self.BIASP3 = QtGui.QCheckBox(self.widget3)
-#        self.LOFFP3.setObjectName(_fromUtf8("LOFFP3"))
         self.horizontalLayout3.addWidget(self.BIASP3)
         self.BIASP2 = QtGui.QCheckBox(self.widget3)
-#        self.LOFFP2.setObjectName(_fromUtf8("LOFFP2"))
         self.horizontalLayout3.addWidget(self.BIASP2)
         self.BIASP1 = QtGui.QCheckBox(self.widget3)
-#        self.LOFFP1.setObjectName(_fromUtf8("LOFFP1"))
         self.horizontalLayout3.addWidget(self.BIASP1)
         self.widget4 = QtGui.QWidget(self.BIASControl)
         self.widget4.setGeometry(QtCore.QRect(130, 90, 604, 19))
-#        self.widget1.setObjectName(_fromUtf8("widget1"))
         self.horizontalLayout_4 = QtGui.QHBoxLayout(self.widget4)
         self.horizontalLayout_4.setMargin(0)
-#        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.BIASN8 = QtGui.QCheckBox(self.widget4)
-#        self.LOFFN8.setObjectName(_fromUtf8("LOFFN8"))
         self.horizontalLayout_4.addWidget(self.BIASN8)
         self.BIASN7 = QtGui.QCheckBox(self.widget4)
-#        self.LOFFN7.setObjectName(_fromUtf8("LOFFN7"))
         self.horizontalLayout_4.addWidget(self.BIASN7)
         self.BIASN6 = QtGui.QCheckBox(self.widget4)
-#        self.LOFFN6.setObjectName(_fromUtf8("LOFFN6"))
         self.horizontalLayout_4.addWidget(self.BIASN6)
         self.BIASN5 = QtGui.QCheckBox(self.widget4)
-#        self.LOFFN5.setObjectName(_fromUtf8("LOFFN5"))
         self.horizontalLayout_4.addWidget(self.BIASN5)
         self.BIASN4 = QtGui.QCheckBox(self.widget4)
-#        self.LOFFN4.setObjectName(_fromUtf8("LOFFN4"))
         self.horizontalLayout_4.addWidget(self.BIASN4)
         self.BIASN3 = QtGui.QCheckBox(self.widget4)
-#        self.LOFFN3.setObjectName(_fromUtf8("LOFFN3"))
         self.horizontalLayout_4.addWidget(self.BIASN3)
         self.BIASN2 = QtGui.QCheckBox(self.widget4)
-#        self.LOFFN2.setObjectName(_fromUtf8("LOFFN2"))
         self.horizontalLayout_4.addWidget(self.BIASN2)
         self.BIASN1 = QtGui.QCheckBox(self.widget4)
-#        self.LOFFN1.setObjectName(_fromUtf8("LOFFN1"))
         self.horizontalLayout_4.addWidget(self.BIASN1)
 
         
 ############################Tab3 setup##################################
-#    def RegisterMapSetup(self):
+    def RegisterMapSetup(self):
+        self.tableWidget = QtGui.QTableWidget(self.RegMap)
+        self.tableWidget.setGeometry(QtCore.QRect(90, 30, 383, 553))
+        self.tableWidget.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.tableWidget.setLineWidth(2)
+        self.tableWidget.setMidLineWidth(1)
+        self.tableWidget.setRowCount(24)
+        self.tableWidget.setColumnCount(11)
         
+        
+        self.tableWidget.setColumnWidth(0, 200)
+        self.tableWidget.setColumnWidth(1, 200)
+        
+        listHeader = [
+        self.tr('Register'),
+        self.tr('Address'),
+        self.tr('Value'),
+        self.tr('D7'),
+        self.tr('D6'),
+        self.tr('D5'),
+        self.tr('D4'),
+        self.tr('D3'),
+        self.tr('D2'),
+        self.tr('D1'),
+        self.tr('D0')
+        ]
+        
+        self.tableWidget.setItem(0, 0, QtGui.QTableWidgetItem('ID'))
+        self.tableWidget.setItem(1, 0, QtGui.QTableWidgetItem('CONFIG1'))
+        self.tableWidget.setItem(2, 0, QtGui.QTableWidgetItem('CONFIG2'))
+        self.tableWidget.setItem(3, 0, QtGui.QTableWidgetItem('CONFIG3'))
+        self.tableWidget.setItem(4, 0, QtGui.QTableWidgetItem('LOFF'))
+        self.tableWidget.setItem(5, 0, QtGui.QTableWidgetItem('CH1SET'))
+        self.tableWidget.setItem(6, 0, QtGui.QTableWidgetItem('CH2SET'))
+        self.tableWidget.setItem(7, 0, QtGui.QTableWidgetItem('CH3SET'))
+        self.tableWidget.setItem(8, 0, QtGui.QTableWidgetItem('CH4SET'))
+        self.tableWidget.setItem(9, 0, QtGui.QTableWidgetItem('CH5SET'))
+        self.tableWidget.setItem(10, 0, QtGui.QTableWidgetItem('CH6SET'))
+        self.tableWidget.setItem(11, 0, QtGui.QTableWidgetItem('CH7SET'))  
+        self.tableWidget.setItem(12, 0, QtGui.QTableWidgetItem('CH8SET'))
+        self.tableWidget.setItem(13, 0, QtGui.QTableWidgetItem('BIAS_SENSP'))
+        self.tableWidget.setItem(14, 0, QtGui.QTableWidgetItem('BIAS_SENSN'))
+        self.tableWidget.setItem(15, 0, QtGui.QTableWidgetItem('LOFF_SENSP'))
+        self.tableWidget.setItem(16, 0, QtGui.QTableWidgetItem('LOFF_SENSN'))
+        self.tableWidget.setItem(17, 0, QtGui.QTableWidgetItem('LOFF_FLIP'))
+        self.tableWidget.setItem(18, 0, QtGui.QTableWidgetItem('LOFF_STATP'))
+        self.tableWidget.setItem(19, 0, QtGui.QTableWidgetItem('LOFF_STATN'))
+        self.tableWidget.setItem(20, 0, QtGui.QTableWidgetItem('GPIO'))
+        self.tableWidget.setItem(21, 0, QtGui.QTableWidgetItem('MISC1'))
+        self.tableWidget.setItem(22, 0, QtGui.QTableWidgetItem('MISC2'))
+        self.tableWidget.setItem(23, 0, QtGui.QTableWidgetItem('CONFIG4'))
+        self.tableWidget.horizontalHeader().setVisible(True)
+        self.tableWidget.setHorizontalHeaderLabels(listHeader)
+        self.tableWidget.resizeColumnsToContents()
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget.horizontalHeader().setHighlightSections(True)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(22)
+        self.tableWidget.verticalHeader().setVisible(False)
 
         
 #########################################################################        
     def AnalysisDTSetup(self):        
         
         self.groupBox = QtGui.QGroupBox(self.analyzedata)
-        self.groupBox.setGeometry(QtCore.QRect(680, 30, 131, 371))
+        self.groupBox.setGeometry(QtCore.QRect(750, 30, 131, 371))
         self.groupBox.setTitle("")
+        
         self.OutputDTRate = QtGui.QTextEdit(self.groupBox)
         self.OutputDTRate.setGeometry(QtCore.QRect(20, 40, 91, 31))
         self.OutputDTRate.setText("250SPS")
         self.OutputDTRate.setReadOnly(True) 
+        
+        self.acquireData = QtGui.QPushButton(self.groupBox)
+        self.acquireData.setGeometry(QtCore.QRect(20, 190, 91, 31))
+        self.acquireData.setText("Plot")
         
                 
         
@@ -1094,7 +1228,6 @@ class BrainInterface(QtGui.QMainWindow):
         elif cText == self.tr('f(MOD)/4096'):
             self.OutputDTRate.setText("250SPS") 
 
-    
         
 def main():
     
