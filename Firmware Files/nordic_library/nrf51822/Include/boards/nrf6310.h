@@ -20,15 +20,15 @@
 #define LED0           8
 #define LED1           9
 
-#define BUTTON_START   0
-#define BUTTON0        0
-#define BUTTON_STOP    7
-#define BUTTON1        1
+#define BUTTON_START   24
+#define BUTTON0        24
+#define BUTTON_STOP    30
+#define BUTTON1        25
 
-#define RX_PIN_NUMBER  16    // UART RX pin number.
-#define TX_PIN_NUMBER  17    // UART TX pin number.
-#define CTS_PIN_NUMBER 18    // UART Clear To Send pin number. Not used if HWFC is set to false
-#define RTS_PIN_NUMBER 19    // Not used if HWFC is set to false
+#define RX_PIN_NUMBER  5    // UART RX pin number.
+#define TX_PIN_NUMBER  6    // UART TX pin number.
+#define CTS_PIN_NUMBER 7    // UART Clear To Send pin number. Not used if HWFC is set to false
+#define RTS_PIN_NUMBER 8    // Not used if HWFC is set to false
 #define HWFC           false // UART hardware flow control
 
 #define BLINKY_STATE_MASK   0x07
