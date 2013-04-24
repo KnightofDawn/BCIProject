@@ -113,7 +113,7 @@ class BrainInterface(QtGui.QMainWindow):
 
         # Call the setuUi function of the main window object.
         self.ui.setupUi(self)
-        self.initVariables()
+#        self.initVariables()
      
         self.scrolllayout = QtGui.QVBoxLayout()
         self.scrollwidget = QtGui.QWidget()
@@ -157,11 +157,8 @@ class BrainInterface(QtGui.QMainWindow):
             
 
         self.manTabWidget.setUsesScrollButtons(True)
-        self.scrolllayout.addWidget( self.manTabWidget)
-#        self.setLayout(self.layout)   
-        
-
-        
+        self.scrolllayout.addWidget(self.manTabWidget)
+#        self.setLayout(self.layout)        
      
         self.manTabWidget.currentChanged.connect(self.manTabHandler)       
        
@@ -171,7 +168,7 @@ class BrainInterface(QtGui.QMainWindow):
         
        
         
-        self.manTabWidget.setCurrentIndex(0) 
+        
 
   ########################## Code for variable explorer and console ##################################     
 
@@ -227,19 +224,15 @@ class BrainInterface(QtGui.QMainWindow):
             print "Index ",index             
         if (index == 2):
             print "Index ",index 
-           
+            self.ReadRegData()
         if (index == 3):
             print "Index ",index 
         if (index == 4):
             print "Index ",index             
         if (index == 5):
             print "Index ",index 
-
-
-
-
         
-    def  initVariables(self):
+    def initVariables(self):
         print "Init Variables"
         brainData[0]=[1,2,3,4,5,6,1,2,3,4,5,6]    
         brainData[1]=[1,2,10,4,5,6,1,2,3,4,5,6]
@@ -260,6 +253,7 @@ class BrainInterface(QtGui.QMainWindow):
             command = '2'+'%01x'%(regnum)+'0000000D'
         else:
             command = '3'+'%01x'%(regnum-16)+'0000000D'
+#        print command
         str_a = ""
         str_b = ""
         while command:
@@ -287,13 +281,12 @@ class BrainInterface(QtGui.QMainWindow):
             command = '5'+'%01x'%(regnum-16)+'00'+data+'000D'
         str_m = ""
         str_n = ""
-        print command
+#        print command
         while command:
             str_m = command[0:2]
             s_m = int(str_m,16)
             str_n += struct.pack('B', s_m)
             command = command[2:]
-        print str_n
         self.ser.flushInput()
         self.ser.write(str_n)
         
@@ -310,11 +303,10 @@ class BrainInterface(QtGui.QMainWindow):
         print repr(str_reset2)
         self.ser.flushInput()
         self.ser.write(str_reset2)   
-        waittime = time.sleep(0.04)
-        print 'wait'
-        print waittime
-        
-        
+#        waittime = time.sleep(0.04)
+#        print 'wait'
+#        print waittime
+                
     def SDATAC(self):
         SDATACCMD = '110000000D'
         str_SDATAC1 = ""
@@ -465,10 +457,7 @@ class BrainInterface(QtGui.QMainWindow):
         """Convert Hex to Binary"""
         str_d = format(int(data,16),'#010b')
         return str_d
-
-        
-        
-        
+       
     def refresh_vexplorer_table(self):
         """ (Utility) Refresh variable explorer table"""
         if self.nsb.is_visible and self.nsb.isVisible():
@@ -751,10 +740,6 @@ class BrainInterface(QtGui.QMainWindow):
         self.Ch2Select.setGeometry(QtCore.QRect(50, 30, 70, 27))
         self.Ch2Select.setChecked(True)
 
-
-        
-        
-#############################Edit ComboBox############################
         listGain = [
         self.tr('24'),
         self.tr('12'),
@@ -843,9 +828,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.ChanInCh3.currentIndexChanged.connect(self.setCh3Input)
         self.ChanInCh2.currentIndexChanged.connect(self.setCh2Input)
         self.ChanInCh1.currentIndexChanged.connect(self.setCh1Input)
-        
- 
-       
+               
     def setCh8Gain(self):
         gainVal8 = self.GainCh8.currentIndex()
         if gainVal8 == 1:        
@@ -1150,7 +1133,7 @@ class BrainInterface(QtGui.QMainWindow):
         SRB2ValCh7 = self.SRB2Ch7.currentIndex()
         if SRB2ValCh7==0:
             self.setChSRB2(7, 0)
-        elif SRB2ValCh8==1:
+        elif SRB2ValCh7==1:
             self.setChSRB2(7, 1)   
             
     def setCh6SRB2(self):
@@ -1446,16 +1429,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.tr('f(MOD)/64')
         ]
          
-        self.OutputDRate.addItems(listDatarate)
-        self.OutputDRate.setItemData(0,"Data Rate = 250SPS",QtCore.Qt.ToolTipRole)
-        self.OutputDRate.setItemData(1,"Data Rate = 500SPS",QtCore.Qt.ToolTipRole)
-        self.OutputDRate.setItemData(2,"Data Rate = 1000SPS",QtCore.Qt.ToolTipRole)
-        self.OutputDRate.setItemData(3,"Data Rate = 2000SPS",QtCore.Qt.ToolTipRole)
-        self.OutputDRate.setItemData(4,"Data Rate = 4000SPS",QtCore.Qt.ToolTipRole)
-        self.OutputDRate.setItemData(5,"Data Rate = 8000SPS",QtCore.Qt.ToolTipRole)
-        self.OutputDRate.setItemData(6,"Data Rate = 16000SPS",QtCore.Qt.ToolTipRole)
-        
-        self.OutputDRate.currentIndexChanged.connect(self.myDRateChange)
+
         
 ####################CONFIG2##############################################
         self.SetCONFIG2 = QtGui.QGroupBox(self.GlobalReg)
@@ -1800,21 +1774,200 @@ class BrainInterface(QtGui.QMainWindow):
         self.horizontalLayout_4.addWidget(self.BIASN2)
         self.BIASN1 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN1)
+        
+        
+        self.OutputDRate.addItems(listDatarate)
+        self.OutputDRate.setItemData(0,"Data Rate = 250SPS",QtCore.Qt.ToolTipRole)
+        self.OutputDRate.setItemData(1,"Data Rate = 500SPS",QtCore.Qt.ToolTipRole)
+        self.OutputDRate.setItemData(2,"Data Rate = 1000SPS",QtCore.Qt.ToolTipRole)
+        self.OutputDRate.setItemData(3,"Data Rate = 2000SPS",QtCore.Qt.ToolTipRole)
+        self.OutputDRate.setItemData(4,"Data Rate = 4000SPS",QtCore.Qt.ToolTipRole)
+        self.OutputDRate.setItemData(5,"Data Rate = 8000SPS",QtCore.Qt.ToolTipRole)
+        self.OutputDRate.setItemData(6,"Data Rate = 16000SPS",QtCore.Qt.ToolTipRole)
+        
+        self.OutputDRate.currentIndexChanged.connect(self.myDRateChange)
+        
+        self.DaisyChainMultiRM.currentIndexChanged.connect(self.setMultiMode)
+        self.ClkOut.currentIndexChanged.connect(self.setClkEn)    
+        
+        self.TestSource.currentIndexChanged.connect(self.setTestSource)
+        self.TestAmp.currentIndexChanged.connect(self.setTestAmp)
+        self.TestFrq.currentIndexChanged.connect(self.setTestFrq)
+        
+    def daisyMulti(self, multi):
+        if multi == 1:            
+            multiVal = self.ReadReg(1)
+            hexmultiVal = self.hex2bin(multiVal)
+            hexmultiVal = '%02x'%((int(hexmultiVal,2))&(int('0xBF',16))|(int('0xD0',16)))
+            self.WriteReg(1, hexmultiVal)
+        elif multi == 0:
+            multiVal = self.ReadReg(1)
+            hexmultiVal = self.hex2bin(multiVal)
+            hexmultiVal = '%02x'%((int(hexmultiVal,2))&(int('0xBF',16))|(int('0x90',16)))
+            self.WriteReg(1, hexmultiVal)   
+    def setMultiMode(self):
+        multiIdx = self.DaisyChainMultiRM.currentIndex()
+        if multiIdx == 0:
+            self.daisyMulti(0)
+        else:
+            self.daisyMulti(1)
 
+    def ClkEnable(self, clken):
+        if clken == 1:
+            clkVal = self.ReadReg(1)
+            hexclkVal = self.hex2bin(clkVal)
+            hexclkVal = '%02x'%((int(hexclkVal,2))&(int('0xDF',16))|(int('0xB0',16)))
+            self.WriteReg(1, hexclkVal)
+        elif clkVal == 0:
+            clkVal = self.ReadReg(1)
+            hexclkVal = self.hex2bin(clkVal)
+            hexclkVal = '%02x'%((int(hexclkVal,2))&(int('0xDF',16))|(int('0xB0',16)))
+            self.WriteReg(1, hexclkVal)        
+    def setClkEn(self):
+        ClkIdx = self.ClkOut.currentIndex()
+        if ClkIdx == 0:
+            self.ClkEnable(0)
+        else:
+            self.ClkEnable(1)
+            
+    def dataRate(self, rate):
+        if rate == 250:            
+            drVal = self.ReadReg(1)
+            hexdrVal = self.hex2bin(drVal)
+            hexdrVal = '%02x'%((int(hexdrVal,2))&(int('0xF8',16))|(int('0x96',16)))
+            self.WriteReg(1, hexdrVal)
+        elif rate == 500:
+            drVal = self.ReadReg(1)
+            hexdrVal = self.hex2bin(drVal)
+            hexdrVal = '%02x'%((int(hexdrVal,2))&(int('0xF8',16))|(int('0x95',16)))
+            self.WriteReg(1, hexdrVal)               
+        elif rate == 1000:
+            drVal = self.ReadReg(1)
+            hexdrVal = self.hex2bin(drVal)
+            hexdrVal = '%02x'%((int(hexdrVal,2))&(int('0xF8',16))|(int('0x94',16)))
+            self.WriteReg(1, hexdrVal)
+        elif rate == 2000:
+            drVal = self.ReadReg(1)
+            hexdrVal = self.hex2bin(drVal)
+            hexdrVal = '%02x'%((int(hexdrVal,2))&(int('0xF8',16))|(int('0x93',16)))
+            self.WriteReg(1, hexdrVal)
+        elif rate == 4000:
+            drVal = self.ReadReg(1)
+            hexdrVal = self.hex2bin(drVal)
+            hexdrVal = '%02x'%((int(hexdrVal,2))&(int('0xF8',16))|(int('0x92',16)))
+            self.WriteReg(1, hexdrVal)
+        elif rate == 8000:
+            drVal = self.ReadReg(1)
+            hexdrVal = self.hex2bin(drVal)
+            hexdrVal = '%02x'%((int(hexdrVal,2))&(int('0xF8',16))|(int('0x91',16)))
+            self.WriteReg(1, hexdrVal)
+        elif rate == 16000:
+            drVal = self.ReadReg(1)
+            hexdrVal = self.hex2bin(drVal)
+            hexdrVal = '%02x'%((int(hexdrVal,2))&(int('0xF8',16))|(int('0x90',16)))
+            self.WriteReg(1, hexdrVal)        
+
+    def myDRateChange(self):
+        cText = self.OutputDRate.currentIndex()        
+        if cText == 1:
+            self.OutputDTRate.setText("500SPS")
+            self.dataRate(500)
+        elif cText == 2:
+            self.OutputDTRate.setText("1000SPS")
+            self.dataRate(1000)
+        elif cText == 3:
+            self.OutputDTRate.setText("2000SPS")
+            self.dataRate(2000)
+        elif cText == 4:
+            self.OutputDTRate.setText("4000SPS")
+            self.dataRate(4000)
+        elif cText == 5:
+            self.OutputDTRate.setText("8000SPS")
+            self.dataRate(8000)
+        elif cText == 6:
+            self.OutputDTRate.setText("16000SPS")
+            self.dataRate(16000)
+        elif cText == 0:
+            self.OutputDTRate.setText("250SPS") 
+            self.dataRate(250)
+            
+    def TestSc(self, internal):
+        if internal == 1:
+            TestScVal = self.ReadReg(2)
+            hexTestScVal = self.hex2bin(TestScVal)
+            hexTestScVal = '%02x'%((int(hexTestScVal,2))&(int('0xEF',16))|(int('0xD0',16)))
+            self.WriteReg(2, hexTestScVal)
+        elif internal == 0:
+            TestScVal = self.ReadReg(2)
+            hexTestScVal = self.hex2bin(TestScVal)
+            hexTestScVal = '%02x'%((int(hexTestScVal,2))&(int('0xEF',16))|(int('0xD0',16)))
+            self.WriteReg(2, hexTestScVal)        
+    def setTestSource(self):
+        TestScIdx = self.TestSource.currentIndex()
+        if TestScIdx == 0:
+            self.ClkEnable(0)
+        else:
+            self.ClkEnable(1)        
+            
+    def TestA(self, amp):
+        if amp == 1:
+            TestAVal = self.ReadReg(2)
+            hexTestAVal = self.hex2bin(TestAVal)
+            hexTestAVal = '%02x'%((int(hexTestAVal,2))&(int('0xEF',16))|(int('0xD0',16)))
+            self.WriteReg(2, hexTestAVal)
+        elif amp == 0:
+            TestAVal = self.ReadReg(2)
+            hexTestAVal = self.hex2bin(TestAVal)
+            hexTestAVal = '%02x'%((int(hexTestAVal,2))&(int('0xEF',16))|(int('0xC0',16)))
+            self.WriteReg(2, hexTestAVal)        
+    def setTestAmp(self):
+        TestAmpIdx = self.TestAmp.currentIndex()
+        if TestAmpIdx == 0:
+            self.TestA(0)
+        else:
+            self.TestA(1)        
+            
+    def TestF(self, Frq):
+        if Frq == 3:
+            TestFVal = self.ReadReg(2)
+            hexTestFVal = self.hex2bin(TestFVal)
+            hexTestFVal = '%02x'%((int(hexTestFVal,2))&(int('0xFC',16))|(int('0xC3',16)))
+            self.WriteReg(2, hexTestFVal)
+        elif Frq == 2:
+            TestFVal = self.ReadReg(2)
+            hexTestFVal = self.hex2bin(TestFVal)
+            hexTestFVal = '%02x'%((int(hexTestFVal,2))&(int('0xFC',16))|(int('0xC2',16)))
+            self.WriteReg(2, hexTestFVal)        
+        elif Frq == 1:
+            TestFVal = self.ReadReg(2)
+            hexTestFVal = self.hex2bin(TestFVal)
+            hexTestFVal = '%02x'%((int(hexTestFVal,2))&(int('0xFC',16))|(int('0xC1',16)))
+            self.WriteReg(2, hexTestFVal) 
+        elif Frq == 0:
+            TestFVal = self.ReadReg(2)
+            hexTestFVal = self.hex2bin(TestFVal)
+            hexTestFVal = '%02x'%((int(hexTestFVal,2))&(int('0xFC',16))|(int('0xC0',16)))
+            self.WriteReg(2, hexTestFVal) 
+    def setTestFrq(self):
+        TestFrqIdx = self.TestFrq.currentIndex()
+        if TestFrqIdx == 0:
+            self.TestF(0)
+        elif TestFrqIdx == 1:
+            self.TestF(1)     
+        elif TestFrqIdx == 2:
+            self.TestF(2)     
+        elif TestFrqIdx == 3:
+            self.TestF(3)     
+    
         
 ############################Tab3 setup##################################
     def RegisterMapSetup(self):
         self.tableWidget = QtGui.QTableWidget(self.RegMap)
         self.tableWidget.setGeometry(QtCore.QRect(90, 30, 383, 553))
-#        self.tableWidget.setFrameShape(QtGui.QFrame.StyledPanel)
         self.tableWidget.setLineWidth(2)
         self.tableWidget.setMidLineWidth(1)
         self.tableWidget.setRowCount(24)
         self.tableWidget.setColumnCount(11)
-        
-        
-#        self.tableWidget.setColumnWidth(0, 200)
-#        self.tableWidget.setColumnWidth(1, 200)
         
         listHeader = [
         self.tr('Register'),
@@ -1871,427 +2024,162 @@ class BrainInterface(QtGui.QMainWindow):
         self.resetRegMap.setGeometry(QtCore.QRect(550,100, 75, 23))
         self.resetRegMap.setText("Reset Device")
         self.resetRegMap.clicked.connect(self.deviceSetup)
-        
+ 
+    def splitData(self, data, regnum):
+        binval = self.hex2bin(data)
+        binval = binval[2:]
+        lenval = len(binval)
+        while binval:
+            lenbinval = len(binval)
+            fbit = binval[0:1]
+            sto = int(fbit,16)
+            self.tableWidget.setItem(regnum,(3 + lenval - lenbinval),QtGui.QTableWidgetItem(str(sto)))
+            binval = binval[1:]        
+       
     def ReadRegData(self):
-########################Register0&1###############################
-        command0 = '200100000D'
-        str3 = ""
-        str4 = ""
-        y = int(command0[3:4])
-        x = int(command0[1:2])        
-        
-        while command0:
-            str3 = command0[0:2]
-            s = int(str3, 16)
-            str4 += struct.pack('B', s)
-            command0 = command0[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str4)
-        
-        data = self.ser.read(16)
-        
-        result = ''  
-        hLen = len(data)
-        for i in xrange(hLen):  
-            hvol = ord(data[i])  
-            hhex = '%02X'%hvol  
-            result += hhex+' '  
-        
-        val = result[18:20]
-        addr = '%02X'%(x)+'h'
+        val = self.ReadReg(0)
+        addr = '%02X'%(0)+'h'
         self.tableWidget.setItem(0, 1, QtGui.QTableWidgetItem(addr))
         self.tableWidget.setItem(0, 2, QtGui.QTableWidgetItem(val)) 
-        
-        val1 = result[21:23]
-        addr1 = '%02X'%(x+y)+'h'
+        self.splitData(val,0)
+                    
+        val1 = self.ReadReg(1)
+        addr1 = '%02X'%(1)+'h'
         self.tableWidget.setItem(1, 1, QtGui.QTableWidgetItem(addr1))
-        self.tableWidget.setItem(1, 2, QtGui.QTableWidgetItem(val1))  
-        
-######################Register2&3###################################        
-        command1 = '220100000D'
-        str5 = ""
-        str6 = ""
-        y1 = int(command1[3:4])
-        x1 = int(command1[1:2])       
-        
-        while command1:
-            str5 = command1[0:2]
-            s = int(str5, 16)
-            str6 += struct.pack('B', s)
-            command1 = command1[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str6)
-        
-        data1 = self.ser.read(16)
-        
-        result1 = ''  
-        hLen1 = len(data1)
-        for i in xrange(hLen1):  
-            hvol1 = ord(data1[i])  
-            hhex1 = '%02X'%hvol1  
-            result1 += hhex1+' '  
-        
-        val2 = result1[18:20]
-        addr2 = '%02X'%(x1)+'h'
+        self.tableWidget.setItem(1, 2, QtGui.QTableWidgetItem(val1)) 
+        self.splitData(val1,1)
+             
+        val2 = self.ReadReg(2)
+        addr2 = '%02X'%(2)+'h'
         self.tableWidget.setItem(2, 1, QtGui.QTableWidgetItem(addr2))
         self.tableWidget.setItem(2, 2, QtGui.QTableWidgetItem(val2))  
+        self.splitData(val2,2)
         
-        val3 = result1[21:23]
-        addr3 = '%02X'%(x1+y1)+'h'
+        val3 = self.ReadReg(3)
+        addr3 = '%02X'%(3)+'h'
         self.tableWidget.setItem(3, 1, QtGui.QTableWidgetItem(addr3))
-        self.tableWidget.setItem(3, 2, QtGui.QTableWidgetItem(val3))  
+        self.tableWidget.setItem(3, 2, QtGui.QTableWidgetItem(val3)) 
+        self.splitData(val3,3)
         
-#########################Register4&5###################################3
-        command2 = '240100000D'
-        str7 = ""
-        str8 = ""
-        y2 = int(command2[3:4])
-        x2 = int(command2[1:2])       
-        
-        while command2:
-            str7 = command2[0:2]
-            s = int(str7, 16)
-            str8 += struct.pack('B', s)
-            command2 = command2[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str8)
-        
-        data2 = self.ser.read(16)
-        
-        result2 = ''  
-        hLen2 = len(data2)
-        for i in xrange(hLen2):  
-            hvol2 = ord(data2[i])  
-            hhex2 = '%02X'%hvol2  
-            result2 += hhex2+' '  
-        
-        val4 = result2[18:20]
-        addr4 = '%02X'%(x2)+'h'
+        val4 = self.ReadReg(4)
+        addr4 = '%02X'%(4)+'h'
         self.tableWidget.setItem(4, 1, QtGui.QTableWidgetItem(addr4))
         self.tableWidget.setItem(4, 2, QtGui.QTableWidgetItem(val4))  
+        self.splitData(val4,4)
         
-        val5 = result2[21:23]
-        addr5 = '%02X'%(x2+y2)+'h'
+        val5 = self.ReadReg(5)
+        addr5 = '%02X'%(5)+'h'
         self.tableWidget.setItem(5, 1, QtGui.QTableWidgetItem(addr5))
-        self.tableWidget.setItem(5, 2, QtGui.QTableWidgetItem(val5))  
-        
-########################Register6&7###################################
-        command3 = '260100000D'
-        str9 = ""
-        str10 = ""
-        y3 = int(command3[3:4])
-        x3 = int(command3[1:2])        
-        
-        while command3:
-            str9 = command3[0:2]
-            s = int(str9, 16)
-            str10 += struct.pack('B', s)
-            command3 = command3[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str10)
-        
-        data3 = self.ser.read(16)
-        
-        result3 = ''  
-        hLen3 = len(data3)
-        for i in xrange(hLen3):  
-            hvol3 = ord(data3[i])  
-            hhex3 = '%02X'%hvol3  
-            result3 += hhex3+' '  
-        
-        val6 = result3[18:20]
-        addr6 = '%02X'%(x3)+'h'
+        self.tableWidget.setItem(5, 2, QtGui.QTableWidgetItem(val5)) 
+        self.splitData(val5,5)
+
+        val6 = self.ReadReg(6)
+        addr6 = '%02X'%(6)+'h'
         self.tableWidget.setItem(6, 1, QtGui.QTableWidgetItem(addr6))
         self.tableWidget.setItem(6, 2, QtGui.QTableWidgetItem(val6))  
+        self.splitData(val6,6)
         
-        val7 = result3[21:23]
-        addr7 = '%02X'%(x3+y3)+'h'
+        val7 = self.ReadReg(7)
+        addr7 = '%02X'%(7)+'h'
         self.tableWidget.setItem(7, 1, QtGui.QTableWidgetItem(addr7))
         self.tableWidget.setItem(7, 2, QtGui.QTableWidgetItem(val7))  
-        
-#################################Register8&9##############################
-        command4 = '280100000D'
-        str11 = ""
-        str12 = ""
-        y4 = int(command4[3:4])
-        x4 = int(command4[1:2])        
-        
-        while command4:
-            str11 = command4[0:2]
-            s = int(str11, 16)
-            str12 += struct.pack('B', s)
-            command4 = command4[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str12)
-        
-        data4 = self.ser.read(16)
-        
-        result4 = ''  
-        hLen4 = len(data4)
-        for i in xrange(hLen4):  
-            hvol4 = ord(data4[i])  
-            hhex4 = '%02X'%hvol4  
-            result4 += hhex4+' '  
-        
-        val8 = result4[18:20]
-        addr8 = '%02X'%(x4)+'h'
+        self.splitData(val7,7)
+
+        val8 = self.ReadReg(8)
+        addr8 = '%02X'%(8)+'h'
         self.tableWidget.setItem(8, 1, QtGui.QTableWidgetItem(addr8))
         self.tableWidget.setItem(8, 2, QtGui.QTableWidgetItem(val8))  
+        self.splitData(val8,8)
         
-        val9 = result4[21:23]
-        addr9 = '%02X'%(x4+y4)+'h'
+        val9 = self.ReadReg(9)
+        addr9 = '%02X'%(9)+'h'
         self.tableWidget.setItem(9, 1, QtGui.QTableWidgetItem(addr9))
         self.tableWidget.setItem(9, 2, QtGui.QTableWidgetItem(val9)) 
-        
-################################Register10&11#############################
-        command5 = '2A0100000D'
-        str13 = ""
-        str14 = ""
-        y5 = int(command5[3:4])
-        x5 = int(command5[1:2],16)        
-        
-        while command5:
-            str13 = command5[0:2]
-            s = int(str13, 16)
-            str14 += struct.pack('B', s)
-            command5 = command5[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str14)
-        
-        data5 = self.ser.read(16)
-        
-        result5 = ''  
-        hLen5 = len(data5)
-        for i in xrange(hLen5):  
-            hvol5 = ord(data5[i])  
-            hhex5 = '%02X'%hvol5  
-            result5 += hhex5+' '  
-        
-        val10 = result5[18:20]
-        addr10 = '%02X'%(x5)+'h'
+        self.splitData(val9,9)
+
+        val10 = self.ReadReg(10)
+        addr10 = '%02X'%(10)+'h'
         self.tableWidget.setItem(10, 1, QtGui.QTableWidgetItem(addr10))
-        self.tableWidget.setItem(10, 2, QtGui.QTableWidgetItem(val10))  
+        self.tableWidget.setItem(10, 2, QtGui.QTableWidgetItem(val10))
+        self.splitData(val10,10)
         
-        val11 = result5[21:23]
-        addr11 = '%02X'%(x5+y5)+'h'
+        val11 = self.ReadReg(11)
+        addr11 = '%02X'%(11)+'h'
         self.tableWidget.setItem(11, 1, QtGui.QTableWidgetItem(addr11))
         self.tableWidget.setItem(11, 2, QtGui.QTableWidgetItem(val11)) 
+        self.splitData(val11,11)
 
-################################Register12&13#############################
-        command6 = '2C0100000D'
-        str15 = ""
-        str16 = ""
-        y6 = int(command6[3:4])
-        x6 = int(command6[1:2],16)        
-        
-        while command6:
-            str15 = command6[0:2]
-            s = int(str15, 16)
-            str16 += struct.pack('B', s)
-            command6 = command6[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str16)
-        
-        data6 = self.ser.read(16)
-        
-        result6 = ''  
-        hLen6 = len(data6)
-        for i in xrange(hLen6):  
-            hvol6 = ord(data6[i])  
-            hhex6 = '%02X'%hvol6  
-            result6 += hhex6+' '  
-        
-        val12 = result6[18:20]
-        addr12 = '%02X'%(x6) +'h'
+        val12 = self.ReadReg(12)
+        addr12 = '%02X'%(12) +'h'
         self.tableWidget.setItem(12, 1, QtGui.QTableWidgetItem(addr12))
-        self.tableWidget.setItem(12, 2, QtGui.QTableWidgetItem(val12))  
+        self.tableWidget.setItem(12, 2, QtGui.QTableWidgetItem(val12)) 
+        self.splitData(val12,12)
         
-        val13 = result6[21:23]
-        addr13 = '%02X'%(x6+y6)+'h'
+        val13 = self.ReadReg(13)
+        addr13 = '%02X'%(13)+'h'
         self.tableWidget.setItem(13, 1, QtGui.QTableWidgetItem(addr13))
         self.tableWidget.setItem(13, 2, QtGui.QTableWidgetItem(val13)) 
-        
-################################Register14&15#############################
-        command7 = '2E0100000D'
-        str17 = ""
-        str18 = ""
-        y7 = int(command7[3:4])
-        x7 = int(command7[1:2],16)        
-        
-        while command7:
-            str17 = command7[0:2]
-            s = int(str17, 16)
-            str18 += struct.pack('B', s)
-            command7 = command7[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str18)
-        
-        data7 = self.ser.read(16)
-        
-        result7 = ''  
-        hLen7 = len(data7)
-        for i in xrange(hLen7):  
-            hvol7 = ord(data7[i])  
-            hhex7 = '%02X'%hvol7  
-            result7 += hhex7+' '  
-        
-        val14 = result7[18:20]
-        addr14 = '%02X'%(x7) +'h'
-        self.tableWidget.setItem(14, 1, QtGui.QTableWidgetItem(addr14))
-        self.tableWidget.setItem(14, 2, QtGui.QTableWidgetItem(val14))  
-        
-        val15 = result7[21:23]
-        addr15 = '%02X'%(x7+y7)+'h'
-        self.tableWidget.setItem(15, 1, QtGui.QTableWidgetItem(addr15))
-        self.tableWidget.setItem(15, 2, QtGui.QTableWidgetItem(val15)) 
+        self.splitData(val13,13)
 
-################################Register16&17#############################
-        command8 = '300100000D'
-        str19 = ""
-        str20 = ""
-        y8 = int(command8[3:4])
-        x8 = int(command8[1:2],16)        
+        val14 = self.ReadReg(14)
+        addr14 = '%02X'%(14) +'h'
+        self.tableWidget.setItem(14, 1, QtGui.QTableWidgetItem(addr14))
+        self.tableWidget.setItem(14, 2, QtGui.QTableWidgetItem(val14)) 
+        self.splitData(val14,14)
         
-        while command8:
-            str19 = command8[0:2]
-            s = int(str19, 16)
-            str20 += struct.pack('B', s)
-            command8 = command8[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str20)
-        
-        data8 = self.ser.read(16)
-        
-        result8 = ''  
-        hLen8 = len(data8)
-        for i in xrange(hLen8):  
-            hvol8 = ord(data8[i])  
-            hhex8 = '%02X'%hvol8  
-            result8 += hhex8+' '  
-        
-        val16 = result8[18:20]
-        addr16 = '1'+'%01X'%(x8) +'h'
+        val15 = self.ReadReg(15)
+        addr15 = '%02X'%(15)+'h'
+        self.tableWidget.setItem(15, 1, QtGui.QTableWidgetItem(addr15))
+        self.tableWidget.setItem(15, 2, QtGui.QTableWidgetItem(val15))
+        self.splitData(val15,15)
+
+        val16 = self.ReadReg(16)
+        addr16 = '1'+'%01X'%(16) +'h'
         self.tableWidget.setItem(16, 1, QtGui.QTableWidgetItem(addr16))
         self.tableWidget.setItem(16, 2, QtGui.QTableWidgetItem(val16))  
+        self.splitData(val16,16)
         
-        val17 = result8[21:23]
-        addr17 = '1'+'%01X'%(x8+y8)+'h'
+        val17 = self.ReadReg(17)
+        addr17 = '1'+'%01X'%(17)+'h'
         self.tableWidget.setItem(17, 1, QtGui.QTableWidgetItem(addr17))
         self.tableWidget.setItem(17, 2, QtGui.QTableWidgetItem(val17)) 
-        
-###########################Register18&19####################################
-        command9 = '320100000D'
-        str21 = ""
-        str22 = ""
-        y9 = int(command9[3:4])
-        x9 = int(command9[1:2],16)        
-        
-        while command9:
-            str21 = command9[0:2]
-            s = int(str21, 16)
-            str22 += struct.pack('B', s)
-            command9 = command9[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str22)
-        
-        data9 = self.ser.read(16)
-        
-        result9 = ''  
-        hLen9 = len(data9)
-        for i in xrange(hLen9):  
-            hvol9 = ord(data9[i])  
-            hhex9 = '%02X'%hvol9  
-            result9 += hhex9+' '  
-        
-        val18 = result9[18:20]
-        addr18 = '1'+'%01X'%(x9) +'h'
+        self.splitData(val17,17)
+ 
+        val18 = self.ReadReg(18)
+        addr18 = '1'+'%01X'%(18) +'h'
         self.tableWidget.setItem(18, 1, QtGui.QTableWidgetItem(addr18))
-        self.tableWidget.setItem(18, 2, QtGui.QTableWidgetItem(val18))  
+        self.tableWidget.setItem(18, 2, QtGui.QTableWidgetItem(val18)) 
+        self.splitData(val18,18)
         
-        val19 = result9[21:23]
-        addr19 = '1'+'%01X'%(x9+y9)+'h'
+        val19 = self.ReadReg(19)
+        addr19 = '1'+'%01X'%(19)+'h'
         self.tableWidget.setItem(19, 1, QtGui.QTableWidgetItem(addr19))
         self.tableWidget.setItem(19, 2, QtGui.QTableWidgetItem(val19)) 
-        
-###########################Register20&21####################################
-        command10 = '340100000D'
-        str23 = ""
-        str24 = ""
-        y10 = int(command10[3:4])
-        x10 = int(command10[1:2],16)        
-        
-        while command10:
-            str23 = command10[0:2]
-            s = int(str23, 16)
-            str24 += struct.pack('B', s)
-            command10 = command10[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str24)
-        
-        data10 = self.ser.read(16)
-        
-        result10 = ''  
-        hLen10 = len(data10)
-        for i in xrange(hLen10):  
-            hvol10 = ord(data10[i])  
-            hhex10 = '%02X'%hvol10  
-            result10 += hhex10+' '  
-        
-        val20 = result10[18:20]
-        addr20 = '1'+'%01X'%(x10) +'h'
+        self.splitData(val19,19)
+
+        val20 = self.ReadReg(20)
+        addr20 = '1'+'%01X'%(20) +'h'
         self.tableWidget.setItem(20, 1, QtGui.QTableWidgetItem(addr20))
         self.tableWidget.setItem(20, 2, QtGui.QTableWidgetItem(val20))  
+        self.splitData(val20,20)
         
-        val21 = result10[21:23]
-        addr21 = '1'+'%01X'%(x10+y10)+'h'
+        val21 = self.ReadReg(21)
+        addr21 = '1'+'%01X'%(21)+'h'
         self.tableWidget.setItem(21, 1, QtGui.QTableWidgetItem(addr21))
         self.tableWidget.setItem(21, 2, QtGui.QTableWidgetItem(val21)) 
-        
-###########################Register22&23####################################
-        command11 = '360100000D'
-        str25 = ""
-        str26 = ""
-        y11 = int(command11[3:4])
-        x11 = int(command11[1:2],16)        
-        
-        while command11:
-            str25 = command11[0:2]
-            s = int(str25, 16)
-            str26 += struct.pack('B', s)
-            command11 = command11[2:]
-            
-        self.ser.flushInput()
-        self.ser.write(str26)
-        
-        data11 = self.ser.read(16)
-        
-        result11 = ''  
-        hLen11 = len(data11)
-        for i in xrange(hLen11):  
-            hvol11 = ord(data11[i])  
-            hhex11 = '%02X'%hvol11  
-            result11 += hhex11+' '  
-        
-        val22 = result11[18:20]
-        addr22 = '1'+'%01X'%(x11) +'h'
+        self.splitData(val21,21)
+
+        val22 = self.ReadReg(22)
+        addr22 = '1'+'%01X'%(22) +'h'
         self.tableWidget.setItem(22, 1, QtGui.QTableWidgetItem(addr22))
         self.tableWidget.setItem(22, 2, QtGui.QTableWidgetItem(val22))  
+        self.splitData(val22,22)
         
-        val23 = result11[21:23]
-        addr23 = '1'+'%01X'%(x11+y11)+'h'
+        val23 = self.ReadReg(23)
+        addr23 = '1'+'%01X'%(23)+'h'
         self.tableWidget.setItem(23, 1, QtGui.QTableWidgetItem(addr23))
         self.tableWidget.setItem(23, 2, QtGui.QTableWidgetItem(val23)) 
+        self.splitData(val23,23)
         
 
         
@@ -2322,22 +2210,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.SamplePerChn.setGeometry(QtCore.QRect(20, 120, 91, 31))
         self.SamplePerChn.setText("1000")
         
-    def myDRateChange(self):
-        cText = self.OutputDRate.currentIndex()        
-        if cText == 1:
-            self.OutputDTRate.setText("500SPS")
-        elif cText == 2:
-            self.OutputDTRate.setText("1000SPS")
-        elif cText == 3:
-            self.OutputDTRate.setText("2000SPS")
-        elif cText == 4:
-            self.OutputDTRate.setText("4000SPS")
-        elif cText == 5:
-            self.OutputDTRate.setText("8000SPS")
-        elif cText == 6:
-            self.OutputDTRate.setText("16000SPS")
-        elif cText == 0:
-            self.OutputDTRate.setText("250SPS") 
+
 
         
 def main():
