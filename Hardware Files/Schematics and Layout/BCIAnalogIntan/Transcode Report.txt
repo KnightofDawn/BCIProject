@@ -1,0 +1,63 @@
+
+
+   ---- Transcoding 'C:\Users\cnlab\Desktop\BCIProject\Hardware Files\Schematics and Layout\BCIAnalogIntan\gerbRHD2132_headstage1\RHD2132_headstage1.stc' ----   Thu Apr 25 15:54:57 2013
+
+D10   --> D100
+D11   --> D101
+D12   --> D102
+D13   --> D103
+D14   --> D104
+D15   --> D105
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\cnlab\Desktop\BCIProject\Hardware Files\Schematics and Layout\BCIAnalogIntan\gerbRHD2132_headstage1\RHD2132_headstage1.cmp' ----   Thu Apr 25 15:54:59 2013
+
+D10   --> D106
+D11   --> D107
+D12   --> D108
+D13   --> D109
+D14   --> D110
+D15   --> D111
+D16   --> D112
+D17   --> D113
+D18   --> D114
+D19   --> D115
+D20   --> D116
+D21   --> D117
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\cnlab\Desktop\BCIProject\Hardware Files\Schematics and Layout\BCIAnalogIntan\gerbRHD2132_headstage1\RHD2132_headstage1.l15' ----   Thu Apr 25 15:54:59 2013
+
+D10   --> D118
+D11   --> D119
+D12   --> D120
+D13   --> D121
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\cnlab\Desktop\BCIProject\Hardware Files\Schematics and Layout\BCIAnalogIntan\gerbRHD2132_headstage1\RHD2132_headstage1.ly2' ----   Thu Apr 25 15:54:59 2013
+
+D10   --> D122
+D11   --> D123
+D12   --> D124
+D13   --> D125
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\cnlab\Desktop\BCIProject\Hardware Files\Schematics and Layout\BCIAnalogIntan\gerbRHD2132_headstage1\RHD2132_headstage1.sol' ----   Thu Apr 25 15:54:59 2013
+
+D10   --> D126
+D11   --> D127
+D13   --> D128
+D14   --> D129
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\cnlab\Desktop\BCIProject\Hardware Files\Schematics and Layout\BCIAnalogIntan\gerbRHD2132_headstage1\RHD2132_headstage1.sts' ----   Thu Apr 25 15:54:59 2013
+
+D10   --> D130
+D11   --> D131
+D12   --> D132
+-----------------------------------------------------------------
