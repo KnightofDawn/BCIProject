@@ -224,7 +224,7 @@ class BrainInterface(QtGui.QMainWindow):
             print "Index ",index             
         if (index == 2):
             print "Index ",index 
-            self.ReadRegData()
+#            self.ReadRegData()
         if (index == 3):
             print "Index ",index 
         if (index == 4):
@@ -1794,6 +1794,16 @@ class BrainInterface(QtGui.QMainWindow):
         self.TestAmp.currentIndexChanged.connect(self.setTestAmp)
         self.TestFrq.currentIndexChanged.connect(self.setTestFrq)
         
+        self.RefBuffer.currentIndexChanged.connect(self.setRefBuffer)
+        self.BIASMeas.currentIndexChanged.connect(self.setBIASMeas)
+        self.BIASREFSource.currentIndexChanged.connect(self.setBIASREFS)
+        self.BIASBuffer.currentIndexChanged.connect(self.setBIASBuff)
+        self.SRB1.currentIndexChanged.connect(self.setSRB1)
+        self.LeadoffComparator.currentIndexChanged.connect(self.setLOFFCOMP)
+        self.CompTHD.currentIndexChanged.connect(self.setCompTHD)
+        self.LOFFCurrentMag.currentIndexChanged.connect(self.setLoffMag)
+
+        
     def daisyMulti(self, multi):
         if multi == 1:            
             multiVal = self.ReadReg(1)
@@ -1958,7 +1968,254 @@ class BrainInterface(QtGui.QMainWindow):
             self.TestF(2)     
         elif TestFrqIdx == 3:
             self.TestF(3)     
+            
+    def RefBuff(self, enable):
+        if enable == 1:
+            RefBuffVal = self.ReadReg(3)
+            hexRefBuffVal = self.hex2bin(RefBuffVal)
+            hexRefBuffVal = '%02x'%((int(hexRefBuffVal,2))&(int('0x7F',16))|(int('0xE0',16)))
+            self.WriteReg(3, hexRefBuffVal)
+        elif enable == 0:
+            RefBuffVal = self.ReadReg(3)
+            hexRefBuffVal = self.hex2bin(RefBuffVal)
+            hexRefBuffVal = '%02x'%((int(hexRefBuffVal,2))&(int('0x7F',16))|(int('0x60',16)))
+            self.WriteReg(3, hexRefBuffVal)        
+    def setRefBuffer(self):
+        RefBufferIdx = self.RefBuffer.currentIndex()
+        if RefBufferIdx == 0:
+            self.RefBuff(0)
+        else:
+            self.RefBuff(1)        
+            
+    def BIASM(self, on):
+        if on == 1:
+            BIASMVal = self.ReadReg(3)
+            hexBIASMVal = self.hex2bin(BIASMVal)
+            hexBIASMVal = '%02x'%((int(hexBIASMVal,2))&(int('0xEF',16))|(int('0x70',16)))
+            self.WriteReg(3, hexBIASMVal)
+        elif on == 0:
+            BIASMVal = self.ReadReg(3)
+            hexBIASMVal = self.hex2bin(BIASMVal)
+            hexBIASMVal = '%02x'%((int(hexBIASMVal,2))&(int('0xEF',16))|(int('0x60',16)))
+            self.WriteReg(3, hexBIASMVal)        
+    def setBIASMeas(self):
+        BIASMeasIdx = self.BIASMeas.currentIndex()
+        if BIASMeasIdx == 0:
+            self.BIASM(0)
+        else:
+            self.BIASM(1)   
+            
+    def BIASREFS(self, internal):
+        if internal == 1:
+            BIASREFSVal = self.ReadReg(3)
+            hexBIASREFSVal = self.hex2bin(BIASREFSVal)
+            hexBIASREFSVal = '%02x'%((int(hexBIASREFSVal,2))&(int('0xF7',16))|(int('0x68',16)))
+            self.WriteReg(3, hexBIASREFSVal)
+        elif internal == 0:
+            BIASREFSVal = self.ReadReg(3)
+            hexBIASREFSVal = self.hex2bin(BIASREFSVal)
+            hexBIASREFSVal = '%02x'%((int(hexBIASREFSVal,2))&(int('0xF7',16))|(int('0x60',16)))
+            self.WriteReg(3, hexBIASREFSVal)        
+    def setBIASREFS(self):
+        BIASREFSIdx = self.BIASREFSource.currentIndex()
+        if BIASREFSIdx == 0:
+            self.BIASREFS(0)
+        else:
+            self.BIASREFS(1)   
     
+    def BIASBuff(self, enable):
+        if enable == 1:
+            BIASBuffVal = self.ReadReg(3)
+            hexBIASBuffVal = self.hex2bin(BIASBuffVal)
+            hexBIASBuffVal = '%02x'%((int(hexBIASBuffVal,2))&(int('0xFB',16))|(int('0x64',16)))
+            self.WriteReg(3, hexBIASBuffVal)
+        elif enable == 0:
+            BIASBuffVal = self.ReadReg(3)
+            hexBIASBuffVal = self.hex2bin(BIASBuffVal)
+            hexBIASBuffVal = '%02x'%((int(hexBIASBuffVal,2))&(int('0xFB',16))|(int('0x60',16)))
+            self.WriteReg(3, hexBIASBuffVal)        
+    def setBIASBuff(self):
+        BIASBuffIdx = self.BIASBuffer.currentIndex()
+        if BIASBuffIdx == 0:
+            self.BIASBuff(0)
+        else:
+            self.BIASBuff(1)   
+            
+    def BIASSense(self, enable):
+        if enable == 1:
+            BIASSenseVal = self.ReadReg(3)
+            hexBIASSenseVal = self.hex2bin(BIASSenseVal)
+            hexBIASSenseVal = '%02x'%((int(hexBIASSenseVal,2))&(int('0xFD',16))|(int('0x62',16)))
+            self.WriteReg(3, hexBIASSenseVal)
+        elif enable == 0:
+            BIASSenseVal = self.ReadReg(3)
+            hexBIASSenseVal = self.hex2bin(BIASSenseVal)
+            hexBIASSenseVal = '%02x'%((int(hexBIASSenseVal,2))&(int('0xFD',16))|(int('0x60',16)))
+            self.WriteReg(3, hexBIASSenseVal) 
+            
+    def SRB1on(self, on):
+        if on == 1:
+            SRB1Val = self.ReadReg(21)
+            hexSRB1Val = self.hex2bin(SRB1Val)
+            hexSRB1Val = '%02x'%((int(hexSRB1Val,2))&(int('0xDF',16))|(int('0x20',16)))
+            self.WriteReg(21, hexSRB1Val)
+        elif on == 0:
+            SRB1Val = self.ReadReg(21)
+            hexSRB1Val = self.hex2bin(SRB1Val)
+            hexSRB1Val = '%02x'%((int(hexSRB1Val,2))&(int('0xDF',16))|(int('0x00',16)))
+            self.WriteReg(21, hexSRB1Val)        
+    def setSRB1(self):
+        SRB1Idx = self.SRB1.currentIndex()
+        if SRB1Idx == 0:
+            self.SRB1on(0)
+        else:
+            self.SRB1on(1)   
+            
+    def LoffComp(self, enable):
+        if enable == 1:
+            LoffCompVal = self.ReadReg(23)
+            hexLoffCompVal = self.hex2bin(LoffCompVal)
+            hexLoffCompVal = '%02x'%((int(hexLoffCompVal,2))&(int('0xFD',16))|(int('0x02',16)))
+            self.WriteReg(23, hexLoffCompVal)
+        elif enable == 0:
+            LoffCompVal = self.ReadReg(23)
+            hexLoffCompVal = self.hex2bin(LoffCompVal)
+            hexLoffCompVal = '%02x'%((int(hexLoffCompVal,2))&(int('0xFD',16))|(int('0x00',16)))
+            self.WriteReg(23, hexLoffCompVal)        
+    def setLOFFCOMP(self):
+        LOFFCOMPIdx = self.LeadoffComparator.currentIndex()
+        if LOFFCOMPIdx == 0:
+            self.LoffComp(0)
+        else:
+            self.LoffComp(1)   
+            
+    def CompTH(self, compside):
+        if compside == 95:
+            CompTHDVal = self.ReadReg(4)
+            hexCompTHDVal = self.hex2bin(CompTHDVal)
+            hexCompTHDVal = '%02x'%((int(hexCompTHDVal,2))&(int('0x1F',16))|(int('0x00',16)))
+            self.WriteReg(4, hexCompTHDVal)
+        elif compside == 92.5:
+            CompTHDVal = self.ReadReg(4)
+            hexCompTHDVal = self.hex2bin(CompTHDVal)
+            hexCompTHDVal = '%02x'%((int(hexCompTHDVal,2))&(int('0x1F',16))|(int('0x20',16)))
+            self.WriteReg(4, hexCompTHDVal)        
+        elif compside == 90:
+            CompTHDVal = self.ReadReg(4)
+            hexCompTHDVal = self.hex2bin(CompTHDVal)
+            hexCompTHDVal = '%02x'%((int(hexCompTHDVal,2))&(int('0x1F',16))|(int('0x40',16)))
+            self.WriteReg(4, hexCompTHDVal) 
+        elif compside == 87.5:
+            CompTHDVal = self.ReadReg(4)
+            hexCompTHDVal = self.hex2bin(CompTHDVal)
+            hexCompTHDVal = '%02x'%((int(hexCompTHDVal,2))&(int('0x1F',16))|(int('0x60',16)))
+            self.WriteReg(4, hexCompTHDVal)         
+        elif compside == 85:
+            CompTHDVal = self.ReadReg(4)
+            hexCompTHDVal = self.hex2bin(CompTHDVal)
+            hexCompTHDVal = '%02x'%((int(hexCompTHDVal,2))&(int('0x1F',16))|(int('0x80',16)))
+            self.WriteReg(4, hexCompTHDVal)
+        elif compside == 80:
+            CompTHDVal = self.ReadReg(4)
+            hexCompTHDVal = self.hex2bin(CompTHDVal)
+            hexCompTHDVal = '%02x'%((int(hexCompTHDVal,2))&(int('0x1F',16))|(int('0xA0',16)))
+            self.WriteReg(4, hexCompTHDVal)        
+        elif compside == 75:
+            CompTHDVal = self.ReadReg(4)
+            hexCompTHDVal = self.hex2bin(CompTHDVal)
+            hexCompTHDVal = '%02x'%((int(hexCompTHDVal,2))&(int('0x1F',16))|(int('0xC0',16)))
+            self.WriteReg(4, hexCompTHDVal) 
+        elif compside == 70:
+            CompTHDVal = self.ReadReg(4)
+            hexCompTHDVal = self.hex2bin(CompTHDVal)
+            hexCompTHDVal = '%02x'%((int(hexCompTHDVal,2))&(int('0x1F',16))|(int('0xE0',16)))
+            self.WriteReg(4, hexCompTHDVal)    
+
+    def setCompTHD(self):
+        CompTHDIdx = self.CompTHD.currentIndex()
+        if CompTHDIdx == 0:
+            self.CompTH(95)
+        elif CompTHDIdx == 1:
+            self.CompTH(92.5)     
+        elif CompTHDIdx == 2:
+            self.CompTH(90)     
+        elif CompTHDIdx == 3:
+            self.CompTH(87.5)
+        elif CompTHDIdx == 4:
+            self.CompTH(85)
+        elif CompTHDIdx == 5:
+            self.CompTH(80)     
+        elif CompTHDIdx == 6:
+            self.CompTH(75)     
+        elif CompTHDIdx == 7:
+            self.CompTH(70)       
+
+    def LoffCurrMag(self, current):
+        if current == '6n':
+            LoffCurrMagVal = self.ReadReg(4)
+            hexLoffCurrMagVal = self.hex2bin(LoffCurrMagVal)
+            hexLoffCurrMagVal = '%02x'%((int(hexLoffCurrMagVal,2))&(int('0xF3',16))|(int('0x00',16)))
+            self.WriteReg(4, hexLoffCurrMagVal)
+        elif current == '24n':
+            LoffCurrMagVal = self.ReadReg(4)
+            hexLoffCurrMagVal = self.hex2bin(LoffCurrMagVal)
+            hexLoffCurrMagVal = '%02x'%((int(hexLoffCurrMagVal,2))&(int('0xF3',16))|(int('0x04',16)))
+            self.WriteReg(4, hexLoffCurrMagVal)        
+        elif current == '6u':
+            LoffCurrMagVal = self.ReadReg(4)
+            hexLoffCurrMagVal = self.hex2bin(LoffCurrMagVal)
+            hexLoffCurrMagVal = '%02x'%((int(hexLoffCurrMagVal,2))&(int('0xF3',16))|(int('0x08',16)))
+            self.WriteReg(4, hexLoffCurrMagVal) 
+        elif current == '24u':
+            LoffCurrMagVal = self.ReadReg(4)
+            hexLoffCurrMagVal = self.hex2bin(LoffCurrMagVal)
+            hexLoffCurrMagVal = '%02x'%((int(hexLoffCurrMagVal,2))&(int('0xF3',16))|(int('0x0C',16)))
+            self.WriteReg(4, hexLoffCurrMagVal) 
+
+    def setLoffMag(self):
+        LoffMagIdx = self.LOFFCurrentMag.currentIndex()
+        if LoffMagIdx == 0:
+            self.TestF('6n')
+        elif LoffMagIdx == 1:
+            self.TestF('24n')     
+        elif LoffMagIdx == 2:
+            self.TestF('6u')     
+        elif LoffMagIdx == 3:
+            self.TestF('24u')    
+
+    def LoffFreq(self, frq):
+        if frq == 0:
+            LoffFreqVal = self.ReadReg(4)
+            hexLoffFreqVal = self.hex2bin(LoffFreqVal)
+            hexLoffFreqVal = '%02x'%((int(hexLoffFreqVal,2))&(int('0xFC',16))|(int('0x00',16)))
+            self.WriteReg(4, hexLoffFreqVal)
+        elif frq == 1:
+            LoffFreqVal = self.ReadReg(4)
+            hexLoffFreqVal = self.hex2bin(LoffFreqVal)
+            hexLoffFreqVal = '%02x'%((int(hexLoffFreqVal,2))&(int('0xFC',16))|(int('0x01',16)))
+            self.WriteReg(4, hexLoffFreqVal)        
+        elif frq == 2:
+            LoffFreqVal = self.ReadReg(4)
+            hexLoffFreqVal = self.hex2bin(LoffFreqVal)
+            hexLoffFreqVal = '%02x'%((int(hexLoffFreqVal,2))&(int('0xFC',16))|(int('0x02',16)))
+            self.WriteReg(4, hexLoffFreqVal) 
+        elif frq ==3:
+            LoffFreqVal = self.ReadReg(4)
+            hexLoffFreqVal = self.hex2bin(LoffFreqVal)
+            hexLoffFreqVal = '%02x'%((int(hexLoffFreqVal,2))&(int('0xFC',16))|(int('0x03',16)))
+            self.WriteReg(4, hexLoffFreqVal) 
+
+    def setLOFFFrq(self):
+        LOFFFrqIdx = self.LOFFFrq.currentIndex()
+        if LOFFFrqIdx == 0:
+            self.LoffFreq(0)
+        elif LOFFFrqIdx == 1:
+            self.LoffFreq(1)     
+        elif LOFFFrqIdx == 2:
+            self.LoffFreq(2)     
+        elif LOFFFrqIdx == 3:
+            self.LoffFreq(3)    
+                                        
         
 ############################Tab3 setup##################################
     def RegisterMapSetup(self):
@@ -2014,6 +2271,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.tableWidget.horizontalHeader().setHighlightSections(True)
         self.tableWidget.verticalHeader().setDefaultSectionSize(22)
         self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.setEditTriggers(QtGui.QTableWidget.NoEditTriggers)
         
         self.refreshRegMap = QtGui.QPushButton(self.RegMap)
         self.refreshRegMap.setGeometry(QtCore.QRect(550,55, 75, 23))
@@ -2021,9 +2279,33 @@ class BrainInterface(QtGui.QMainWindow):
         self.refreshRegMap.clicked.connect(self.ReadRegData)
         
         self.resetRegMap = QtGui.QPushButton(self.RegMap)
-        self.resetRegMap.setGeometry(QtCore.QRect(550,100, 75, 23))
+        self.resetRegMap.setGeometry(QtCore.QRect(550,105, 75, 23))
         self.resetRegMap.setText("Reset Device")
         self.resetRegMap.clicked.connect(self.deviceSetup)
+        
+        self.standbyRegMap = QtGui.QPushButton(self.RegMap)
+        self.standbyRegMap.setGeometry(QtCore.QRect(550,155, 75, 23))
+        self.standbyRegMap.setText("Standby")
+        self.standbyRegMap.setStyleSheet("Color: Green")
+        self.standbyRegMap.setCheckable(True)
+        self.standbyRegMap.clicked.connect(self.setStandbyWakeup)
+        
+        
+    def setStandbyWakeup(self):
+        if (self.standbyRegMap.clicked):
+            self.standbyRegMap.setText("Wakeup")
+            self.standbyRegMap.clicked = False
+            self.standbyRegMap.setStyleSheet("Color: Red")
+            self.DeviceStandby()
+#            time.sleep(1)
+            
+        else:
+            self.standbyRegMap.setText("Standby")
+            self.standbyRegMap.clicked = True
+            self.standbyRegMap.setStyleSheet("Color: Green")  
+            self.DeviceWakeup()
+#            self.deviceSetup()
+#            time.sleep(1)
  
     def splitData(self, data, regnum):
         binval = self.hex2bin(data)
@@ -2134,49 +2416,49 @@ class BrainInterface(QtGui.QMainWindow):
         self.splitData(val15,15)
 
         val16 = self.ReadReg(16)
-        addr16 = '1'+'%01X'%(16) +'h'
+        addr16 = '%01X'%(16) +'h'
         self.tableWidget.setItem(16, 1, QtGui.QTableWidgetItem(addr16))
         self.tableWidget.setItem(16, 2, QtGui.QTableWidgetItem(val16))  
         self.splitData(val16,16)
         
         val17 = self.ReadReg(17)
-        addr17 = '1'+'%01X'%(17)+'h'
+        addr17 = '%01X'%(17)+'h'
         self.tableWidget.setItem(17, 1, QtGui.QTableWidgetItem(addr17))
         self.tableWidget.setItem(17, 2, QtGui.QTableWidgetItem(val17)) 
         self.splitData(val17,17)
  
         val18 = self.ReadReg(18)
-        addr18 = '1'+'%01X'%(18) +'h'
+        addr18 = '%01X'%(18) +'h'
         self.tableWidget.setItem(18, 1, QtGui.QTableWidgetItem(addr18))
         self.tableWidget.setItem(18, 2, QtGui.QTableWidgetItem(val18)) 
         self.splitData(val18,18)
         
         val19 = self.ReadReg(19)
-        addr19 = '1'+'%01X'%(19)+'h'
+        addr19 = '%01X'%(19)+'h'
         self.tableWidget.setItem(19, 1, QtGui.QTableWidgetItem(addr19))
         self.tableWidget.setItem(19, 2, QtGui.QTableWidgetItem(val19)) 
         self.splitData(val19,19)
 
         val20 = self.ReadReg(20)
-        addr20 = '1'+'%01X'%(20) +'h'
+        addr20 = '%01X'%(20) +'h'
         self.tableWidget.setItem(20, 1, QtGui.QTableWidgetItem(addr20))
         self.tableWidget.setItem(20, 2, QtGui.QTableWidgetItem(val20))  
         self.splitData(val20,20)
         
         val21 = self.ReadReg(21)
-        addr21 = '1'+'%01X'%(21)+'h'
+        addr21 = '%01X'%(21)+'h'
         self.tableWidget.setItem(21, 1, QtGui.QTableWidgetItem(addr21))
         self.tableWidget.setItem(21, 2, QtGui.QTableWidgetItem(val21)) 
         self.splitData(val21,21)
 
         val22 = self.ReadReg(22)
-        addr22 = '1'+'%01X'%(22) +'h'
+        addr22 = '%01X'%(22) +'h'
         self.tableWidget.setItem(22, 1, QtGui.QTableWidgetItem(addr22))
         self.tableWidget.setItem(22, 2, QtGui.QTableWidgetItem(val22))  
         self.splitData(val22,22)
         
         val23 = self.ReadReg(23)
-        addr23 = '1'+'%01X'%(23)+'h'
+        addr23 = '%01X'%(23)+'h'
         self.tableWidget.setItem(23, 1, QtGui.QTableWidgetItem(addr23))
         self.tableWidget.setItem(23, 2, QtGui.QTableWidgetItem(val23)) 
         self.splitData(val23,23)
@@ -2210,7 +2492,22 @@ class BrainInterface(QtGui.QMainWindow):
         self.SamplePerChn.setGeometry(QtCore.QRect(20, 120, 91, 31))
         self.SamplePerChn.setText("1000")
         
-
+        self.acquireData.clicked.connect(self.plotDataprep)
+        
+    def plotDataprep(self):
+        self.ConversionSTART()
+        self.RDATAC()
+        print "Plot"
+        ##########plot###############
+        myData = self.ser.read(512)
+        result_m = ''  
+        hLen_m = len(myData)
+        for i in xrange(hLen_m):  
+            hvol_m = ord(myData[i])  
+            hhex_m = '%02X'%hvol_m  
+            result_m += hhex_m+' '  
+        print result_m
+        #self.SDATAC()
 
         
 def main():
