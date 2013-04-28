@@ -86,7 +86,7 @@ if platform.python_version()[0] == "3":
     raw_input=input
 
 brainData = {}
-
+myData = []
 
 
 class BrainInterface(QtGui.QMainWindow):
@@ -164,7 +164,7 @@ class BrainInterface(QtGui.QMainWindow):
        
     
 #************************************************************************************************************************************************
-#        self.queueLock = threading.Lock()
+        self.queueLock = threading.Lock()
         
        
         
@@ -214,9 +214,12 @@ class BrainInterface(QtGui.QMainWindow):
         self.GlobalRegSetup()
         self.AnalysisDTSetup()
         self.RegisterMapSetup()
+        self.DefaultSetting()
 
-
-#*************************************************************************************************        
+#*************************************************************************************************     
+    def DefaultSetting(self):
+        print "default"
+   
     def manTabHandler(self,index):
         if (index == 0) :
             print "Index ",index 
@@ -234,9 +237,14 @@ class BrainInterface(QtGui.QMainWindow):
         
     def initVariables(self):
         print "Init Variables"
-        brainData[0]=[1,2,3,4,5,6,1,2,3,4,5,6]    
-        brainData[1]=[1,2,10,4,5,6,1,2,3,4,5,6]
-        brainData[2]=[1,9,3,4,5,6,1,2,3,4,5,6]
+        brainData[0]=[]    
+        brainData[1]=[]
+        brainData[2]=[]
+        brainData[3]=[]
+        brainData[4]=[]
+        brainData[5]=[]
+        brainData[6]=[]
+        brainData[7]=[]
         
         #End initVariables      
 
@@ -246,6 +254,7 @@ class BrainInterface(QtGui.QMainWindow):
 #        SPICOMMAND.CMD_RESET
         self.deviceReset()
         self.SDATAC()
+        
         print 'Device setup done'
 
     def ReadReg(self, regnum):
@@ -264,15 +273,21 @@ class BrainInterface(QtGui.QMainWindow):
         self.ser.flushInput()
         self.ser.write(str_b)
         data_1 = self.ser.read(16)
-        result_1 = ''  
-        hLen_1 = len(data_1)
-        for i in xrange(hLen_1):  
-            hvol_1 = ord(data_1[i])  
-            hhex_1 = '%02X'%hvol_1  
-            result_1 += hhex_1+' '  
 
-        val_Reg = result_1[18:20]
-        return val_Reg       
+        result_1 = '' 
+        
+        hLen_1 = len(data_1)
+        if hLen_1 == 0:
+            return "00"
+        else:
+            
+            for i in xrange(hLen_1):  
+                hvol_1 = ord(data_1[i])  
+                hhex_1 = '%02X'%hvol_1  
+                result_1 += hhex_1+' '  
+
+            val_Reg = result_1[18:20]
+            return val_Reg       
     
     def WriteReg(self, regnum, data):
         if regnum < 16:
@@ -302,7 +317,8 @@ class BrainInterface(QtGui.QMainWindow):
             resetCMD = resetCMD[2:]
         print repr(str_reset2)
         self.ser.flushInput()
-        self.ser.write(str_reset2)   
+        self.ser.write(str_reset2)  
+
 #        waittime = time.sleep(0.04)
 #        print 'wait'
 #        print waittime
@@ -365,7 +381,7 @@ class BrainInterface(QtGui.QMainWindow):
             s_start = int(str_start1,16)
             str_start2 += struct.pack('B', s_start)
             startCMD = startCMD[2:]
-        print repr(str_start2)
+#        print repr(str_start2)
         self.ser.flushInput()
         self.ser.write(str_start2)   
 
@@ -393,7 +409,7 @@ class BrainInterface(QtGui.QMainWindow):
             s_RDATAC = int(str_RDATAC1,16)
             str_RDATAC2 += struct.pack('B', s_RDATAC)
             RDATACCMD = RDATACCMD[2:]
-        print repr(str_RDATAC2)
+#        print repr(str_RDATAC2)
         self.ser.flushInput()
         self.ser.write(str_RDATAC2)      
         
@@ -1006,12 +1022,12 @@ class BrainInterface(QtGui.QMainWindow):
         if powerdown == 1:            
             chVal = self.ReadReg(chnum+4)
             hexChVal = self.hex2bin(chVal)
-            hexChVal = '%02x'%((int(hexChVal,2))&(int('0x7F',16))|(int('0x80',16)))
+            hexChVal = '%02X'%((int(hexChVal,2))&(int('0x7F',16))|(int('0x80',16)))
             self.WriteReg(chnum+4, hexChVal)
         elif powerdown == 0:
             chVal = self.ReadReg(chnum+4)
             hexChVal = self.hex2bin(chVal)
-            hexChVal = '%02x'%((int(hexChVal,2))&(int('0x7F',16))|(int('0x00',16)))
+            hexChVal = '%02X'%((int(hexChVal,2))&(int('0x7F',16))|(int('0x00',16)))
             self.WriteReg(chnum+4, hexChVal)            
      
     def changeCh8Status(self):
@@ -1880,7 +1896,7 @@ class BrainInterface(QtGui.QMainWindow):
     def myDRateChange(self):
         cText = self.OutputDRate.currentIndex()        
         if cText == 1:
-            self.OutputDTRate.setText("500SPS")
+            self.OutputDTRate.setsetText("500SPS")
             self.dataRate(500)
         elif cText == 2:
             self.OutputDTRate.setText("1000SPS")
@@ -2308,6 +2324,7 @@ class BrainInterface(QtGui.QMainWindow):
 #            time.sleep(1)
  
     def splitData(self, data, regnum):
+                
         binval = self.hex2bin(data)
         binval = binval[2:]
         lenval = len(binval)
@@ -2323,7 +2340,7 @@ class BrainInterface(QtGui.QMainWindow):
         addr = '%02X'%(0)+'h'
         self.tableWidget.setItem(0, 1, QtGui.QTableWidgetItem(addr))
         self.tableWidget.setItem(0, 2, QtGui.QTableWidgetItem(val)) 
-        self.splitData(val,0)
+        self.splitData(val,0)   
                     
         val1 = self.ReadReg(1)
         addr1 = '%02X'%(1)+'h'
@@ -2472,7 +2489,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.groupBox.setGeometry(QtCore.QRect(750, 30, 131, 371))
         self.groupBox.setTitle("")
         
-        self.OutputDTRate = QtGui.QTextEdit(self.groupBox)
+        self.OutputDTRate = QtGui.QLineEdit(self.groupBox)
         self.OutputDTRate.setGeometry(QtCore.QRect(20, 40, 91, 31))
         self.OutputDTRate.setText("250SPS")
         self.OutputDTRate.setReadOnly(True) 
@@ -2488,26 +2505,85 @@ class BrainInterface(QtGui.QMainWindow):
         self.label_2 = QtGui.QLabel(self.groupBox)
         self.label_2.setGeometry(QtCore.QRect(20, 100, 71, 16))
         self.label_2.setText("Samples/CH")
-        self.SamplePerChn = QtGui.QTextEdit(self.groupBox)
+        self.SamplePerChn = QtGui.QLineEdit(self.groupBox)
         self.SamplePerChn.setGeometry(QtCore.QRect(20, 120, 91, 31))
-        self.SamplePerChn.setText("1000")
+        self.SamplePerChn.setText("5")
         
+#        self.widget = mplwidget(self.analyzedata)
+#        self.widget.setGeometry(QtCore.QRect(100, 70, 541, 481))
+
         self.acquireData.clicked.connect(self.plotDataprep)
         
     def plotDataprep(self):
         self.ConversionSTART()
         self.RDATAC()
+
         print "Plot"
-        ##########plot###############
-        myData = self.ser.read(512)
-        result_m = ''  
-        hLen_m = len(myData)
-        for i in xrange(hLen_m):  
-            hvol_m = ord(myData[i])  
-            hhex_m = '%02X'%hvol_m  
-            result_m += hhex_m+' '  
-        print result_m
-        #self.SDATAC()
+        ##############plot###############
+#        global myData
+        readtext = self.SamplePerChn.text()
+        readByte = int(readtext)
+        
+
+        mydata=self.findStatus()
+        ddata = self.ser.read(readByte*27-3)
+        for i in xrange(len(ddata)):
+            hhh = ord(ddata[i])
+            mydata.append(hhh)
+        print mydata  
+
+        
+        
+#        for n in xrange(len(myData)):
+#            if n%54 == 6:
+#                data0tmp=myData[n:n+6]
+#                brainData[0] += data0tmp
+#            else:pass
+#        
+#        print brainData[0]
+
+#        ams = self.findStatus()
+#        ddata = self.ser.read(readByte*27-3)
+#        for i in xrange(len(ddata)):
+#            if i%27 == 0:
+#                ddata [i] = bin(ord(ddata[i]))
+#                ddata[i+1] = bin(ord(ddata[i+1]))
+#                hhh = ddata[i:i+3]
+#        for i in xrange(readByte*9-1):
+#            if i%9 == 0:
+#                
+#                ddata = self.ser.read(3)
+#                #asd = []
+#                for n in xrange(len(ddata)):
+#                    hhh = ord(ddata[n])
+#                    hhh = bin(hhh)
+#                    brainData[0].append(hhh[2:])
+#                    
+#            else:pass
+#        print brainData[0]
+        
+            
+            
+            
+    def findStatus(self):
+        while(True):
+            self.ser.flushInput()
+            tempchar = self.ser.read(3)
+            result_m = '' 
+            result_n = []
+            hLen_m = len(tempchar)
+            for i in xrange(hLen_m):  
+                hvol_m = ord(tempchar[i])  
+                hhex_m = '%02X'%hvol_m 
+                result_m += hhex_m
+                result_n.append(hvol_m)
+            chars = result_m
+            if (hLen_m == 3)& (chars == 'C00000'):
+                return result_n
+
+#        time.sleep(5)
+#        self.SDATAC()
+#        self.ConversionSTOP()
 
         
 def main():
