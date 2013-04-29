@@ -245,6 +245,7 @@ class BrainInterface(QtGui.QMainWindow):
         brainData[5]=[]
         brainData[6]=[]
         brainData[7]=[]
+        brainData[8]=[]
         
         #End initVariables      
 
@@ -473,6 +474,17 @@ class BrainInterface(QtGui.QMainWindow):
         """Convert Hex to Binary"""
         str_d = format(int(data,16),'#010b')
         return str_d
+       
+#    def twoscomplement2integer(self, data):
+#        
+#        if data[:1] == 0:
+#            value = int(data,2)
+#        else :
+#            intivalue = ~(int(data[1:],2)-1)
+#            value = -(int(str(intivalue),2))
+#        return value
+            
+       
        
     def refresh_vexplorer_table(self):
         """ (Utility) Refresh variable explorer table"""
@@ -2525,60 +2537,83 @@ class BrainInterface(QtGui.QMainWindow):
         readByte = int(readtext)
         
 
-        mydata=self.findStatus()
+        myData=self.findStatus()
         ddata = self.ser.read(readByte*27-3)
+        
         for i in xrange(len(ddata)):
-            hhh = ord(ddata[i])
-            mydata.append(hhh)
-        print mydata  
-
+            if i%3 == 0:               
+                hhh_1 = ord(ddata[i])
+                hhh_2 = ord(ddata[i+1])
+                hhh_3 = ord(ddata[i+2])
+                hhx_1 = '%02x'%hhh_1
+                hhx_2 = '%02x'%hhh_2
+                hhx_3 = '%02x'%hhh_3
+                hht_1 = self.hex2bin(hhx_1)
+                hht_2 = self.hex2bin(hhx_2)
+                hht_3 = self.hex2bin(hhx_3)
+                hht = hht_1[2:]+hht_2[2:]+hht_3[2:]          
+                myData.append(hht)
+            else:
+                pass
+        print myData 
         
-        
-#        for n in xrange(len(myData)):
-#            if n%54 == 6:
-#                data0tmp=myData[n:n+6]
-#                brainData[0] += data0tmp
-#            else:pass
-#        
-#        print brainData[0]
-
-#        ams = self.findStatus()
-#        ddata = self.ser.read(readByte*27-3)
-#        for i in xrange(len(ddata)):
-#            if i%27 == 0:
-#                ddata [i] = bin(ord(ddata[i]))
-#                ddata[i+1] = bin(ord(ddata[i+1]))
-#                hhh = ddata[i:i+3]
-#        for i in xrange(readByte*9-1):
-#            if i%9 == 0:
-#                
-#                ddata = self.ser.read(3)
-#                #asd = []
-#                for n in xrange(len(ddata)):
-#                    hhh = ord(ddata[n])
-#                    hhh = bin(hhh)
-#                    brainData[0].append(hhh[2:])
-#                    
-#            else:pass
-#        print brainData[0]
-        
+        for n in xrange(len(myData)):
+            if n%9 == 0:
+                brainData[0].append(myData[n])
+            elif n%9 ==1:
+                brainData[1].append(myData[n])
+#                brainData[1].append(self.twoscomplement2integer(myData[n]))
+            elif n%9 ==2:
+                brainData[2].append(myData[n])
+#                brainData[2].append(self.twoscomplement2integer(myData[n]))
+            elif n%9 ==3:
+                brainData[3].append(myData[n])
+#                brainData[3].append(self.twoscomplement2integer(myData[n]))
+            elif n%9 ==4:
+                brainData[4].append(myData[n])
+#                brainData[4].append(self.twoscomplement2integer(myData[n]))
+            elif n%9 ==5:
+                brainData[5].append(myData[n])
+#                brainData[5].append(self.twoscomplement2integer(myData[n]))
+            elif n%9 ==6:
+                brainData[6].append(myData[n])
+#                brainData[6].append(self.twoscomplement2integer(myData[n]))
+            elif n%9 ==7:
+                brainData[7].append(myData[n])
+#                brainData[7].append(self.twoscomplement2integer(myData[n]))
+            elif n%9 ==8:
+                brainData[8].append(myData[n])
+#                brainData[8].append(self.twoscomplement2integer(myData[n]))
             
-            
+        print brainData[1]
             
     def findStatus(self):
         while(True):
             self.ser.flushInput()
             tempchar = self.ser.read(3)
-            result_m = '' 
+            result_m = ''
             result_n = []
             hLen_m = len(tempchar)
-            for i in xrange(hLen_m):  
-                hvol_m = ord(tempchar[i])  
-                hhex_m = '%02X'%hvol_m 
+            for i in xrange(hLen_m):
+                hvol_m = ord(tempchar[i])
+                hhex_m = '%02X'%hvol_m
                 result_m += hhex_m
-                result_n.append(hvol_m)
-            chars = result_m
-            if (hLen_m == 3)& (chars == 'C00000'):
+                if i%3 == 0:                   
+                    hvol_1 = ord(tempchar[i])
+                    hvol_2 = ord(tempchar[i+1])
+                    hvol_3 = ord(tempchar[i+2])
+                    hhex_1 = '%02X'%hvol_1
+                    hhex_2 = '%02X'%hvol_2
+                    hhex_3 = '%02X'%hvol_3
+                    hhet_1 = self.hex2bin(hhex_1)
+                    hhet_2 = self.hex2bin(hhex_2)
+                    hhet_3 = self.hex2bin(hhex_3)
+                    hhet = hhet_1[2:]+hhet_2[2:]+hhet_3[2:]
+                    result_n.append(hhet)
+                else:
+                    pass
+                    
+            if (hLen_m == 3) & (result_m == 'C00000'):
                 return result_n
 
 #        time.sleep(5)
