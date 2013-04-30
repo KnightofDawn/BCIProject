@@ -114,12 +114,13 @@ class BrainInterface(QtGui.QMainWindow):
         # Call the setuUi function of the main window object.
         self.ui.setupUi(self)
 #        self.initVariables()
+        
      
         self.scrolllayout = QtGui.QVBoxLayout()
         self.scrollwidget = QtGui.QWidget()
         self.scrollwidget.setLayout(self.scrolllayout)         
         self.myScrollArea = QtGui.QScrollArea()
-        self.scrollwidget.setMinimumSize(1800,1800)
+        self.scrollwidget.setMinimumSize(1000,1100)
          
         self.myScrollArea.setWidgetResizable(True)
         self.myScrollArea.setEnabled(True)
@@ -175,7 +176,7 @@ class BrainInterface(QtGui.QMainWindow):
         msg = "NumPy, SciPy, Matplotlib have been imported"
         cmds = ['from numpy import *', 'from scipy import *', 'from matplotlib.pyplot import *']
         self.console = cons = InternalShell(self, namespace=globals(), message=msg, commands=cmds, multithreaded=False)
-        self.console.setMinimumWidth(200)
+        self.console.setMinimumWidth(400)
         font = QtGui.QFont("Consolas")
         font.setPointSize(14)
         msg = "NumPy, SciPy, Matplotlib have been imported"
@@ -207,18 +208,29 @@ class BrainInterface(QtGui.QMainWindow):
        
 #####################################################################################################       
         self.OpenSerialport()
-        self.deviceSetup()        
+        self.deviceSetup()  
+        
         self.initVariables()
         self.refresh_vexplorer_table()
+
         self.confRegSetup()
         self.GlobalRegSetup()
         self.AnalysisDTSetup()
         self.RegisterMapSetup()
-        self.DefaultSetting()
+#        self.DefaultSetting()
+
 
 #*************************************************************************************************     
     def DefaultSetting(self):
         print "default"
+        self.WriteReg(5,'60')
+        self.WriteReg(6,'60')
+        self.WriteReg(7,'60')
+        self.WriteReg(8,'60')
+        self.WriteReg(9,'60')
+        self.WriteReg(10,'60')
+        self.WriteReg(11,'60')
+        self.WriteReg(12,'60')
    
     def manTabHandler(self,index):
         if (index == 0) :
@@ -255,14 +267,15 @@ class BrainInterface(QtGui.QMainWindow):
 #        SPICOMMAND.CMD_RESET
         self.deviceReset()
         self.SDATAC()
+
         
         print 'Device setup done'
 
     def ReadReg(self, regnum):
         if regnum < 16:        
-            command = '2'+'%01x'%(regnum)+'0000000D'
+            command = '2'+'%01x'%(regnum)+'00'
         else:
-            command = '3'+'%01x'%(regnum-16)+'0000000D'
+            command = '3'+'%01x'%(regnum-16)+'00'
 #        print command
         str_a = ""
         str_b = ""
@@ -273,7 +286,7 @@ class BrainInterface(QtGui.QMainWindow):
             command = command[2:]
         self.ser.flushInput()
         self.ser.write(str_b)
-        data_1 = self.ser.read(16)
+        data_1 = self.ser.read(8)
 
         result_1 = '' 
         
@@ -292,9 +305,9 @@ class BrainInterface(QtGui.QMainWindow):
     
     def WriteReg(self, regnum, data):
         if regnum < 16:
-            command = '4'+'%01x'%(regnum)+'00'+data+'000D'            
+            command = '4'+'%01x'%(regnum)+'00'+data            
         else:
-            command = '5'+'%01x'%(regnum-16)+'00'+data+'000D'
+            command = '5'+'%01x'%(regnum-16)+'00'+data
         str_m = ""
         str_n = ""
 #        print command
@@ -307,35 +320,35 @@ class BrainInterface(QtGui.QMainWindow):
         self.ser.write(str_n)
         
     def deviceReset(self):
-        resetCMD = '060000000D'
-        str_reset1 = ""
+        resetCMD = '06'
+        #str_reset1 = ""
         str_reset2 = ""
         print resetCMD
-        while resetCMD:
-            str_reset1 = resetCMD[0:2]
-            s_reset = int(str_reset1,16)
-            str_reset2 += struct.pack('B', s_reset)
-            resetCMD = resetCMD[2:]
+        #while resetCMD:
+        #str_reset1 = resetCMD[0:2]
+        s_reset = int(resetCMD,16)
+        str_reset2 += struct.pack('B', s_reset)
+        #resetCMD = resetCMD[2:]
         print repr(str_reset2)
-        self.ser.flushInput()
+        #self.ser.flushInput()
         self.ser.write(str_reset2)  
-
+        time.sleep(0.5)
 #        waittime = time.sleep(0.04)
 #        print 'wait'
 #        print waittime
                 
     def SDATAC(self):
-        SDATACCMD = '110000000D'
-        str_SDATAC1 = ""
+        SDATACCMD = '11'
+        #str_SDATAC1 = ""
         str_SDATAC2 = ""
         print SDATACCMD
-        while SDATACCMD:
-            str_SDATAC1 = SDATACCMD[0:2]
-            s_SDATAC = int(str_SDATAC1,16)
-            str_SDATAC2 += struct.pack('B', s_SDATAC)
-            SDATACCMD = SDATACCMD[2:]
+        #while SDATACCMD:
+            #str_SDATAC1 = SDATACCMD[0:2]
+        s_SDATAC = int(SDATACCMD,16)
+        str_SDATAC2 += struct.pack('B', s_SDATAC)
+        #SDATACCMD = SDATACCMD[2:]
         print repr(str_SDATAC2)
-        self.ser.flushInput()
+        #self.ser.flushInput()
         self.ser.write(str_SDATAC2)   
 
     def OpenSerialport(self):
@@ -345,87 +358,87 @@ class BrainInterface(QtGui.QMainWindow):
         print check
         
     def DeviceWakeup(self):
-        wakeupCMD = '020000000D'
-        str_wakeup1 = ""
+        wakeupCMD = '02'
+        #str_wakeup1 = ""
         str_wakeup2 = ""
         print wakeupCMD
-        while wakeupCMD:
-            str_wakeup1 = wakeupCMD[0:2]
-            s_wakeup = int(str_wakeup1,16)
-            str_wakeup2 += struct.pack('B', s_wakeup)
-            wakeupCMD = wakeupCMD[2:]
+        #while wakeupCMD:
+            #str_wakeup1 = wakeupCMD[0:2]
+        s_wakeup = int(wakeupCMD,16)
+        str_wakeup2 += struct.pack('B', s_wakeup)
+            #wakeupCMD = wakeupCMD[2:]
         print repr(str_wakeup2)
-        self.ser.flushInput()
+        #self.ser.flushInput()
         self.ser.write(str_wakeup2)  
 
     def DeviceStandby(self):
-        standbyCMD = '040000000D'
-        str_standby1 = ""
+        standbyCMD = '04'
+        #str_standby1 = ""
         str_standby2 = ""
         print standbyCMD
-        while standbyCMD:
-            str_standby1 = standbyCMD[0:2]
-            s_standby = int(str_standby1,16)
-            str_standby2 += struct.pack('B', s_standby)
-            standbyCMD = standbyCMD[2:]
+        #while standbyCMD:
+            #str_standby1 = standbyCMD[0:2]
+        s_standby = int(standbyCMD,16)
+        str_standby2 += struct.pack('B', s_standby)
+            #standbyCMD = standbyCMD[2:]
         print repr(str_standby2)
-        self.ser.flushInput()
+        #self.ser.flushInput()
         self.ser.write(str_standby2)   
 
     def ConversionSTART(self):
-        startCMD = '080000000D'
-        str_start1 = ""
+        startCMD = '08'
+       # str_start1 = ""
         str_start2 = ""
         print startCMD
-        while startCMD:
-            str_start1 = startCMD[0:2]
-            s_start = int(str_start1,16)
-            str_start2 += struct.pack('B', s_start)
-            startCMD = startCMD[2:]
+        #while startCMD:
+            #str_start1 = startCMD[0:2]
+        s_start = int(startCMD,16)
+        str_start2 += struct.pack('B', s_start)
+            #startCMD = startCMD[2:]
 #        print repr(str_start2)
-        self.ser.flushInput()
+        #self.ser.flushInput()
         self.ser.write(str_start2)   
 
     def ConversionSTOP(self):
-        stopCMD = '0A0000000D'
-        str_stop1 = ""
+        stopCMD = '0A'
+        #str_stop1 = ""
         str_stop2 = ""
         print stopCMD
-        while stopCMD:
-            str_stop1 = stopCMD[0:2]
-            s_stop = int(str_stop1,16)
-            str_stop2 += struct.pack('B', s_stop)
-            stopCMD = stopCMD[2:]
+        #while stopCMD:
+            #str_stop1 = stopCMD[0:2]
+        s_stop = int(stopCMD,16)
+        str_stop2 += struct.pack('B', s_stop)
+            #stopCMD = stopCMD[2:]
         print repr(str_stop2)
-        self.ser.flushInput()
+        #self.ser.flushInput()
         self.ser.write(str_stop2)                
         
     def RDATAC(self):
-        RDATACCMD = '100000000D'
-        str_RDATAC1 = ""
+        RDATACCMD = '10'
+        #str_RDATAC1 = ""
         str_RDATAC2 = ""
         print RDATACCMD
-        while RDATACCMD:
-            str_RDATAC1 = RDATACCMD[0:2]
-            s_RDATAC = int(str_RDATAC1,16)
-            str_RDATAC2 += struct.pack('B', s_RDATAC)
-            RDATACCMD = RDATACCMD[2:]
+        #while RDATACCMD:
+            #str_RDATAC1 = RDATACCMD[0:2]
+        s_RDATAC = int(RDATACCMD,16)
+        str_RDATAC2 += struct.pack('B', s_RDATAC)
+            #RDATACCMD = RDATACCMD[2:]
 #        print repr(str_RDATAC2)
-        self.ser.flushInput()
+        #self.ser.flushInput()
         self.ser.write(str_RDATAC2)      
         
     def RDATA(self):
-        RDATACMD = '120000000D'
-        str_RDATA1 = ""
+        RDATACMD = '12'
+        #str_RDATA1 = ""
         str_RDATA2 = ""
         print RDATACMD
-        while RDATACMD:
-            str_RDATA1 = RDATACMD[0:2]
-            s_RDATA = int(str_RDATA1,16)
-            str_RDATA2 += struct.pack('B', s_RDATA)
-            RDATACMD = RDATACMD[2:]
+        #while RDATACMD:
+            #str_RDATA1 = RDATACMD[0:2]
+        s_RDATA = int(RDATACMD,16)
+        str_RDATA2 += struct.pack('B', s_RDATA)
+            #RDATACMD = RDATACMD[2:]
         print repr(str_RDATA2)
-        self.ser.flushInput()
+        #self.ser.flushInput()
         self.ser.write(str_RDATA2)              
         
             
@@ -478,7 +491,7 @@ class BrainInterface(QtGui.QMainWindow):
 #    def twoscomplement2integer(self, data):
 #        
 #        if data[:1] == 0:
-#            value = int(data,2)
+#            
 #        else :
 #            intivalue = ~(int(data[1:],2)-1)
 #            value = -(int(str(intivalue),2))
@@ -1444,7 +1457,12 @@ class BrainInterface(QtGui.QMainWindow):
         ]
 
         self.ClkOut.addItems(listClkout)
+        self.ClkOut.setItemData(0,"When CLKSEL pin = 1, Output disabled indicates internal oscillator signal is not connected to the CLK pin.",QtCore.Qt.ToolTipRole)
+        self.ClkOut.setItemData(1,"When CLKSEL pin = 1, Output disabled indicates internal oscillator signal is connected to the CLK pin.",QtCore.Qt.ToolTipRole)
+        
         self.DaisyChainMultiRM.addItems(listDaisyMulti)
+        self.DaisyChainMultiRM.setItemData(0,"Daisy Chain Mode: In this mode, SCLK, DIN, and CS are shared across multiple devices. The DOUT of one device is hooked up to the DAISY_IN of the other device, thereby creating a chain.",QtCore.Qt.ToolTipRole)
+        self.DaisyChainMultiRM.setItemData(1,"Multiple Readback Mode: In this mode, data can be read out multiple times.",QtCore.Qt.ToolTipRole)
         
 
         listDatarate = [
@@ -1490,7 +1508,11 @@ class BrainInterface(QtGui.QMainWindow):
         ]
 
         self.TestSource.addItems(listTestSource)
+        self.TestSource.setItemData(0,"Test Siganls are driven externally.",QtCore.Qt.ToolTipRole)
+        self.TestSource.setItemData(1,"Test Siganls are generated internally.",QtCore.Qt.ToolTipRole)
         self.TestAmp.addItems(listTestAmp)
+        self.TestAmp.setItemData(0,"Test Signal Amplitude = (Vrefp-Vrefn)/2.4 mV",QtCore.Qt.ToolTipRole)
+        self.TestAmp.setItemData(1,"Test Signal Amplitude = 2*(Vrefp-Vrefn)/2.4 mV",QtCore.Qt.ToolTipRole)
         
 
         listTestFrq = [
@@ -1500,7 +1522,8 @@ class BrainInterface(QtGui.QMainWindow):
         self.tr('DC')
         ]
          
-        self.TestFrq.addItems(listTestFrq)        
+        self.TestFrq.addItems(listTestFrq)     
+        
         
 ###########################CONFIG3########################################
         self.SetCONFIG3 = QtGui.QGroupBox(self.GlobalReg)
@@ -1538,7 +1561,12 @@ class BrainInterface(QtGui.QMainWindow):
         ]
 
         self.RefBuffer.addItems(listRefBuffer)
+        self.RefBuffer.setItemData(0,"Power down internal reference buffer.",QtCore.Qt.ToolTipRole)
+        self.RefBuffer.setItemData(1,"Enable internal reference buffer.",QtCore.Qt.ToolTipRole)
+        
         self.BIASMeas.addItems(listBIASMeas)
+        self.BIASMeas.setItemData(0,"BIAS measurment disabled.",QtCore.Qt.ToolTipRole)
+        self.BIASMeas.setItemData(1,"BIASIN signal is routed to the channel that has the MUX setting 010 (Vref).",QtCore.Qt.ToolTipRole)
         
 
         listBIASREFSource = [
@@ -1547,6 +1575,8 @@ class BrainInterface(QtGui.QMainWindow):
         ]
          
         self.BIASREFSource.addItems(listBIASREFSource)   
+        self.BIASREFSource.setItemData(0,"Power down internal reference buffer.",QtCore.Qt.ToolTipRole)
+        self.BIASREFSource.setItemData(1,"Enable internal reference buffer.",QtCore.Qt.ToolTipRole)
         
         listBIASBuffer = [
         self.tr('Disabled'),
@@ -1554,6 +1584,8 @@ class BrainInterface(QtGui.QMainWindow):
         ]
         
         self.BIASBuffer.addItems(listBIASBuffer)
+        self.BIASBuffer.setItemData(0,"Power down internal reference buffer.",QtCore.Qt.ToolTipRole)
+        self.BIASBuffer.setItemData(1,"Enable internal reference buffer.",QtCore.Qt.ToolTipRole)
         
 ###########################CONFIG4#######################################
         self.SetCONFIG4 = QtGui.QGroupBox(self.GlobalReg)
@@ -1679,7 +1711,7 @@ class BrainInterface(QtGui.QMainWindow):
         
 ###############################LOFF&BIAS Detection Control registers#####
         self.LOFFPNFLIP = QtGui.QGroupBox(self.GlobalReg)
-        self.LOFFPNFLIP.setGeometry(QtCore.QRect(90, 660, 700, 175))
+        self.LOFFPNFLIP.setGeometry(QtCore.QRect(90, 660, 750, 175))
         self.LOFFPNFLIP.setTitle("Lead-off Detection and Current Direction Control Registers")
         self.widget = QtGui.QWidget(self.LOFFPNFLIP)
         self.widget.setGeometry(QtCore.QRect(130, 40, 604, 19))
@@ -1689,71 +1721,98 @@ class BrainInterface(QtGui.QMainWindow):
 
         self.pushButton = QtGui.QPushButton(self.LOFFPNFLIP)
         self.pushButton.setGeometry(QtCore.QRect(20, 40, 75, 23))
+        self.pushButton.setText("Enable All")
         self.pushButton_2 = QtGui.QPushButton(self.LOFFPNFLIP)
         self.pushButton_2.setGeometry(QtCore.QRect(20, 90, 75, 23))
+        self.pushButton_2.setText("Enable All")
         self.pushButton_3 = QtGui.QPushButton(self.LOFFPNFLIP)
         self.pushButton_3.setGeometry(QtCore.QRect(20, 140, 75, 23))
+        self.pushButton_3.setText("Enable All")
         
         self.LOFFP8 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP8)
+        self.LOFFP8.setText("LOFFP8")
         self.LOFFP7 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP7)
+        self.LOFFP7.setText("LOFFP7")
         self.LOFFP6 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP6)
+        self.LOFFP6.setText("LOFFP6")
         self.LOFFP5 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP5)
+        self.LOFFP5.setText("LOFFP5")
         self.LOFFP4 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP4)
+        self.LOFFP4.setText("LOFFP4")
         self.LOFFP3 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP3)
+        self.LOFFP3.setText("LOFFP3")
         self.LOFFP2 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP2)
+        self.LOFFP2.setText("LOFFP2")
         self.LOFFP1 = QtGui.QCheckBox(self.widget)
         self.horizontalLayout.addWidget(self.LOFFP1)
+        self.LOFFP1.setText("LOFFP1")
         self.widget1 = QtGui.QWidget(self.LOFFPNFLIP)
         self.widget1.setGeometry(QtCore.QRect(130, 90, 604, 19))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.widget1)
         self.horizontalLayout_2.setMargin(0)
         self.LOFFN8 = QtGui.QCheckBox(self.widget1)
         self.horizontalLayout_2.addWidget(self.LOFFN8)
+        self.LOFFN8.setText("LOFFN8")
         self.LOFFN7 = QtGui.QCheckBox(self.widget1)
         self.horizontalLayout_2.addWidget(self.LOFFN7)
+        self.LOFFN7.setText("LOFFN7")
         self.LOFFN6 = QtGui.QCheckBox(self.widget1)
         self.horizontalLayout_2.addWidget(self.LOFFN6)
+        self.LOFFN6.setText("LOFFN6")
         self.LOFFN5 = QtGui.QCheckBox(self.widget1)
         self.horizontalLayout_2.addWidget(self.LOFFN5)
+        self.LOFFN5.setText("LOFFN5")
         self.LOFFN4 = QtGui.QCheckBox(self.widget1)
         self.horizontalLayout_2.addWidget(self.LOFFN4)
+        self.LOFFN4.setText("LOFFN4")
         self.LOFFN3 = QtGui.QCheckBox(self.widget1)
         self.horizontalLayout_2.addWidget(self.LOFFN3)
+        self.LOFFN3.setText("LOFFN3")
         self.LOFFN2 = QtGui.QCheckBox(self.widget1)
         self.horizontalLayout_2.addWidget(self.LOFFN2)
+        self.LOFFN2.setText("LOFFN2")
         self.LOFFN1 = QtGui.QCheckBox(self.widget1)
         self.horizontalLayout_2.addWidget(self.LOFFN1)
+        self.LOFFN1.setText("LOFFN1")
         self.widget2 = QtGui.QWidget(self.LOFFPNFLIP)
         self.widget2.setGeometry(QtCore.QRect(130, 140, 604, 19))
         self.horizontalLayout_3 = QtGui.QHBoxLayout(self.widget2)
         self.horizontalLayout_3.setMargin(0)
         self.LOFF_FLIP8 = QtGui.QCheckBox(self.widget2)
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP8)
+        self.LOFF_FLIP8.setText("LoffFlip8")
         self.LOFF_FLIP7 = QtGui.QCheckBox(self.widget2)
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP7)
+        self.LOFF_FLIP7.setText("LoffFlip7")
         self.LOFF_FLIP6 = QtGui.QCheckBox(self.widget2)
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP6)
+        self.LOFF_FLIP6.setText("LoffFlip6")
         self.LOFF_FLIP5 = QtGui.QCheckBox(self.widget2)
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP5)
+        self.LOFF_FLIP5.setText("LoffFlip5")
         self.LOFF_FLIP4 = QtGui.QCheckBox(self.widget2)
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP4)
+        self.LOFF_FLIP4.setText("LoffFlip4")
         self.LOFF_FLIP3 = QtGui.QCheckBox(self.widget2)
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP3)
+        self.LOFF_FLIP3.setText("LoffFlip3")
         self.LOFF_FLIP2 = QtGui.QCheckBox(self.widget2)
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP2)
+        self.LOFF_FLIP2.setText("LoffFlip2")
         self.LOFF_FLIP1 = QtGui.QCheckBox(self.widget2)
         self.horizontalLayout_3.addWidget(self.LOFF_FLIP1)
+        self.LOFF_FLIP1.setText("LoffFlip1")
         
 ################################BIAS###################################
         self.BIASControl = QtGui.QGroupBox(self.GlobalReg)
-        self.BIASControl.setGeometry(QtCore.QRect(90, 845, 700, 126))
+        self.BIASControl.setGeometry(QtCore.QRect(90, 845, 750, 126))
         self.BIASControl.setTitle("BIAS Control Registers")
         self.widget3 = QtGui.QWidget(self.BIASControl)
         self.widget3.setGeometry(QtCore.QRect(130, 40, 604, 19))
@@ -1763,45 +1822,63 @@ class BrainInterface(QtGui.QMainWindow):
         
         self.pushButton4 = QtGui.QPushButton(self.BIASControl)
         self.pushButton4.setGeometry(QtCore.QRect(20, 40, 75, 23))
+        self.pushButton4.setText("Enable All")
         self.pushButton5 = QtGui.QPushButton(self.BIASControl)
         self.pushButton5.setGeometry(QtCore.QRect(20, 90, 75, 23))
+        self.pushButton5.setText("Enable All")
 
         self.BIASP8 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP8)
+        self.BIASP8.setText("BIASP8")
         self.BIASP7 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP7)
+        self.BIASP7.setText("BIASP7")
         self.BIASP6 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP6)
+        self.BIASP6.setText("BIASP6")
         self.BIASP5 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP5)
+        self.BIASP5.setText("BIASP5")
         self.BIASP4 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP4)
+        self.BIASP4.setText("BIASP4")
         self.BIASP3 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP3)
+        self.BIASP3.setText("BIASP3")
         self.BIASP2 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP2)
+        self.BIASP2.setText("BIASP2")
         self.BIASP1 = QtGui.QCheckBox(self.widget3)
         self.horizontalLayout3.addWidget(self.BIASP1)
+        self.BIASP1.setText("BIASP1")
         self.widget4 = QtGui.QWidget(self.BIASControl)
         self.widget4.setGeometry(QtCore.QRect(130, 90, 604, 19))
         self.horizontalLayout_4 = QtGui.QHBoxLayout(self.widget4)
         self.horizontalLayout_4.setMargin(0)
         self.BIASN8 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN8)
+        self.BIASN8.setText("BIASN8")
         self.BIASN7 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN7)
+        self.BIASN7.setText("BIASN7")
         self.BIASN6 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN6)
+        self.BIASN6.setText("BIASN6")
         self.BIASN5 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN5)
+        self.BIASN5.setText("BIASN5")
         self.BIASN4 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN4)
+        self.BIASN4.setText("BIASN4")
         self.BIASN3 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN3)
+        self.BIASN3.setText("BIASN3")
         self.BIASN2 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN2)
+        self.BIASN2.setText("BIASN2")
         self.BIASN1 = QtGui.QCheckBox(self.widget4)
         self.horizontalLayout_4.addWidget(self.BIASN1)
+        self.BIASN1.setText("BIASN1")
         
         
         self.OutputDRate.addItems(listDatarate)
@@ -1908,7 +1985,7 @@ class BrainInterface(QtGui.QMainWindow):
     def myDRateChange(self):
         cText = self.OutputDRate.currentIndex()        
         if cText == 1:
-            self.OutputDTRate.setsetText("500SPS")
+            self.OutputDTRate.setText("500SPS")
             self.dataRate(500)
         elif cText == 2:
             self.OutputDTRate.setText("1000SPS")
@@ -2498,7 +2575,7 @@ class BrainInterface(QtGui.QMainWindow):
     def AnalysisDTSetup(self):        
         
         self.groupBox = QtGui.QGroupBox(self.analyzedata)
-        self.groupBox.setGeometry(QtCore.QRect(750, 30, 131, 371))
+        self.groupBox.setGeometry(QtCore.QRect(680, 30, 131, 371))
         self.groupBox.setTitle("")
         
         self.OutputDTRate = QtGui.QLineEdit(self.groupBox)
@@ -2519,7 +2596,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.label_2.setText("Samples/CH")
         self.SamplePerChn = QtGui.QLineEdit(self.groupBox)
         self.SamplePerChn.setGeometry(QtCore.QRect(20, 120, 91, 31))
-        self.SamplePerChn.setText("5")
+        self.SamplePerChn.setText("3")
         
 #        self.widget = mplwidget(self.analyzedata)
 #        self.widget.setGeometry(QtCore.QRect(100, 70, 541, 481))
@@ -2527,8 +2604,10 @@ class BrainInterface(QtGui.QMainWindow):
         self.acquireData.clicked.connect(self.plotDataprep)
         
     def plotDataprep(self):
+               
         self.ConversionSTART()
-        self.RDATAC()
+        self.RDATAC() 
+        
 
         print "Plot"
         ##############plot###############
@@ -2536,25 +2615,33 @@ class BrainInterface(QtGui.QMainWindow):
         readtext = self.SamplePerChn.text()
         readByte = int(readtext)
         
-
-        myData=self.findStatus()
-        ddata = self.ser.read(readByte*27-3)
+        myData = []
+#        myData=self.findStatus()
         
-        for i in xrange(len(ddata)):
-            if i%3 == 0:               
-                hhh_1 = ord(ddata[i])
-                hhh_2 = ord(ddata[i+1])
-                hhh_3 = ord(ddata[i+2])
-                hhx_1 = '%02x'%hhh_1
-                hhx_2 = '%02x'%hhh_2
-                hhx_3 = '%02x'%hhh_3
-                hht_1 = self.hex2bin(hhx_1)
-                hht_2 = self.hex2bin(hhx_2)
-                hht_3 = self.hex2bin(hhx_3)
-                hht = hht_1[2:]+hht_2[2:]+hht_3[2:]          
-                myData.append(hht)
+        while(readByte > 0):
+            ddata = self.ser.read(27)
+            self.ser.write("00")        
+            if (len(ddata) == 27):
+                
+                for i in xrange(len(ddata)):
+                    if i%3 == 0:    
+                        hhh_1 = ord(ddata[i])
+                        hhh_2 = ord(ddata[i+1])
+                        hhh_3 = ord(ddata[i+2])
+                        hhx_1 = '%02x'%hhh_1
+                        hhx_2 = '%02x'%hhh_2
+                        hhx_3 = '%02x'%hhh_3
+                        hht_1 = self.hex2bin(hhx_1)
+                        hht_2 = self.hex2bin(hhx_2)
+                        hht_3 = self.hex2bin(hhx_3)
+                        hht = hht_1[2:]+hht_2[2:]+hht_3[2:]          
+                        myData.append(hht)
+                    else:
+                        pass
+                readByte = readByte-1
             else:
                 pass
+            
         print myData 
         
         for n in xrange(len(myData)):
