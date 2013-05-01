@@ -31,9 +31,7 @@ class MplCanvas(FigureCanvas):
         for  i in range(int(numPlots)):   
             sub = str(numPlots)+"1"+str(i+1)
             plotnum = int(sub)
-            x = np.arange(0, 2*np.pi, 0.01)            
             ax = self.fig.add_subplot(plotnum, axisbg='#FFFFFF')
-            print i
             if (len(plotList) > 0) :
                 title = plotList[i].currentText()
                 ax.set_title(title)
@@ -52,18 +50,30 @@ class MplCanvas(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         # notify the system of updated policy
         FigureCanvas.updateGeometry(self)
-      
+#        self.fig.canvas.mpl_connect('figure_enter_event', self.enter_figure)
+#        self.fig.canvas.mpl_connect('figure_leave_event', self.leave_figure)
+#        self.fig.canvas.mpl_connect('axes_enter_event', self.enter_axes)
+#        self.fig.canvas.mpl_connect('axes_leave_event', self.leave_axes)
+#        self.fig.canvas.mpl_connect('button_press_event', self.mouse_pressed)
+#        self.fig.canvas.mpl_connect('button_release_event', self.mouse_released)
+#        self.fig.canvas.mpl_connect('motion_notify_event', self.mouse_motion)
+#        self.fig.canvas.mpl_connect('pick_event', self.pickEvent)
+#        self.fig.canvas.mpl_connect('resize_event', self.canvasResized)
+#        self.fig.canvas.mpl_connect('scroll_event', self.mouseScrolled)
      
 
 
-    def plotData(self,sub,Data):   
-        
+    def plotData(self,sub,Data):           
         ax = self.Canvaces[sub]
         #print(ax)
         n = len(Data)
-        line, = ax.plot(range(n-200,n), Data[-200:])
-        line.set_data(range(n-200, n), Data[-200:])
-        ax.set_xlim(n-201, n-1)
+        if (len > 10000):
+            line = ax.plot(Data[-10000:])
+        else:
+            line = ax.plot(Data)
+            
+#        line.set_data(range(0, n-1), Data[0:n-1])
+#        ax.set_xlim(0, n-1)
         self.fig.canvas.draw()
         #print(Data[-10:])
         #ani = animation.FuncAnimation(self.fig, self.updat, self.data_gen, interval=100)
@@ -75,7 +85,69 @@ class MplCanvas(FigureCanvas):
         ax = self.Canvaces[index]
         ax.set_title(title)
         self.fig.canvas.draw()
-        print index , title
+
+
+    def enter_axes(self,event):
+        #print 'enter_axes', event.inaxes
+        event.inaxes.patch.set_facecolor('yellow')
+        event.canvas.draw()
+
+    def leave_axes(self,event):
+        #print 'leave_axes', event.inaxes
+        event.inaxes.patch.set_facecolor('white')
+        event.canvas.draw()
+    
+    def enter_figure(self,event):
+        #print 'enter_figure', event.canvas.figure
+        event.canvas.figure.patch.set_facecolor('red')
+        event.canvas.draw()
+    
+    def leave_figure(self,event):
+        event.canvas.figure.patch.set_facecolor('grey')
+        event.canvas.draw()
+        
+    def mouse_pressed(self,event):
+        event.canvas.figure.patch.set_facecolor('red')
+        event.canvas.draw()
+  
+       #print 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
+         #   event.button, event.x, event.y, event.xdata, event.ydata)    
+            
+    def mouse_released(self,event):
+        event.canvas.figure.patch.set_facecolor('red')
+        event.canvas.draw()
+ 
+        #print 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
+          #  event.button, event.x, event.y, event.xdata, event.ydata) 
+
+    def mouse_motion(self,event):
+        event.canvas.figure.patch.set_facecolor('red')
+        event.canvas.draw()
+ 
+        #print "mouse motion" 
+
+    def pickEvent(self,event):
+        event.canvas.figure.patch.set_facecolor('red')
+        event.canvas.draw()
+ 
+        #print 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
+#            event.button, event.x, event.y, event.xdata, event.ydata) 
+
+    def canvasResized(self,event):        
+        event.canvas.figure.patch.set_facecolor('red')
+        event.canvas.draw()
+  
+       #print "canvas resized"
+        event.canvas.draw() 
+
+    def mouseScrolled(self,event):
+        #print "mouse scrolled" 
+        event.canvas.figure.patch.set_facecolor('red')
+        event.canvas.draw()
+
+
+
+
 
 class MplWidget_Single(QtGui.QWidget):
     """Widget defined in Qt Designer"""
@@ -173,3 +245,6 @@ class MplWidget_Single(QtGui.QWidget):
         self.emit(QtCore.SIGNAL("dropped"))
         #else:
         #    event.ignore()
+
+
+ 

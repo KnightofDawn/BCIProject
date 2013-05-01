@@ -170,7 +170,13 @@ class BrainInterface(QtGui.QMainWindow):
         self.queueLock = threading.Lock()
         
        
-        
+            
+         #TIMER TO UPDATE THE PLOTS
+        self.timer = Qt.QTimer()
+        self.timer.timeout.connect(self.on_timer)            
+        update_freq = 1
+        if update_freq > 0:
+            self.timer.start(1000.0 / update_freq)    
         
 
   ########################## Code for variable explorer and console ##################################     
@@ -220,6 +226,10 @@ class BrainInterface(QtGui.QMainWindow):
         self.AnalysisDTSetup()
         self.RegisterMapSetup()
 #        self.DefaultSetting()
+
+        self.packetQueue = Queue.Queue(maxsize=0)
+        threading.Thread(target=self._packetProcessor, name="Processor thread, {}".format(str(self))).start()
+        threading.Thread(target=self._serialReceiver, name="Processor thread, {}".format(str(self))).start()
 
 
 #*************************************************************************************************     
@@ -2794,8 +2804,106 @@ class BrainInterface(QtGui.QMainWindow):
 #        time.sleep(5)
 #        self.SDATAC()
 #        self.ConversionSTOP()
-
+    def on_timer(self):
+        """ Executed periodically when the monitor update timer
+            is fired.
+        """
+        self.plotRTData()
+        self.refresh_vexplorer_table(self.isCaptured)
         
+        
+    def RTDisplayAddPlot(self):
+         if (len(self.RTPlotVariables) >4 ):
+             vertical = len(self.RTPlotVariables) * 300
+             self.scrollwidget.setMinimumSize(1800,vertical) 
+             self.RTDisplayWidget.setGeometry(QtCore.QRect(260, 0, 1041, vertical))
+         combo1 = ExtendedComboBox(self.RTDisplayContGroup)
+         self.RTDisplayContLayout.addWidget(combo1)
+         combo1.addItem("Please Select")
+         for key in realTimeData.keys():
+               combo1.addItem(key)
+        
+         self.numRTFigures = self.numRTFigures + 1
+         self.RTPlotVariables.append(combo1) 
+         self.RTDisplayWidget.addSubPlot(self.numRTFigures,self.RTPlotVariables)
+         combo1.activated.connect(self.plotRTData)      
+
+    def plotRTData(self):
+        for combo in self.RTPlotVariables:
+            plotIndex = self.RTPlotVariables.index(combo)
+            dataKey = str(combo.currentText())   
+            if dataKey in realTimeData.keys():
+                self.RTDisplayWidget.plotData(plotIndex,realTimeData[dataKey])           
+                self.RTDisplayWidget.assignTitle(plotIndex,dataKey)   
+
+
+    def setupRTDataDisplay(self):                       
+        
+        self.RTDisplayContGroup = QtGui.QGroupBox("Real Time Display Group")
+    
+        self.RTDisplayPlotGroup = QtGui.QGroupBox("Real Time Plots")
+        
+        self.RTDisplayContLayout = QtGui.QVBoxLayout(self.RTDisplayContGroup)    
+        self.RTDisplayContLayout.setAlignment(QtCore.Qt.AlignTop)        
+        self.RTDisplayContGroup.setMaximumWidth(200)
+        self.RTDisplayPlotLayout = QtGui.QVBoxLayout(self.RTDisplayPlotGroup)
+        
+        self.RTDisplayqscroll = QtGui.QScrollArea(self.RTDisplayPlotGroup)
+#        qscroll.setGeometry(QtCore.QRect(0, 0, 500, 500))
+        self.RTDisplayqscroll.setFrameStyle(QtGui.QFrame.NoFrame)
+        self.RTDisplayPlotLayout.addWidget(self.RTDisplayqscroll)
+        
+        self.RTDisplayqscrollContents = QtGui.QWidget()
+        self.RTDisplayqscrollLayout = QtGui.QVBoxLayout(self.RTDisplayqscrollContents)
+#        qscrollLayout.setGeometry(QtCore.QRect(0, 0, 500, 500))
+        
+        self.RTDisplayqscroll.setWidget(self.RTDisplayqscrollContents)
+        self.RTDisplayqscroll.setWidgetResizable(True)
+
+        self.tabLayout5.addWidget(self.RTDisplayContGroup)
+        self.tabLayout5.addWidget(self.RTDisplayPlotGroup)
+        self.RTDisplayqscrollContents.setLayout(self.RTDisplayqscrollLayout)
+        self.RTFigures = []
+        self.numRTFigures = 0
+        
+        self.RTDisplayStopRTData = QtGui.QPushButton()
+        self.RTDisplayStopRTData.setMinimumHeight(50)
+        self.RTDisplayStopRTData.setText(QtGui.QApplication.translate("MainWindow", "Stop RT Data", None, QtGui.QApplication.UnicodeUTF8))
+        self.RTDisplayContLayout.addWidget(self.RTDisplayStopRTData)
+   
+        self.RTDisplayAddVariable = QtGui.QPushButton()
+        self.RTDisplayAddVariable.setMinimumHeight(50)
+        self.RTDisplayAddVariable.setText(QtGui.QApplication.translate("MainWindow", "Add Variable", None, QtGui.QApplication.UnicodeUTF8))
+        self.RTDisplayContLayout.addWidget(self.RTDisplayAddVariable)
+     
+        self.RTDisplayWidget = MplWidget_Single(self.RTDisplayPlotGroup)
+        self.RTDisplayqscrollLayout.addWidget(self.RTDisplayWidget)
+        
+        self.RTDisplayAddVariable.clicked.connect(self.RTDisplayAddPlot)
+        self.RTDisplayStopRTData.clicked.connect(self.StopStartRTData)
+        
+        
+    def _packetProcessor(self):
+        while self.isAppRunning:
+           with self.queueLock:
+               packet = self.packetQueue.get()
+
+            # Parse the data and place in  
+
+
+           sleep(0.000001)
+           
+           
+    def _serialReceiver(self):
+        while self.isAppRunning:
+            
+           #read packet from serial prt and place in packet queue
+           with self.queueLock:
+               self.packetQueue.put(packet)
+
+           
+
+           sleep(0.000001)
 def main():
     
     app = QtGui.QApplication(sys.argv)
