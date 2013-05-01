@@ -18,7 +18,7 @@ import random
 import json
 import pickle
 import serial
-import SPICOMMAND
+#import SPICOMMAND
 
 # Import the modules QtCore (for low level Qt functions)
 # QtGui (for visual/GUI related Qt functions)
@@ -85,8 +85,10 @@ from  mplwidget import *
 if platform.python_version()[0] == "3":
     raw_input=input
 
-brainData = {}
-myData = []
+brainData = {} #one time data
+mydata = {} #continuous data
+myData = {} #one time data
+braindata = {} #continuous data
 
 
 class BrainInterface(QtGui.QMainWindow):
@@ -258,13 +260,23 @@ class BrainInterface(QtGui.QMainWindow):
         brainData[6]=[]
         brainData[7]=[]
         brainData[8]=[]
+        mydata[0] = []
+        myData[0] = []
+        braindata[0]=[]    
+        braindata[1]=[]
+        braindata[2]=[]
+        braindata[3]=[]
+        braindata[4]=[]
+        braindata[5]=[]
+        braindata[6]=[]
+        braindata[7]=[]
+        braindata[8]=[]
         
         #End initVariables      
 
         """Device Setup"""
     def deviceSetup(self):
 
-#        SPICOMMAND.CMD_RESET
         self.deviceReset()
         self.SDATAC()
 
@@ -2585,7 +2597,11 @@ class BrainInterface(QtGui.QMainWindow):
         
         self.acquireData = QtGui.QPushButton(self.groupBox)
         self.acquireData.setGeometry(QtCore.QRect(20, 190, 91, 31))
-        self.acquireData.setText("Plot")
+        self.acquireData.setText("Capture data")
+        
+        self.continuousdata = QtGui.QPushButton(self.groupBox)
+        self.continuousdata.setGeometry(QtCore.QRect(20, 250, 91, 31))
+        self.continuousdata.setText("Plot")
                 
         
         self.label = QtGui.QLabel(self.groupBox)
@@ -2597,12 +2613,88 @@ class BrainInterface(QtGui.QMainWindow):
         self.SamplePerChn = QtGui.QLineEdit(self.groupBox)
         self.SamplePerChn.setGeometry(QtCore.QRect(20, 120, 91, 31))
         self.SamplePerChn.setText("3")
+
         
-#        self.widget = mplwidget(self.analyzedata)
-#        self.widget.setGeometry(QtCore.QRect(100, 70, 541, 481))
+#        self.pltwidget = MplCanvas(self.analyzedata)
+#        self.pltwidget.setGeometry(QtCore.QRect(100, 70, 541, 481))
+        
 
         self.acquireData.clicked.connect(self.plotDataprep)
+        self.continuousdata.clicked.connect(self.ReadDataContinue)
         
+    def ReadDataContinue(self):
+        if (self.continuousdata.clicked):
+            self.continuousdata.setText("Stop Conversion")
+            self.continuousdata.clicked = False
+            self.continuousdata.setStyleSheet("Color: Red")
+            self.ConversionSTART()
+            self.RDATAC() 
+    
+            print "Plot"
+        
+            while(self.continuousdata.clicked == False):
+                ddata = self.ser.read(27)
+                self.ser.write("00")        
+                while ((len(ddata) == 27)&(self.continuousdata.clicked == False)):
+                
+                    for i in xrange(len(ddata)):
+                        if i%3 == 0:    
+                            hhh_1 = ord(ddata[i])
+                            hhh_2 = ord(ddata[i+1])
+                            hhh_3 = ord(ddata[i+2])
+                            hhx_1 = '%02x'%hhh_1
+                            hhx_2 = '%02x'%hhh_2
+                            hhx_3 = '%02x'%hhh_3
+                            hht_1 = self.hex2bin(hhx_1)
+                            hht_2 = self.hex2bin(hhx_2)
+                            hht_3 = self.hex2bin(hhx_3)
+                            hht = hht_1[2:]+hht_2[2:]+hht_3[2:]          
+                            mydata[0].append(hht)
+                        else:
+                            pass
+                    time.sleep(0.1)
+                
+                    #print len(mydata[0])
+
+        
+            for n in xrange(len(mydata[0])):
+                if n%9 == 0:
+                    braindata[0].append(mydata[0][n])
+                elif n%9 ==1:
+                    braindata[1].append(mydata[0][n])
+#                brainData[1].append(self.twoscomplement2integer(myData[n]))
+                elif n%9 ==2:
+                    braindata[2].append(mydata[0][n])
+#                brainData[2].append(self.twoscomplement2integer(myData[n]))
+                elif n%9 ==3:
+                    braindata[3].append(mydata[0][n])
+#                brainData[3].append(self.twoscomplement2integer(myData[n]))
+                elif n%9 ==4:
+                    braindata[4].append(mydata[0][n])
+#                brainData[4].append(self.twoscomplement2integer(myData[n]))
+                elif n%9 ==5:
+                    braindata[5].append(mydata[0][n])
+#                brainData[5].append(self.twoscomplement2integer(myData[n]))
+                elif n%9 ==6:
+                    braindata[6].append(mydata[0][n])
+#                brainData[6].append(self.twoscomplement2integer(myData[n]))
+                elif n%9 ==7:
+                    braindata[7].append(mydata[0][n])
+#                brainData[7].append(self.twoscomplement2integer(myData[n]))
+                elif n%9 ==8:
+                    braindata[8].append(mydata[0][n])
+#                brainData[8].append(self.twoscomplement2integer(myData[n]))
+#            time.sleep(1)
+            
+        else:
+            self.continuousdata.setText("Plot")
+            self.continuousdata.clicked = True
+            self.continuousdata.setStyleSheet("Color: Green")  
+            self.ConversionSTOP()
+            self.SDATAC()
+            print mydata[0]
+#            self.ser.close()
+
     def plotDataprep(self):
                
         self.ConversionSTART()
@@ -2611,13 +2703,9 @@ class BrainInterface(QtGui.QMainWindow):
 
         print "Plot"
         ##############plot###############
-#        global myData
         readtext = self.SamplePerChn.text()
         readByte = int(readtext)
-        
-        myData = []
-#        myData=self.findStatus()
-        
+
         while(readByte > 0):
             ddata = self.ser.read(27)
             self.ser.write("00")        
@@ -2635,73 +2723,73 @@ class BrainInterface(QtGui.QMainWindow):
                         hht_2 = self.hex2bin(hhx_2)
                         hht_3 = self.hex2bin(hhx_3)
                         hht = hht_1[2:]+hht_2[2:]+hht_3[2:]          
-                        myData.append(hht)
+                        myData[0].append(hht)
                     else:
                         pass
                 readByte = readByte-1
             else:
                 pass
             
-        print myData 
+        print myData[0] 
         
-        for n in xrange(len(myData)):
+        for n in xrange(len(myData[0])):
             if n%9 == 0:
-                brainData[0].append(myData[n])
+                brainData[0].append(myData[0][n])
             elif n%9 ==1:
-                brainData[1].append(myData[n])
+                brainData[1].append(myData[0][n])
 #                brainData[1].append(self.twoscomplement2integer(myData[n]))
             elif n%9 ==2:
-                brainData[2].append(myData[n])
+                brainData[2].append(myData[0][n])
 #                brainData[2].append(self.twoscomplement2integer(myData[n]))
             elif n%9 ==3:
-                brainData[3].append(myData[n])
+                brainData[3].append(myData[0][n])
 #                brainData[3].append(self.twoscomplement2integer(myData[n]))
             elif n%9 ==4:
-                brainData[4].append(myData[n])
+                brainData[4].append(myData[0][n])
 #                brainData[4].append(self.twoscomplement2integer(myData[n]))
             elif n%9 ==5:
-                brainData[5].append(myData[n])
+                brainData[5].append(myData[0][n])
 #                brainData[5].append(self.twoscomplement2integer(myData[n]))
             elif n%9 ==6:
-                brainData[6].append(myData[n])
+                brainData[6].append(myData[0][n])
 #                brainData[6].append(self.twoscomplement2integer(myData[n]))
             elif n%9 ==7:
-                brainData[7].append(myData[n])
+                brainData[7].append(myData[0][n])
 #                brainData[7].append(self.twoscomplement2integer(myData[n]))
             elif n%9 ==8:
-                brainData[8].append(myData[n])
+                brainData[8].append(myData[0][n])
 #                brainData[8].append(self.twoscomplement2integer(myData[n]))
             
         print brainData[1]
             
-    def findStatus(self):
-        while(True):
-            self.ser.flushInput()
-            tempchar = self.ser.read(3)
-            result_m = ''
-            result_n = []
-            hLen_m = len(tempchar)
-            for i in xrange(hLen_m):
-                hvol_m = ord(tempchar[i])
-                hhex_m = '%02X'%hvol_m
-                result_m += hhex_m
-                if i%3 == 0:                   
-                    hvol_1 = ord(tempchar[i])
-                    hvol_2 = ord(tempchar[i+1])
-                    hvol_3 = ord(tempchar[i+2])
-                    hhex_1 = '%02X'%hvol_1
-                    hhex_2 = '%02X'%hvol_2
-                    hhex_3 = '%02X'%hvol_3
-                    hhet_1 = self.hex2bin(hhex_1)
-                    hhet_2 = self.hex2bin(hhex_2)
-                    hhet_3 = self.hex2bin(hhex_3)
-                    hhet = hhet_1[2:]+hhet_2[2:]+hhet_3[2:]
-                    result_n.append(hhet)
-                else:
-                    pass
-                    
-            if (hLen_m == 3) & (result_m == 'C00000'):
-                return result_n
+#    def findStatus(self):
+#        while(True):
+#            self.ser.flushInput()
+#            tempchar = self.ser.read(3)
+#            result_m = ''
+#            result_n = []
+#            hLen_m = len(tempchar)
+#            for i in xrange(hLen_m):
+#                hvol_m = ord(tempchar[i])
+#                hhex_m = '%02X'%hvol_m
+#                result_m += hhex_m
+#                if i%3 == 0:                   
+#                    hvol_1 = ord(tempchar[i])
+#                    hvol_2 = ord(tempchar[i+1])
+#                    hvol_3 = ord(tempchar[i+2])
+#                    hhex_1 = '%02X'%hvol_1
+#                    hhex_2 = '%02X'%hvol_2
+#                    hhex_3 = '%02X'%hvol_3
+#                    hhet_1 = self.hex2bin(hhex_1)
+#                    hhet_2 = self.hex2bin(hhex_2)
+#                    hhet_3 = self.hex2bin(hhex_3)
+#                    hhet = hhet_1[2:]+hhet_2[2:]+hhet_3[2:]
+#                    result_n.append(hhet)
+#                else:
+#                    pass
+#                    
+#            if (hLen_m == 3) & (result_m == 'C00000'):
+#                return result_n
 
 #        time.sleep(5)
 #        self.SDATAC()
