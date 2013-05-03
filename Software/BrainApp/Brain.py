@@ -144,25 +144,25 @@ class BrainInterface(QtGui.QMainWindow):
         self.confReg  = QtGui.QWidget()        
         self.GlobalReg  = QtGui.QWidget()        
         self.RegMap  = QtGui.QWidget()        
-        self.analyzedata  = QtGui.QWidget()        
+#        self.analyzedata  = QtGui.QWidget()        
         self.tab4  = QtGui.QWidget()    
-        self.tab5  = QtGui.QWidget()        
+#        self.tab5  = QtGui.QWidget()        
        
                 
         self.tabconfReg= QtGui.QHBoxLayout(self.confReg)
         self.tabGlobalReg= QtGui.QHBoxLayout(self.GlobalReg)
         self.tabRegMap= QtGui.QHBoxLayout(self.RegMap)
-        self.tabanalyzedata= QtGui.QHBoxLayout(self.analyzedata)
+#        self.tabanalyzedata= QtGui.QHBoxLayout(self.analyzedata)
         self.tabLayout5= QtGui.QHBoxLayout(self.tab4)
-        self.tabLayout6= QtGui.QHBoxLayout(self.tab5)
+#        self.tabLayout6= QtGui.QHBoxLayout(self.tab5)
         
         
         self.manTabWidget.addTab(self.confReg,"Configure Channel Registers")                     
         self.manTabWidget.addTab(self.GlobalReg,"Configure Global Registers")       
         self.manTabWidget.addTab(self.RegMap,"Register Map")       
-        self.manTabWidget.addTab(self.analyzedata,"Analysis")       
+#        self.manTabWidget.addTab(self.analyzedata,"Analysis")       
         self.manTabWidget.addTab(self.tab4,"Real Time Plot")       
-        self.manTabWidget.addTab(self.tab5,"Tab 5")       
+#        self.manTabWidget.addTab(self.tab5,"Tab 5")       
             
 
         self.manTabWidget.setUsesScrollButtons(True)
@@ -233,12 +233,12 @@ class BrainInterface(QtGui.QMainWindow):
 
         self.confRegSetup()
         self.GlobalRegSetup()
-        self.AnalysisDTSetup()
+#        self.AnalysisDTSetup()
         self.RegisterMapSetup()
         self.setupRTDataDisplay()
 #        self.DefaultSetting()
 
-        self.packetQueue = Queue.Queue(maxsize=2048)
+        self.packetQueue = Queue.Queue(maxsize=0)
 #        threading.Thread(target=self._packetProcessor, name="Processor thread, {}".format(str(self))).start()
 #        threading.Thread(target=self._serialReceiver, name="Processor thread, {}".format(str(self))).start()
 
@@ -262,13 +262,15 @@ class BrainInterface(QtGui.QMainWindow):
             print "Index ",index             
         if (index == 2):
             print "Index ",index 
-#            self.ReadRegData()
+            time.sleep(0.0001)
+            self.ReadRegData()
         if (index == 3):
             print "Index ",index 
-        if (index == 4):
-            print "Index ",index             
-        if (index == 5):
-            print "Index ",index 
+#        if (index == 4):
+##            self.startThread1()
+#            print "Index ",index             
+#        if (index == 5):
+#            print "Index ",index 
         
     def initVariables(self):
         print "Init Variables"
@@ -364,8 +366,9 @@ class BrainInterface(QtGui.QMainWindow):
         str_reset2 += struct.pack('B', s_reset)
         #resetCMD = resetCMD[2:]
         print repr(str_reset2)
-        #self.ser.flushInput()
+        
         self.ser.write(str_reset2)  
+        self.ser.flush()
         time.sleep(0.5)
 #        waittime = time.sleep(0.04)
 #        print 'wait'
@@ -539,7 +542,7 @@ class BrainInterface(QtGui.QMainWindow):
 #                print str(i)+"als"
                 if  (num[i+1] == "1"):
 
-                    a = eval(num[i+1]) * mask * pow(2,len(num)-1-1-i)                  
+                    a = eval(num[i+1]) * mask * pow(2,22-i)                  
 
                     mvalue = mvalue+a
                 else:
@@ -558,13 +561,13 @@ class BrainInterface(QtGui.QMainWindow):
             for n in xrange(len(num)-1):
                 data =(xvalue) ^ (1<<n)
                 xvalue = data
-            num = format(data,'#06b')[2:]
+            num = format(data,'#025b')[2:]
 #            print num
-            for i in xrange(4):
+            for i in xrange(len(num)-1):
 #                print str(i)+"als"
                 if  (num[i] == "1"):
                     #a = (eval(num[(len(num)-i-1):(len(num)-i)]))*(2^i)*mask
-                    a = eval(num[i]) * mask * pow(2,3-i)                  
+                    a = eval(num[i]) * mask * pow(2,22-i)                  
 #                    print pow(2,i)
 #                    print a
                     value = value+a
@@ -2876,22 +2879,26 @@ class BrainInterface(QtGui.QMainWindow):
         combo1.addItem("Please Select")
         for key in braindata.keys():
 #        for key in realTimeData.keys():     
-            combo1.addItem('Channel'+' '+ str(key))
+            combo1.addItem('Channel'+' '+str(key))
+           
         
         self.numRTFigures = self.numRTFigures + 1
         self.RTPlotVariables.append(combo1) 
         self.RTDisplayWidget.addSubPlot(self.numRTFigures,self.RTPlotVariables)
-        combo1.currentIndexChanged.connect(self.plotRTData)      
+        
+        combo1.activated.connect(self.plotRTData)      
 
     def plotRTData(self):
         for combo in self.RTPlotVariables:
             plotIndex = self.RTPlotVariables.index(combo)
-            dataKey = str(combo.currentIndex())  
+            
+            #dataKey = str(combo.currentText())
+            dataKey = combo.currentIndex()
+            plotTitle = str(combo.currentText())
             if dataKey in braindata.keys():
 #            if dataKey in realTimeData.keys():
                 self.RTDisplayWidget.plotData(plotIndex,braindata[dataKey]) 
-                print 'a'
-                self.RTDisplayWidget.assignTitle(plotIndex,dataKey)  
+                self.RTDisplayWidget.assignTitle(plotIndex,plotTitle)
                 
 
 
@@ -2956,65 +2963,69 @@ class BrainInterface(QtGui.QMainWindow):
         
         self.RTDisplayAddVariable.clicked.connect(self.RTDisplayAddPlot)
         self.RTDisplayStopRTData.clicked.connect(self.StopStartRTData)
-        self.continuousdata.clicked.connect(self.startThread)
+        self.continuousdata.clicked.connect(self.startThread2)
         
-    def startThread(self):
+    def startThread2(self):
         
         threading.Thread(target=self._serialReceiver, name="readSerial thread, {}".format(str(self))).start()   
         threading.Thread(target=self._packetProcessor, name="Processor thread, {}".format(str(self))).start()
         self.isAppRunning = True
         
     def _packetProcessor(self):
-        
+        time.sleep(3)
         while self.isAppRunning:
-#            time.sleep(0.001)
+            time.sleep(1)
             count = 0
-            while(self.packetQueue.empty()==False):
-#            with self.queueLock:
-#                count = 0
-#                while(self.RTDisplayStopRTData.clicked == False):
-                mydata[0] = self.packetQueue.get()
-                
-                if count%9 == 0:
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-            
-                elif count%9 ==1:
-#                brainData[1].append(myData[0][n])
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-                elif count%9 ==2:
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-#                brainData[2].append(self.twoscomplement2integer(myData[n]))
-                elif count%9 ==3:
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-#                brainData[3].append(self.twoscomplement2integer(myData[n]))
-                elif count%9 ==4:
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-#                brainData[4].append(self.twoscomplement2integer(myData[n]))
-                elif count%9 ==5:
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-#                brainData[5].append(self.twoscomplement2integer(myData[n]))
-                elif count%9 ==6:
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-#                brainData[6].append(self.twoscomplement2integer(myData[n]))
-                elif count%9 ==7:
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-#                brainData[7].append(self.twoscomplement2integer(myData[n]))
-                elif count%9 ==8:
-                    braindata[count%9].append(self.twoscomplement2integer(mydata[0]))
-#                brainData[8].append(self.twoscomplement2integer(myData[n]))               
-                count = count+1
-            # Parse the data and place in 
-#        self.packetQueue.join()
-            
+            while (self.continuousdata.clicked):
 
+                    packet = self.packetQueue.get()
+#                    print packet
+                    
+                    if count%9 == 0:
+                        braindata[0].append(packet)            
+                    elif count%9 ==1:
+#                brainData[1].append(myData[0][n])
+                        braindata[1].append(self.twoscomplement2integer(packet))
+                    elif count%9 ==2:
+                        braindata[2].append(self.twoscomplement2integer(packet))
+#                brainData[2].append(self.twoscomplement2integer(myData[n]))
+                    elif count%9 ==3:
+                        braindata[3].append(self.twoscomplement2integer(packet))
+#                brainData[3].append(self.twoscomplement2integer(myData[n]))
+                    elif count%9 ==4:
+                        braindata[4].append(self.twoscomplement2integer(packet))
+#                brainData[4].append(self.twoscomplement2integer(myData[n]))
+                    elif count%9 ==5:
+                        braindata[5].append(self.twoscomplement2integer(packet))
+#                brainData[5].append(self.twoscomplement2integer(myData[n]))
+                    elif count%9 ==6:
+                        braindata[6].append(self.twoscomplement2integer(packet))
+#                brainData[6].append(self.twoscomplement2integer(myData[n]))
+                    elif count%9 ==7:
+                        braindata[7].append(self.twoscomplement2integer(packet))
+#                brainData[7].append(self.twoscomplement2integer(myData[n]))
+                    elif count%9 ==8:
+                        braindata[8].append(self.twoscomplement2integer(packet))
+#                brainData[8].append(self.twoscomplement2integer(myData[n]))
+                    
+                
+                    count = count+1
+#            print 'thread2'
+                
+        time.sleep(0.000001)
            
     def StopStartRTData(self):
-        self.isAppRunning = False        
-        
+        self.isAppRunning = False  
+        self.continuousdata.clicked = False
+#        self.packetQueue.join()
+#        time.sleep(0.0001)
         self.ConversionSTOP()
         self.SDATAC()
+
+#    def startThread1(self):
+#        
+#        threading.Thread(target=self._serialReceiver, name="readSerial thread, {}".format(str(self))).start()
 #        self.isAppRunning = True
-        
            
     def _serialReceiver(self):
         while self.isAppRunning:
@@ -3027,44 +3038,40 @@ class BrainInterface(QtGui.QMainWindow):
 
             print "Plot"
     
-#            while (self.continuousdata.clicked):
-            ddata = self.ser.read(27)
-            self.ser.write("00")        
-            while (len(ddata) == 27):
-        
-                for i in xrange(len(ddata)):
-                    if i%3 == 0:    
-                        hhh_1 = ord(ddata[i])
-                        hhh_2 = ord(ddata[i+1])
-                        hhh_3 = ord(ddata[i+2])
-                        hhx_1 = '%02x'%hhh_1
-                        hhx_2 = '%02x'%hhh_2
-                        hhx_3 = '%02x'%hhh_3
-                        hht_1 = self.hex2bin(hhx_1)
-                        hht_2 = self.hex2bin(hhx_2)
-                        hht_3 = self.hex2bin(hhx_3)
-                        hht = hht_1[2:]+hht_2[2:]+hht_3[2:] 
+            while (self.continuousdata.clicked):
+#                while (True):
+                ddata = self.ser.read(27)
+                self.ser.write("00")        
+                if (len(ddata) == 27):
+    
+                    for i in xrange(len(ddata)):
+                        if i%3 == 0:    
+                            hhh_1 = ord(ddata[i])
+                            hhh_2 = ord(ddata[i+1])
+                            hhh_3 = ord(ddata[i+2])
+                            hhx_1 = '%02x'%hhh_1
+                            hhx_2 = '%02x'%hhh_2
+                            hhx_3 = '%02x'%hhh_3
+                            hht_1 = self.hex2bin(hhx_1)
+                            hht_2 = self.hex2bin(hhx_2)
+                            hht_3 = self.hex2bin(hhx_3)
+                            hht = hht_1[2:]+hht_2[2:]+hht_3[2:] 
 #                                with self.queueLock:
-                        self.packetQueue.put(hht)
-                        size = self.packetQueue.qsize()
-                        print size
-#                               
-                    else:
-                        pass
+                            self.packetQueue.put(hht)
+                            size = self.packetQueue.qsize()
+                            print 'qsize:'+str(size)    
+                        else:
+                            pass
             
-                
-                
-#                print mydata[0]
-            
-            
-#read packet from serial port and place in packet queue
-#        with self.queueLock:
-#            self.packetQueue.put(mydata[0])
-#        threading.Thread(target=self._packetProcessor, name="Processor thread, {}".format(str(self))).start()
-#        threading.Thread(target=self._serialReceiver, name="Processor thread, {}".format(str(self))).start()
-           
+                else:
+                    pass
 
-        sleep(0.000001)
+        time.sleep(0.000001)
+
+
+
+        
+        
         
 def main():
     
