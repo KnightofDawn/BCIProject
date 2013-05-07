@@ -86,10 +86,11 @@ from  mplwidget import *
 if platform.python_version()[0] == "3":
     raw_input=input
 
-brainData = {} #one time data
-mydata = {} #continuous data
-myData = {} #one time data
+#brainData = {} #one time data
+#mydata = {} #continuous data
+#myData = {} #one time data
 braindata = {} #continuous data
+statusbits = []
 
 
 
@@ -216,6 +217,7 @@ class BrainInterface(QtGui.QMainWindow):
         
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.vexplorer_dock)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.console_dock)
+        #Add menu items 
              
         self.ui.menuView.addAction(self.vexplorer_dock.toggleViewAction())
         self.ui.menuView.addAction(self.console_dock.toggleViewAction())
@@ -224,37 +226,24 @@ class BrainInterface(QtGui.QMainWindow):
         self.ui.menuHelp.addSeparator()
         self.ui.menuHelp.addAction(self.ui.actionHelp)
        
+        self.ui.actionAbout.triggered.connect(self.menuAboutClicked)
 #####################################################################################################       
         self.OpenSerialport()
         self.deviceSetup()  
-        
         self.initVariables()
         self.refresh_vexplorer_table()
-
         self.confRegSetup()
         self.GlobalRegSetup()
 #        self.AnalysisDTSetup()
         self.RegisterMapSetup()
         self.setupRTDataDisplay()
-#        self.DefaultSetting()
+        self.defaultSetting()
 
         self.packetQueue = Queue.Queue(maxsize=0)
-#        threading.Thread(target=self._packetProcessor, name="Processor thread, {}".format(str(self))).start()
-#        threading.Thread(target=self._serialReceiver, name="Processor thread, {}".format(str(self))).start()
 
 
 #*************************************************************************************************     
-    def DefaultSetting(self):
-        print "default"
-        self.WriteReg(5,'60')
-        self.WriteReg(6,'60')
-        self.WriteReg(7,'60')
-        self.WriteReg(8,'60')
-        self.WriteReg(9,'60')
-        self.WriteReg(10,'60')
-        self.WriteReg(11,'60')
-        self.WriteReg(12,'60')
-   
+
     def manTabHandler(self,index):
         if (index == 0) :
             print "Index ",index 
@@ -274,18 +263,19 @@ class BrainInterface(QtGui.QMainWindow):
         
     def initVariables(self):
         print "Init Variables"
-        brainData[0]=[]    
-        brainData[1]=[]
-        brainData[2]=[]
-        brainData[3]=[]
-        brainData[4]=[]
-        brainData[5]=[]
-        brainData[6]=[]
-        brainData[7]=[]
-        brainData[8]=[]
-        mydata[0] = []
-        myData[0] = []
-        braindata[0]=[]    
+#        brainData[0]=[]    
+#        brainData[1]=[]
+#        brainData[2]=[]
+#        brainData[3]=[]
+#        brainData[4]=[]
+#        brainData[5]=[]
+#        brainData[6]=[]
+#        brainData[7]=[]
+#        brainData[8]=[]
+#        mydata[0] = []
+#        myData[0] = []
+#        braindata[0]=[]  
+#        statusbits = []  
         braindata[1]=[]
         braindata[2]=[]
         braindata[3]=[]
@@ -298,14 +288,34 @@ class BrainInterface(QtGui.QMainWindow):
         self.RTPlotVariables = []
         #End initVariables      
 
-        """Device Setup"""
+#        """Device Setup"""
     def deviceSetup(self):
 
         self.deviceReset()
-        self.SDATAC()
-
-        
+        self.SDATAC()       
         print 'Device setup done'
+        
+    def resetDeviceRegPage(self):
+        self.deviceReset()
+        self.SDATAC()
+        self.ChanInCh1.setCurrentIndex(1)
+        self.ChanInCh2.setCurrentIndex(1)
+        self.ChanInCh3.setCurrentIndex(1)
+        self.ChanInCh4.setCurrentIndex(1)
+        self.ChanInCh5.setCurrentIndex(1)
+        self.ChanInCh6.setCurrentIndex(1)
+        self.ChanInCh7.setCurrentIndex(1)
+        self.ChanInCh8.setCurrentIndex(1)
+        self.defaultSetting()
+        braindata[0]=[]    
+        braindata[1]=[]
+        braindata[2]=[]
+        braindata[3]=[]
+        braindata[4]=[]
+        braindata[5]=[]
+        braindata[6]=[]
+        braindata[7]=[]
+        braindata[8]=[]
 
     def ReadReg(self, regnum):
         if regnum < 16:        
@@ -529,47 +539,25 @@ class BrainInterface(QtGui.QMainWindow):
         mask = 4.5/(pow(2,23)-1)
         value = 0
         mvalue = 0
-#        print num
         firstbit = num[0]
-#        print firstbit
         a = 0
         if (firstbit == '0') :
-            #print (eval(num[(len(num)-0-1):(len(num)-0)]))
-        
-#            while (len(num)>2):
-#                print 'a'
-            for i in xrange(len(num)-1):
-#                print str(i)+"als"
+
+            for i in xrange(23):
                 if  (num[i+1] == "1"):
-
                     a = eval(num[i+1]) * mask * pow(2,22-i)                  
-
                     mvalue = mvalue+a
                 else:
                     pass
-               # print a 
-                
-#                print a
-#                
-#            print eval(value)
         else: 
-#            print 'b'
-#            while (len(num)>2):
-            
-#            print (int(num[1:],2)-1) 
             xvalue = int(num[1:],2)-1
             for n in xrange(len(num)-1):
                 data =(xvalue) ^ (1<<n)
                 xvalue = data
             num = format(data,'#025b')[2:]
-#            print num
-            for i in xrange(len(num)-1):
-#                print str(i)+"als"
+            for i in xrange(23):
                 if  (num[i] == "1"):
-                    #a = (eval(num[(len(num)-i-1):(len(num)-i)]))*(2^i)*mask
                     a = eval(num[i]) * mask * pow(2,22-i)                  
-#                    print pow(2,i)
-#                    print a
                     value = value+a
                 else:
                     pass
@@ -588,6 +576,13 @@ class BrainInterface(QtGui.QMainWindow):
                 if interpreter is not None:
                     self.nsb.editor.set_data(brainData)
                     self.nsb.editor.adjust_columns()
+                    
+    def menuAboutClicked(self):
+        dialog = AboutDialog(parent=self)
+        if dialog.exec_():
+            pass
+        
+        dialog.destroy()
         
 
     def closeEvent(self, event):
@@ -905,13 +900,21 @@ class BrainInterface(QtGui.QMainWindow):
         self.SRB2Ch8.addItems(listSRB2)
         
         self.ChanInCh1.addItems(listChnInput)
+        self.ChanInCh1.setCurrentIndex(1)
         self.ChanInCh2.addItems(listChnInput)
+        self.ChanInCh2.setCurrentIndex(1)
         self.ChanInCh3.addItems(listChnInput)
+        self.ChanInCh3.setCurrentIndex(1)
         self.ChanInCh4.addItems(listChnInput)
+        self.ChanInCh4.setCurrentIndex(1)
         self.ChanInCh5.addItems(listChnInput)
+        self.ChanInCh5.setCurrentIndex(1)
         self.ChanInCh6.addItems(listChnInput)
+        self.ChanInCh6.setCurrentIndex(1)
         self.ChanInCh7.addItems(listChnInput)
+        self.ChanInCh7.setCurrentIndex(1)
         self.ChanInCh8.addItems(listChnInput)
+        self.ChanInCh8.setCurrentIndex(1)
         
         self.Ch8Select.stateChanged.connect(self.changeCh8Status)
         self.Ch3Select.stateChanged.connect(self.changeCh3Status)
@@ -1480,6 +1483,7 @@ class BrainInterface(QtGui.QMainWindow):
             
     def setCh1Input(self):
         Ch1InputVal = self.ChanInCh1.currentIndex()
+        print Ch1InputVal
         if Ch1InputVal == 0:
             self.setChInput(1, 0)
         elif Ch1InputVal == 1:
@@ -1536,8 +1540,10 @@ class BrainInterface(QtGui.QMainWindow):
         ]
 
         self.ClkOut.addItems(listClkout)
-        self.ClkOut.setItemData(0,"When CLKSEL pin = 1, Output disabled indicates internal oscillator signal is not connected to the CLK pin.",QtCore.Qt.ToolTipRole)
-        self.ClkOut.setItemData(1,"When CLKSEL pin = 1, Output disabled indicates internal oscillator signal is connected to the CLK pin.",QtCore.Qt.ToolTipRole)
+        self.ClkOut.setItemData(0,"When CLKSEL pin = 1, \n\
+        Output disabled indicates internal oscillator signal is not connected to the CLK pin.",QtCore.Qt.ToolTipRole)
+        self.ClkOut.setItemData(1,"When CLKSEL pin = 1, \n\
+        Output disabled indicates internal oscillator signal is connected to the CLK pin.",QtCore.Qt.ToolTipRole)
         
         self.DaisyChainMultiRM.addItems(listDaisyMulti)
         self.DaisyChainMultiRM.setItemData(0,"Daisy Chain Mode: In this mode, SCLK, DIN, and CS are shared across multiple devices. The DOUT of one device is hooked up to the DAISY_IN of the other device, thereby creating a chain.",QtCore.Qt.ToolTipRole)
@@ -2012,10 +2018,10 @@ class BrainInterface(QtGui.QMainWindow):
             hexclkVal = self.hex2bin(clkVal)
             hexclkVal = '%02x'%((int(hexclkVal,2))&(int('0xDF',16))|(int('0xB0',16)))
             self.WriteReg(1, hexclkVal)
-        elif clkVal == 0:
+        elif clken == 0:
             clkVal = self.ReadReg(1)
             hexclkVal = self.hex2bin(clkVal)
-            hexclkVal = '%02x'%((int(hexclkVal,2))&(int('0xDF',16))|(int('0xB0',16)))
+            hexclkVal = '%02x'%((int(hexclkVal,2))&(int('0xDF',16))|(int('0x90',16)))
             self.WriteReg(1, hexclkVal)        
     def setClkEn(self):
         ClkIdx = self.ClkOut.currentIndex()
@@ -2094,14 +2100,14 @@ class BrainInterface(QtGui.QMainWindow):
         elif internal == 0:
             TestScVal = self.ReadReg(2)
             hexTestScVal = self.hex2bin(TestScVal)
-            hexTestScVal = '%02x'%((int(hexTestScVal,2))&(int('0xEF',16))|(int('0xD0',16)))
+            hexTestScVal = '%02x'%((int(hexTestScVal,2))&(int('0xEF',16))|(int('0xC0',16)))
             self.WriteReg(2, hexTestScVal)        
     def setTestSource(self):
         TestScIdx = self.TestSource.currentIndex()
         if TestScIdx == 0:
-            self.ClkEnable(0)
+            self.TestSc(0)
         else:
-            self.ClkEnable(1)        
+            self.TestSc(1)        
             
     def TestA(self, amp):
         if amp == 1:
@@ -2465,7 +2471,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.resetRegMap = QtGui.QPushButton(self.RegMap)
         self.resetRegMap.setGeometry(QtCore.QRect(550,105, 75, 23))
         self.resetRegMap.setText("Reset Device")
-        self.resetRegMap.clicked.connect(self.deviceSetup)
+        self.resetRegMap.clicked.connect(self.resetDeviceRegPage)
         
         self.standbyRegMap = QtGui.QPushButton(self.RegMap)
         self.standbyRegMap.setGeometry(QtCore.QRect(550,155, 75, 23))
@@ -2473,6 +2479,73 @@ class BrainInterface(QtGui.QMainWindow):
         self.standbyRegMap.setStyleSheet("Color: Green")
         self.standbyRegMap.setCheckable(True)
         self.standbyRegMap.clicked.connect(self.setStandbyWakeup)
+        
+        self.DefaultSetting = QtGui.QPushButton(self.RegMap)
+        self.DefaultSetting.setGeometry(QtCore.QRect(550,210, 75, 23))
+        self.DefaultSetting.setText("Default")
+        self.DefaultSetting.clicked.connect(self.defaultSetting)
+        
+    def defaultSetting(self):
+#        self.ChanInCh1.setCurrentIndex(0)
+#        self.ChanInCh2.setCurrentIndex(0)
+#        self.ChanInCh3.setCurrentIndex(0)
+#        self.ChanInCh4.setCurrentIndex(0)
+#        self.ChanInCh5.setCurrentIndex(0)
+#        self.ChanInCh6.setCurrentIndex(0)
+#        self.ChanInCh7.setCurrentIndex(0)
+#        self.ChanInCh8.setCurrentIndex(0)
+        
+        self.Ch1Select.setChecked(1)
+        self.Ch2Select.setChecked(1)
+        self.Ch3Select.setChecked(1)
+        self.Ch4Select.setChecked(1)
+        self.Ch5Select.setChecked(1)
+        self.Ch6Select.setChecked(1)
+        self.Ch7Select.setChecked(1)
+        self.Ch8Select.setChecked(1)
+        
+        self.GainCh1.setCurrentIndex(0)
+        self.GainCh2.setCurrentIndex(0)
+        self.GainCh3.setCurrentIndex(0)
+        self.GainCh4.setCurrentIndex(0)
+        self.GainCh5.setCurrentIndex(0)
+        self.GainCh6.setCurrentIndex(0)
+        self.GainCh7.setCurrentIndex(0)
+        self.GainCh8.setCurrentIndex(0)
+        
+        self.SRB2Ch1.setCurrentIndex(0)
+        self.SRB2Ch2.setCurrentIndex(0)
+        self.SRB2Ch3.setCurrentIndex(0)
+        self.SRB2Ch4.setCurrentIndex(0)
+        self.SRB2Ch5.setCurrentIndex(0)
+        self.SRB2Ch6.setCurrentIndex(0)
+        self.SRB2Ch7.setCurrentIndex(0)
+        self.SRB2Ch8.setCurrentIndex(0)
+        
+        self.DaisyChainMultiRM.setCurrentIndex(0)
+        self.ClkOut.setCurrentIndex(0)
+        self.OutputDRate.setCurrentIndex(0)
+        
+        self.TestSource.setCurrentIndex(0)
+        self.TestAmp.setCurrentIndex(0)
+        self.TestFrq.setCurrentIndex(0)
+        
+        self.RefBuffer.setCurrentIndex(0)
+        self.BIASMeas.setCurrentIndex(0)
+        self.BIASREFSource.setCurrentIndex(0)
+        self.BIASBuffer.setCurrentIndex(0)
+        
+        self.LeadoffComparator.setCurrentIndex(0)
+        self.SRB1.setCurrentIndex(0)
+        
+        self.CompTHD.setCurrentIndex(0)
+        self.LOFFCurrentMag.setCurrentIndex(0)
+        self.LOFFFrq.setCurrentIndex(0)
+        
+        self.GPIO1.setCurrentIndex(0)
+        self.GPIO2.setCurrentIndex(0)
+        self.GPIO3.setCurrentIndex(0)
+        self.GPIO4.setCurrentIndex(0)
         
         
     def setStandbyWakeup(self):
@@ -2657,18 +2730,10 @@ class BrainInterface(QtGui.QMainWindow):
         self.groupBox.setGeometry(QtCore.QRect(680, 30, 131, 371))
         self.groupBox.setTitle("")
         
-#        self.OutputDTRate = QtGui.QLineEdit(self.groupBox)
-#        self.OutputDTRate.setGeometry(QtCore.QRect(20, 40, 91, 31))
-#        self.OutputDTRate.setText("250SPS")
-#        self.OutputDTRate.setReadOnly(True) 
         
         self.acquireData = QtGui.QPushButton(self.groupBox)
         self.acquireData.setGeometry(QtCore.QRect(20, 190, 91, 31))
         self.acquireData.setText("Capture data")
-        
-#        self.continuousdata = QtGui.QPushButton(self.groupBox)
-#        self.continuousdata.setGeometry(QtCore.QRect(20, 250, 91, 31))
-#        self.continuousdata.setText("Plot")
                 
         
         self.label = QtGui.QLabel(self.groupBox)
@@ -2680,87 +2745,10 @@ class BrainInterface(QtGui.QMainWindow):
         self.SamplePerChn = QtGui.QLineEdit(self.groupBox)
         self.SamplePerChn.setGeometry(QtCore.QRect(20, 120, 91, 31))
         self.SamplePerChn.setText("3")
-
-        
-#        self.pltwidget = MplCanvas(self.analyzedata)
-#        self.pltwidget.setGeometry(QtCore.QRect(100, 70, 541, 481))
         
 
         self.acquireData.clicked.connect(self.plotDataprep)
 #        self.continuousdata.clicked.connect(self.ReadDataContinue)
-        
-#    def ReadDataContinue(self):
-#        if (self.continuousdata.clicked):
-#            self.continuousdata.setText("Stop Conversion")
-#            self.continuousdata.clicked = False
-#            self.continuousdata.setStyleSheet("Color: Red")
-#            self.ConversionSTART()
-#            self.RDATAC() 
-#    
-#            print "Plot"
-#        
-#            while(self.continuousdata.clicked == False):
-#                ddata = self.ser.read(27)
-#                self.ser.write("00")        
-#                while ((len(ddata) == 27)&(self.continuousdata.clicked == False)):
-#                
-#                    for i in xrange(len(ddata)):
-#                        if i%3 == 0:    
-#                            hhh_1 = ord(ddata[i])
-#                            hhh_2 = ord(ddata[i+1])
-#                            hhh_3 = ord(ddata[i+2])
-#                            hhx_1 = '%02x'%hhh_1
-#                            hhx_2 = '%02x'%hhh_2
-#                            hhx_3 = '%02x'%hhh_3
-#                            hht_1 = self.hex2bin(hhx_1)
-#                            hht_2 = self.hex2bin(hhx_2)
-#                            hht_3 = self.hex2bin(hhx_3)
-#                            hht = hht_1[2:]+hht_2[2:]+hht_3[2:]          
-#                            mydata[0].append(hht)
-#                        else:
-#                            pass
-#                    time.sleep(0.1)
-#                
-#                    #print len(mydata[0])
-#
-#        
-#            for n in xrange(len(mydata[0])):
-#                if n%9 == 0:
-#                    braindata[0].append(mydata[0][n])
-#                elif n%9 ==1:
-#                    braindata[1].append(mydata[0][n])
-##                brainData[1].append(self.twoscomplement2integer(myData[n]))
-#                elif n%9 ==2:
-#                    braindata[2].append(mydata[0][n])
-##                brainData[2].append(self.twoscomplement2integer(myData[n]))
-#                elif n%9 ==3:
-#                    braindata[3].append(mydata[0][n])
-##                brainData[3].append(self.twoscomplement2integer(myData[n]))
-#                elif n%9 ==4:
-#                    braindata[4].append(mydata[0][n])
-##                brainData[4].append(self.twoscomplement2integer(myData[n]))
-#                elif n%9 ==5:
-#                    braindata[5].append(mydata[0][n])
-##                brainData[5].append(self.twoscomplement2integer(myData[n]))
-#                elif n%9 ==6:
-#                    braindata[6].append(mydata[0][n])
-##                brainData[6].append(self.twoscomplement2integer(myData[n]))
-#                elif n%9 ==7:
-#                    braindata[7].append(mydata[0][n])
-##                brainData[7].append(self.twoscomplement2integer(myData[n]))
-#                elif n%9 ==8:
-#                    braindata[8].append(mydata[0][n])
-##                brainData[8].append(self.twoscomplement2integer(myData[n]))
-##            time.sleep(1)
-#            
-#        else:
-#            self.continuousdata.setText("Plot")
-#            self.continuousdata.clicked = True
-#            self.continuousdata.setStyleSheet("Color: Green")  
-#            self.ConversionSTOP()
-#            self.SDATAC()
-#            print mydata[0]
-##            self.ser.close()
 
     def plotDataprep(self):
                
@@ -2891,14 +2879,14 @@ class BrainInterface(QtGui.QMainWindow):
     def plotRTData(self):
         for combo in self.RTPlotVariables:
             plotIndex = self.RTPlotVariables.index(combo)
-            
-            #dataKey = str(combo.currentText())
             dataKey = combo.currentIndex()
             plotTitle = str(combo.currentText())
             if dataKey in braindata.keys():
 #            if dataKey in realTimeData.keys():
                 self.RTDisplayWidget.plotData(plotIndex,braindata[dataKey]) 
                 self.RTDisplayWidget.assignTitle(plotIndex,plotTitle)
+            else:
+                pass
                 
 
 
@@ -2970,6 +2958,7 @@ class BrainInterface(QtGui.QMainWindow):
         threading.Thread(target=self._serialReceiver, name="readSerial thread, {}".format(str(self))).start()   
         threading.Thread(target=self._packetProcessor, name="Processor thread, {}".format(str(self))).start()
         self.isAppRunning = True
+        self.continuousdata.clicked = True
         
     def _packetProcessor(self):
         time.sleep(3)
@@ -2977,12 +2966,13 @@ class BrainInterface(QtGui.QMainWindow):
             time.sleep(1)
             count = 0
             while (self.continuousdata.clicked):
+                while (self.packetQueue.empty() == False):
 
                     packet = self.packetQueue.get()
 #                    print packet
                     
                     if count%9 == 0:
-                        braindata[0].append(packet)            
+                        statusbits.append(packet)            
                     elif count%9 ==1:
 #                brainData[1].append(myData[0][n])
                         braindata[1].append(self.twoscomplement2integer(packet))
@@ -3012,13 +3002,20 @@ class BrainInterface(QtGui.QMainWindow):
                     count = count+1
 #            print 'thread2'
                 
-        time.sleep(0.000001)
+        time.sleep(0.00001)
            
     def StopStartRTData(self):
         self.isAppRunning = False  
         self.continuousdata.clicked = False
-#        self.packetQueue.join()
-#        time.sleep(0.0001)
+        braindata[0]=[]    
+        braindata[1]=[]
+        braindata[2]=[]
+        braindata[3]=[]
+        braindata[4]=[]
+        braindata[5]=[]
+        braindata[6]=[]
+        braindata[7]=[]
+        braindata[8]=[]
         self.ConversionSTOP()
         self.SDATAC()
 
@@ -3029,10 +3026,7 @@ class BrainInterface(QtGui.QMainWindow):
            
     def _serialReceiver(self):
         while self.isAppRunning:
-#            if (self.continuousdata.clicked):
-#                self.continuousdata.setText("Stop")
-#                self.continuousdata.clicked = False
-#                self.continuousdata.setStyleSheet("Color: Red")
+
             self.ConversionSTART()
             self.RDATAC() 
 
@@ -3068,7 +3062,27 @@ class BrainInterface(QtGui.QMainWindow):
 
         time.sleep(0.000001)
 
+class AboutDialog(QtGui.QDialog):
+    def __init__(self, parent):
+        QtGui.QDialog.__init__(self, parent)
+        self.resize(400, 194)
+        self.setWindowTitle("About EEG Analysis")
+        self.setWindowIcon(QtGui.QIcon('CSNELogo.jpg'))
+        
+        self.label = QtGui.QLabel(self)
+        self.label.setGeometry(QtCore.QRect(120, 50, 151, 80))
+#        self.label.setTextFormat(QtCore.Qt.AutoText)
+        self.label.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
+        self.label.setObjectName("label")
+        self.label.setText("EEG Analysis\n\nVersion 0.0.1\n\nSan Diego State University")
 
+        
+        self.buttonBox = QtGui.QDialogButtonBox(parent = self)
+        self.buttonBox.setGeometry(QtCore.QRect(210, 140, 156, 23))
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close)
+        
+#        self.connect(self.buttonBox, QtCore.SIGNAL(("rejected()")), self.buttonBox.close)
+        self.buttonBox.rejected.connect(self.close) 
 
         
         
