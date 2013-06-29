@@ -281,10 +281,10 @@ ARM Macro Assembler    Page 5
               00000000 
               00000000 
 Command Line: --debug --xref --cpu=Cortex-M0 --apcs=interwork --depend=.\arm_st
-artup_nrf51.d -o.\arm_startup_nrf51.o -I"C:\Program Files\Keil\ARM\RV31\INC" -I
-"C:\Program Files\Keil\ARM\CMSIS\Include" -I"C:\Program Files\Keil\ARM\Device\N
-ordic\nRF51822\Include" --predefine="__MICROLIB SETA 1" --list=.\arm_startup_nr
-f51.lst ..\..\nordic_library\nrf51822\Source\templates\arm\arm_startup_nrf51.s
+artup_nrf51.d -o.\arm_startup_nrf51.o -ID:\Keil\ARM\RV31\INC -ID:\Keil\ARM\CMSI
+S\Include -ID:\Keil\ARM\Device\Nordic\nRF51822\Include --predefine="__EVAL SETA
+ 1" --predefine="__MICROLIB SETA 1" --list=.\arm_startup_nrf51.lst ..\..\nordic
+_library\nrf51822\Source\templates\arm\arm_startup_nrf51.s
 
 
 
@@ -924,4 +924,4 @@ _startup_nrf51.s
 m_startup_nrf51.s
 Comment: __main used once
 2 symbols
-383 symbols in table
+384 symbols in table

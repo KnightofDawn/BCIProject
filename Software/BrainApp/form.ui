@@ -13,692 +13,494 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QFrame" name="frameCh1">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>40</y>
-     <width>521</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::Box</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <widget class="QComboBox" name="GainCh1">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>20</y>
-      <width>81</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="editable">
-     <bool>false</bool>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="SRB2Ch1">
-    <property name="geometry">
-     <rect>
-      <x>238</x>
-      <y>20</y>
-      <width>81</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="ChanInCh1">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>20</y>
-      <width>161</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>0</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Channel Select</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>0</y>
-      <width>51</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PGA Gain</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>0</y>
-      <width>41</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>SRB2</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>0</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Channel Input</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="Ch1Select">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>20</y>
-      <width>70</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="SetCONFIG1">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>20</y>
-     <width>801</width>
-     <height>80</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Set Register 1 (CONFIG1)</string>
-   </property>
-   <widget class="QComboBox" name="DaisyChainMultiRM">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>40</y>
-      <width>191</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="ClkOut">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>40</y>
-      <width>171</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="OutputDRate">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>40</y>
-      <width>191</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_43">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>181</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Daisy-chain/Multiple Readback Mode</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_44">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>20</y>
-      <width>161</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>CLKOUT Connection</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_45">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>20</y>
-      <width>181</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Output Data Rate</string>
-    </property>
-   </widget>
-  </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>40</y>
-     <width>131</width>
-     <height>371</height>
+     <x>110</x>
+     <y>310</y>
+     <width>569</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="title">
-    <string>GroupBox</string>
+    <string>Channel Selection</string>
    </property>
-   <widget class="QTextEdit" name="OutputDTRate">
+   <widget class="QWidget" name="gridLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>50</y>
-      <width>91</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Data Rate</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>110</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Samples/CH</string>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="SamplePerChn">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>140</y>
-      <width>91</width>
-      <height>31</height>
-     </rect>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="SetCONFIG2">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>110</y>
-     <width>801</width>
-     <height>80</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Set Register 2 (CONFIG2)</string>
-   </property>
-   <widget class="QComboBox" name="TestSource">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>40</y>
-      <width>191</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="TestAmp">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>40</y>
-      <width>171</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="TestFrq">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>40</y>
-      <width>191</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_46">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
+      <x>10</x>
       <y>20</y>
-      <width>181</width>
-      <height>16</height>
+      <width>551</width>
+      <height>111</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Test Source</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_47">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>20</y>
-      <width>161</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Test Signal Amplitude</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_48">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>20</y>
-      <width>181</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Test Signal Frequency</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="LOFFPNFLIP">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>280</y>
-     <width>791</width>
-     <height>191</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Lead-off Detection and Current Direction Control Registers</string>
-   </property>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>40</y>
-      <width>604</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QCheckBox" name="LOFFP8">
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="checkBox_5">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 11</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFP7">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="checkBox">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
        <property name="text">
-        <string>CheckBox</string>
+        <string>Select All Channel</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFP6">
+     <item row="2" column="2">
+      <widget class="QCheckBox" name="checkBox_10">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 13</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFP5">
+     <item row="1" column="2">
+      <widget class="QCheckBox" name="checkBox_9">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 7</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFP4">
+     <item row="2" column="1">
+      <widget class="QCheckBox" name="checkBox_8">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 12</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFP3">
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="checkBox_7">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 6</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFP2">
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="checkBox_6">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 5</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFP1">
+     <item row="1" column="3">
+      <widget class="QCheckBox" name="checkBox_11">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 8</string>
        </property>
       </widget>
      </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>90</y>
-      <width>604</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QCheckBox" name="LOFFN8">
+     <item row="2" column="3">
+      <widget class="QCheckBox" name="checkBox_12">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 14</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFN7">
+     <item row="1" column="4">
+      <widget class="QCheckBox" name="checkBox_13">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 9</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFN6">
+     <item row="2" column="4">
+      <widget class="QCheckBox" name="checkBox_14">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 15</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFN5">
+     <item row="1" column="5">
+      <widget class="QCheckBox" name="checkBox_15">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 10</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFN4">
+     <item row="2" column="5">
+      <widget class="QCheckBox" name="checkBox_16">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 16</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFN3">
+     <item row="0" column="2">
+      <widget class="QCheckBox" name="checkBox_17">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 1</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFN2">
+     <item row="0" column="3">
+      <widget class="QCheckBox" name="checkBox_18">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 2</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFN1">
+     <item row="0" column="4">
+      <widget class="QCheckBox" name="checkBox_19">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 3</string>
        </property>
       </widget>
      </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>140</y>
-      <width>604</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QCheckBox" name="LOFF_FLIP8">
+     <item row="0" column="5">
+      <widget class="QCheckBox" name="checkBox_20">
        <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="LOFF_FLIP7">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="LOFF_FLIP6">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="LOFF_FLIP5">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="LOFF_FLIP4">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="LOFF_FLIP3">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="LOFF_FLIP2">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="LOFFP1_3">
-       <property name="text">
-        <string>CheckBox</string>
+        <string>Channel 4</string>
        </property>
       </widget>
      </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QTableWidget" name="tableWidget">
+  <widget class="QGroupBox" name="groupBox_1">
    <property name="geometry">
     <rect>
-     <x>930</x>
-     <y>30</y>
-     <width>531</width>
-     <height>571</height>
+     <x>110</x>
+     <y>130</y>
+     <width>569</width>
+     <height>161</height>
     </rect>
    </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
+   <property name="title">
+    <string>ADC Configuration</string>
    </property>
-   <property name="lineWidth">
-    <number>2</number>
+   <widget class="QWidget" name="gridLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>25</y>
+      <width>551</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+     <property name="horizontalSpacing">
+      <number>50</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>5</number>
+     </property>
+     <item row="4" column="1">
+      <widget class="QFrame" name="frame_2">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QCheckBox" name="checkBox_4">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>149</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Two's Complement</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item row="6" column="0" colspan="3">
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QComboBox" name="comboBox_fH_2"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Input Type</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>ADC Sample Rate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="comboBox_fL_2"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Output Format:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QCheckBox" name="checkBox_2">
+       <property name="text">
+        <string>Absolute Value</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLineEdit" name="lineEdit_2">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="2">
+      <widget class="QComboBox" name="comboBox_5"/>
+     </item>
+     <item row="0" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_21">
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>480</y>
+     <width>569</width>
+     <height>101</height>
+    </rect>
    </property>
-   <property name="midLineWidth">
-    <number>1</number>
+   <property name="title">
+    <string>Electrode Inpedance</string>
    </property>
-   <property name="rowCount">
-    <number>24</number>
+   <widget class="QWidget" name="gridLayoutWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>551</width>
+      <height>85</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_4">
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <property name="horizontalSpacing">
+      <number>30</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>5</number>
+     </property>
+     <item row="2" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="accelerated">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>4</number>
+         </property>
+         <property name="maximum">
+          <double>1225.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>4.785000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="comboBox_2"/>
+     </item>
+     <item row="2" column="3">
+      <widget class="QComboBox" name="comboBox_4"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>DAC Capacitor Value</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Impedance Check Channel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>Positive/Negative input</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>DAC Output Voltage</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QSpinBox" name="spinBox">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>16</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="checkBox_3">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Enable</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_0">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>21</y>
+     <width>569</width>
+     <height>91</height>
+    </rect>
    </property>
-   <property name="columnCount">
-    <number>11</number>
+   <property name="title">
+    <string>Amplifier Configuration</string>
    </property>
-   <attribute name="horizontalHeaderVisible">
-    <bool>true</bool>
-   </attribute>
-   <attribute name="horizontalHeaderHighlightSections">
-    <bool>true</bool>
-   </attribute>
-   <attribute name="verticalHeaderVisible">
-    <bool>false</bool>
-   </attribute>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <row/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <item row="0" column="0">
-    <property name="text">
-     <string>Register</string>
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>551</width>
+      <height>61</height>
+     </rect>
     </property>
-   </item>
-   <item row="0" column="1">
-    <property name="text">
-     <string>Address</string>
-    </property>
-   </item>
-   <item row="0" column="2">
-    <property name="text">
-     <string>Value</string>
-    </property>
-   </item>
-   <item row="0" column="3">
-    <property name="text">
-     <string>D7</string>
-    </property>
-   </item>
-   <item row="0" column="4">
-    <property name="text">
-     <string>D6</string>
-    </property>
-   </item>
-   <item row="0" column="5">
-    <property name="text">
-     <string>D5</string>
-    </property>
-   </item>
-   <item row="0" column="6">
-    <property name="text">
-     <string>D4</string>
-    </property>
-   </item>
-   <item row="0" column="7">
-    <property name="text">
-     <string>D3</string>
-    </property>
-   </item>
-   <item row="0" column="8">
-    <property name="text">
-     <string>D2</string>
-    </property>
-   </item>
-   <item row="0" column="9">
-    <property name="text">
-     <string>D1</string>
-    </property>
-   </item>
-   <item row="0" column="10">
-    <property name="text">
-     <string>D0</string>
-    </property>
-   </item>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <property name="horizontalSpacing">
+      <number>50</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>5</number>
+     </property>
+     <item row="1" column="0">
+      <widget class="QComboBox" name="comboBox_fH"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="comboBox_fL"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="pushButton_ResetAmp">
+       <property name="text">
+        <string>Reset Amplifier</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Upper Bandwidth (fH)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Lower Bandwidth (fL)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <resources/>

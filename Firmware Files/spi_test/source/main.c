@@ -50,8 +50,10 @@ int main(void)
   int i = 0;
   int num_byte_entered = 0;
   char temp_char = 0x00;
-  simple_uart_config(RTS_PIN_NUMBER, TX_PIN_NUMBER, CTS_PIN_NUMBER, RX_PIN_NUMBER, HWFC);
-  uint32_t *spi_base_address = spi_master_init(SPI0, SPI_MODE0, false);
+  bool data_rdy = 1;
+	
+	simple_uart_config(RTS_PIN_NUMBER, TX_PIN_NUMBER, CTS_PIN_NUMBER, RX_PIN_NUMBER, HWFC);
+  uint32_t *spi_base_address = spi_master_init(SPI0, SPI_MODE2, false);
   if (spi_base_address == 0) {
     return 0;
   }
@@ -64,22 +66,28 @@ int main(void)
   
   while(true)
   {
-     temp_char = 0x00;
-     i = 0;
-     while(temp_char != 0x0D) {
-        temp_char = simple_uart_get();
+    for (int k = 0; k<32; k++) {
+			temp_char = 0x00;
+			i = 0;
+			while(temp_char != 0x0D) {
+				temp_char = simple_uart_get();
         tx_data[i] = temp_char;
         i++;        
-     }
+			}
 
-     num_byte_entered = i-1;
-     for (int j = 0; j<num_byte_entered; j++) {
-        simple_uart_put(tx_data[j]);
+			num_byte_entered = i-1;
+			for (int j = 0; j<num_byte_entered; j++) {
+					simple_uart_put(tx_data[j]);
+			}
+     
+			//spend OPCODE
+			spi_master_tx_rx(spi_base_address, num_byte_entered, (const uint8_t *)tx_data, rx_data);
+			
+			for (int j = 0; j<num_byte_entered; j++) {
+        simple_uart_put(rx_data[j]);
      }
-     
-     //spend OPCODE
-     spi_master_tx_rx(spi_base_address, num_byte_entered, (const uint8_t *)tx_data, rx_data);
-     
+		}
+		 
      // READ REGISTER DATA
      // if (spi_master_rx(spi_base_address, 1, rx_data)) {
      //     nrf_gpio_pin_write(LED0, 0);
@@ -91,12 +99,17 @@ int main(void)
      //    nrf_delay_ms(DELAY_MS);
      //    nrf_gpio_pin_write(LED1, 1);
      // }
-     // while(nrf_gpio_pin_read(DRDY_N_PIN) == 0) {
-     //     data_rdy = nrf_gpio_pin_read(DRDY_N_PIN);
-     // }
+    while(true) { 
+			while(nrf_gpio_pin_read(DRDY_N_PIN) == 1) {
+          data_rdy = nrf_gpio_pin_read(DRDY_N_PIN);
+			}	
+		 
+			spi_master_tx_rx(spi_base_address, 216, (const uint8_t *)tx_data, rx_data);
      
-     for (int j = 0; j<num_byte_entered; j++) {
+		 
+			for (int j = 0; j<216; j++) {
         simple_uart_put(rx_data[j]);
-     }
+			}
+	  }
   }
 }

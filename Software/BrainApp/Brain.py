@@ -4,37 +4,20 @@
 # also to handle directory and other os related functions
 import sys, os,  csv
 from ctypes import *
-import string
-import socket as sk
 import platform
 import copy
-from xml.etree import ElementTree
-from time import sleep
-from collections import defaultdict
-import threading
-import subprocess
 import time
-import random
-import json
-import pickle
+import threading
 import serial
 import Queue
+from RHD2216 import BrainInterface2
+from UtilityClasses import ExtendedComboBox
 
 # Import the modules QtCore (for low level Qt functions)
 # QtGui (for visual/GUI related Qt functions)
 from PyQt4 import QtCore, QtGui, Qt
 from PyQt4.QtNetwork import *
-from PyQt4.QtCore import pyqtSignal
-
-from matplotlib.widgets import MultiCursor, SpanSelector
-import matplotlib.animation as animation
-
-from matplotlib.gridspec import GridSpec
-
 import matplotlib.pyplot as plt
-import pylab
-from pylab import *
-
 # Import the matplotlib module
 import matplotlib as mplib
 # Import the FigureCanvas object from matplotlib, this is the canvas on which the figure is drawn in the GUI.
@@ -51,32 +34,15 @@ from matplotlib.widgets import SpanSelector
 # InternalShell is the python shell used in the GUI.
 from spyderlib.widgets.internalshell import InternalShell
 # NamespaceBrowser and VariableExplorer are used to create the variable explorer table using in the GUI.
-from spyderlib.widgets.externalshell.namespacebrowser import NamespaceBrowser
 from spyderlib.plugins.variableexplorer import VariableExplorer
 
-import numpy as np
-import numpy.lib.recfunctions as nprf
-from numpy.random import randint
-
 import struct
-
-# FFT functions from SciPy
-#from scipy.signal import fftconvolve
-#from scipy.fftpack import fftshift, fft
-
-# The GUI MainWindow object from the python code generated using the .ui file
-
-# conf.py contains various configurations such as testmux parameter structures, result filenames etc...
-#import conf
-
-from circularQueue import *
-from UtilityClasses import *
-from quicksave import *   
-from  BrainGUI  import Ui_MainWindow
+from  BrainGUI import Ui_MainWindow
 # testdebuglib is a custom module/library of signal processing functions.
 # Currently includes preamble type detection and correlation functions.
 #import testdebuglib as tdlib
 from mplwidget import * 
+from Startup import Ui_Dialog
     
 if platform.python_version()[0] == "3":
     raw_input=input
@@ -84,6 +50,72 @@ if platform.python_version()[0] == "3":
 braindata = {} #continuous data
 statusbits = []
 
+
+class startup_interface(QtGui.QDialog):
+    def __init__(self, parent = None):
+        QtGui.QDialog.__init__(self, parent)
+        self.startupui = Ui_Dialog()
+        self.startupui.setupUi(self)
+
+        self.widget = QtGui.QWidget(self)
+        self.widget.setGeometry(QtCore.QRect(90, 280, 158, 25))
+        self.horizontalLayout = QtGui.QHBoxLayout(self.widget)
+        self.horizontalLayout.setMargin(0)
+        self.pushButtonSelect = QtGui.QPushButton(self.widget)
+        self.pushButtonSelect.setText("Select")
+        self.horizontalLayout.addWidget(self.pushButtonSelect)
+        self.pushButtonQuit = QtGui.QPushButton(self.widget)
+        self.pushButtonQuit.setText("Quit")
+        self.horizontalLayout.addWidget(self.pushButtonQuit)
+        self.widget1 = QtGui.QWidget(self)
+        self.widget1.setGeometry(QtCore.QRect(80, 170, 171, 44))
+        self.verticalLayout = QtGui.QVBoxLayout(self.widget1)
+        self.verticalLayout.setMargin(0)
+        self.label_3 = QtGui.QLabel(self.widget1)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        font.setStrikeOut(False)
+        self.label_3.setFont(font)
+        self.label_3.setText("Choose Device:")
+        self.verticalLayout.addWidget(self.label_3)
+        self.comboBox = QtGui.QComboBox(self.widget1)
+        self.verticalLayout.addWidget(self.comboBox)
+        
+        listDevices = [
+        self.tr('ADS1299'),
+        self.tr('RHD2216')
+        ]
+        
+        self.comboBox.addItems(listDevices)
+        global device
+        device = self.comboBox.currentText()
+        print device
+        
+        self.pushButtonSelect.clicked.connect(self.connectADS)
+        self.comboBox.currentIndexChanged.connect(self.devicecheck)
+        self.pushButtonQuit.clicked.connect(self.close)
+               
+    def devicecheck(self):
+        global device            
+        device = self.comboBox.currentText()       
+       
+    def connectADS(self):
+        global device
+        if device == self.comboBox.currentText():
+            self.accept()
+        else:
+            pass
+    
+def ctsBrain():
+    brainexe = startup_interface()
+    if brainexe.exec_():
+        return True
+    else:
+        return False
+      
 class BrainInterface(QtGui.QMainWindow):
     def __init__(self, parent=None):
         """ Initialize the GUI application. 
@@ -98,7 +130,10 @@ class BrainInterface(QtGui.QMainWindow):
         self.ui = Ui_MainWindow()
         # Call the setuUi function of the main window object.
         self.ui.setupUi(self)
-        self.setWindowTitle("EEG Analysis")
+
+#        self.setWindowTitle(device +"-EEG Analysis")
+
+        self.setWindowTitle("ADS1299-EEG Analysis")
         self.setWindowIcon(QtGui.QIcon('CSNELogo.jpg'))
 
         self.isAppRunning = True
@@ -119,19 +154,20 @@ class BrainInterface(QtGui.QMainWindow):
         self.manTabWidget = QtGui.QTabWidget()
         self.confReg  = QtGui.QWidget()        
         self.GlobalReg  = QtGui.QWidget()        
-        self.RegMap  = QtGui.QWidget()        
+        self.RegMap  = QtGui.QWidget()   
+    
 #        self.analyzedata  = QtGui.QWidget()        
         self.tab4  = QtGui.QWidget()     
                    
         self.tabconfReg= QtGui.QHBoxLayout(self.confReg)
-        self.tabGlobalReg= QtGui.QHBoxLayout(self.GlobalReg)
+#        self.tabGlobalReg= QtGui.QHBoxLayout(self.GlobalReg)
         self.tabRegMap= QtGui.QHBoxLayout(self.RegMap)
 #        self.tabanalyzedata= QtGui.QHBoxLayout(self.analyzedata)
         self.tabLayout5= QtGui.QHBoxLayout(self.tab4)
         
         
         self.manTabWidget.addTab(self.confReg,"Configure Channel Registers")                     
-        self.manTabWidget.addTab(self.GlobalReg,"Configure Global Registers")       
+#        self.manTabWidget.addTab(self.GlobalReg,"Configure Global Registers")       
         self.manTabWidget.addTab(self.RegMap,"Register Map")       
 #        self.manTabWidget.addTab(self.analyzedata,"Analysis")       
         self.manTabWidget.addTab(self.tab4,"Real Time Plot")       
@@ -164,6 +200,7 @@ class BrainInterface(QtGui.QMainWindow):
         self.vexplorer = VariableExplorer(self)
         # Connect the python shell to the variable explorer
         self.nsb = self.vexplorer.add_shellwidget(cons)
+#        self.rgm = self.RegMap
        # # Set visual properties
         cons.set_font(font)
         cons.set_codecompletion_auto(True)
@@ -174,12 +211,20 @@ class BrainInterface(QtGui.QMainWindow):
         self.console_dock = QtGui.QDockWidget("EEG Data Analysis Console", self)
         self.console_dock.setWidget(cons)
         
+#        self.regmap_dock = QtGui.QDockWidget("Register Map",self)
+#        self.regmap_dock.setWidget(self.rgm)
+        
         # Add the variable explorer to the main gui
         self.vexplorer_dock = QtGui.QDockWidget("Variable Explorer", self)
         self.vexplorer_dock.setWidget(self.vexplorer)
         
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.vexplorer_dock)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.console_dock)
+#        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.regmap_dock)
+        
+#        self.tabifyDockWidget(self.vexplorer_dock, self.regmap_dock)
+#        self.vexplorer_dock.raise_()
+
         #Add menu items 
              
         self.ui.menuView.addAction(self.vexplorer_dock.toggleViewAction())
@@ -191,8 +236,8 @@ class BrainInterface(QtGui.QMainWindow):
        
         self.ui.actionAbout.triggered.connect(self.menuAboutClicked)
 #####################################################################################################       
-        self.OpenSerialport()
-        self.deviceSetup()  
+#        self.OpenSerialport()
+#        self.deviceSetup()  
         self.initVariables()
         self.refresh_vexplorer_table()
         self.confRegSetup()
@@ -208,13 +253,13 @@ class BrainInterface(QtGui.QMainWindow):
     def manTabHandler(self,index):
         if (index == 0) :
             print "Index ",index 
+#        if (index == 1):
+#            print "Index ",index             
         if (index == 1):
-            print "Index ",index             
-        if (index == 2):
             print "Index ",index 
             time.sleep(0.0001)
             self.ReadRegData()
-        if (index == 3):
+        if (index == 2):
             print "Index ",index 
         
     def initVariables(self):
@@ -259,7 +304,7 @@ class BrainInterface(QtGui.QMainWindow):
         braindata[6]=[]
         braindata[7]=[]
         braindata[8]=[]
-        statusbits = []
+#        statusbits = []
 
     def ReadReg(self, regnum):
         if regnum < 16:        
@@ -1940,29 +1985,29 @@ class BrainInterface(QtGui.QMainWindow):
             hexdrVal = '%02x'%((int(hexdrVal,2))&(int('0xF8',16))|(int('0x90',16)))
             self.WriteReg(1, hexdrVal)        
 
-    def myDRateChange(self):
-        cText = self.OutputDRate.currentIndex()        
-        if cText == 1:
-            self.OutputDTRate.setText("500SPS")
-            self.dataRate(500)
-        elif cText == 2:
-            self.OutputDTRate.setText("1000SPS")
-            self.dataRate(1000)
-        elif cText == 3:
-            self.OutputDTRate.setText("2000SPS")
-            self.dataRate(2000)
-        elif cText == 4:
-            self.OutputDTRate.setText("4000SPS")
-            self.dataRate(4000)
-        elif cText == 5:
-            self.OutputDTRate.setText("8000SPS")
-            self.dataRate(8000)
-        elif cText == 6:
-            self.OutputDTRate.setText("16000SPS")
-            self.dataRate(16000)
-        elif cText == 0:
-            self.OutputDTRate.setText("250SPS") 
-            self.dataRate(250)
+#    def myDRateChange(self):
+#        cText = self.OutputDRate.currentIndex()        
+#        if cText == 1:
+#            self.OutputDTRate.setText("500SPS")
+#            self.dataRate(500)
+#        elif cText == 2:
+#            self.OutputDTRate.setText("1000SPS")
+#            self.dataRate(1000)
+#        elif cText == 3:
+#            self.OutputDTRate.setText("2000SPS")
+#            self.dataRate(2000)
+#        elif cText == 4:
+#            self.OutputDTRate.setText("4000SPS")
+#            self.dataRate(4000)
+#        elif cText == 5:
+#            self.OutputDTRate.setText("8000SPS")
+#            self.dataRate(8000)
+#        elif cText == 6:
+#            self.OutputDTRate.setText("16000SPS")
+#            self.dataRate(16000)
+#        elif cText == 0:
+#            self.OutputDTRate.setText("250SPS") 
+#            self.dataRate(250)
             
     def TestSc(self, internal):
         if internal == 1:
@@ -2283,11 +2328,16 @@ class BrainInterface(QtGui.QMainWindow):
 ############################Tab3 setup##################################
     def RegisterMapSetup(self):
         self.tableWidget = QtGui.QTableWidget(self.RegMap)
-        self.tableWidget.setGeometry(QtCore.QRect(90, 30, 383, 553))
+        self.tableWidget.setGeometry(QtCore.QRect(60, 40, 400, 553))
         self.tableWidget.setLineWidth(2)
         self.tableWidget.setMidLineWidth(1)
         self.tableWidget.setRowCount(24)
         self.tableWidget.setColumnCount(11)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
+        self.tableWidget.setSizePolicy(sizePolicy)
         
         listHeader = [
         self.tr('Register'),
@@ -2386,30 +2436,31 @@ class BrainInterface(QtGui.QMainWindow):
         self.SRB2Ch7.setCurrentIndex(0)
         self.SRB2Ch8.setCurrentIndex(0)
         
-        self.DaisyChainMultiRM.setCurrentIndex(0)
-        self.ClkOut.setCurrentIndex(0)
-        self.OutputDRate.setCurrentIndex(0)
-        
-        self.TestSource.setCurrentIndex(0)
-        self.TestAmp.setCurrentIndex(0)
-        self.TestFrq.setCurrentIndex(0)
-        
-        self.RefBuffer.setCurrentIndex(0)
-        self.BIASMeas.setCurrentIndex(0)
-        self.BIASREFSource.setCurrentIndex(0)
-        self.BIASBuffer.setCurrentIndex(0)
-        
-        self.LeadoffComparator.setCurrentIndex(0)
-        self.SRB1.setCurrentIndex(0)
-        
-        self.CompTHD.setCurrentIndex(0)
-        self.LOFFCurrentMag.setCurrentIndex(0)
-        self.LOFFFrq.setCurrentIndex(0)
-        
-        self.GPIO1.setCurrentIndex(0)
-        self.GPIO2.setCurrentIndex(0)
-        self.GPIO3.setCurrentIndex(0)
-        self.GPIO4.setCurrentIndex(0)
+#        self.DaisyChainMultiRM.setCurrentIndex(0)
+#        self.ClkOut.setCurrentIndex(0)
+#        self.OutputDRate.setCurrentIndex(0)
+#        self.TestSc(1)
+#        self.BIASREFS(1)
+#        self.TestSource.setCurrentIndex(0)
+#        self.TestAmp.setCurrentIndex(0)
+#        self.TestFrq.setCurrentIndex(0)
+#        
+#        self.RefBuffer.setCurrentIndex(0)
+#        self.BIASMeas.setCurrentIndex(0)
+#        self.BIASREFSource.setCurrentIndex(0)
+#        self.BIASBuffer.setCurrentIndex(0)
+#        
+#        self.LeadoffComparator.setCurrentIndex(0)
+#        self.SRB1.setCurrentIndex(0)
+#        
+#        self.CompTHD.setCurrentIndex(0)
+#        self.LOFFCurrentMag.setCurrentIndex(0)
+#        self.LOFFFrq.setCurrentIndex(0)
+#        
+#        self.GPIO1.setCurrentIndex(0)
+#        self.GPIO2.setCurrentIndex(0)
+#        self.GPIO3.setCurrentIndex(0)
+#        self.GPIO4.setCurrentIndex(0)
         
         
     def setStandbyWakeup(self):
@@ -2580,77 +2631,6 @@ class BrainInterface(QtGui.QMainWindow):
         self.tableWidget.setItem(23, 2, QtGui.QTableWidgetItem(val23)) 
         self.splitData(val23,23)
                 
-#########################################################################        
-    def AnalysisDTSetup(self):                
-        self.groupBox = QtGui.QGroupBox(self.analyzedata)
-        self.groupBox.setGeometry(QtCore.QRect(680, 30, 131, 371))
-        self.groupBox.setTitle("")        
-        
-        self.acquireData = QtGui.QPushButton(self.groupBox)
-        self.acquireData.setGeometry(QtCore.QRect(20, 190, 91, 31))
-        self.acquireData.setText("Capture data")
-        
-        self.label = QtGui.QLabel(self.groupBox)
-        self.label.setGeometry(QtCore.QRect(20, 20, 71, 16))  
-        self.label.setText("Data Rate")
-        self.label_2 = QtGui.QLabel(self.groupBox)
-        self.label_2.setGeometry(QtCore.QRect(20, 100, 71, 16))
-        self.label_2.setText("Samples/CH")
-        self.SamplePerChn = QtGui.QLineEdit(self.groupBox)
-        self.SamplePerChn.setGeometry(QtCore.QRect(20, 120, 91, 31))
-        self.SamplePerChn.setText("3")
-        
-        self.acquireData.clicked.connect(self.plotDataprep)
-
-    def plotDataprep(self):               
-        self.ConversionSTART()
-        self.RDATAC() 
-        readtext = self.SamplePerChn.text()
-        readByte = int(readtext)
-        while(readByte > 0):
-            ddata = self.ser.read(27)
-            self.ser.write("00")        
-            if (len(ddata) == 27):
-                
-                for i in xrange(len(ddata)):
-                    if i%3 == 0:    
-                        hhh_1 = ord(ddata[i])
-                        hhh_2 = ord(ddata[i+1])
-                        hhh_3 = ord(ddata[i+2])
-                        hhx_1 = '%02x'%hhh_1
-                        hhx_2 = '%02x'%hhh_2
-                        hhx_3 = '%02x'%hhh_3
-                        hht_1 = self.hex2bin(hhx_1)
-                        hht_2 = self.hex2bin(hhx_2)
-                        hht_3 = self.hex2bin(hhx_3)
-                        hht = hht_1[2:]+hht_2[2:]+hht_3[2:]          
-                        myData[0].append(hht)
-                    else:
-                        pass
-                readByte = readByte-1
-            else:
-                pass
-                   
-        for n in xrange(len(myData[0])):
-            if n%9 == 0:
-                brainData[0].append(self.twoscomplement2integer(myData[0][n]))
-            elif n%9 ==1:
-                brainData[1].append(self.twoscomplement2integer(myData[0][n]))
-            elif n%9 ==2:
-                brainData[2].append(self.twoscomplement2integer(myData[0][n]))
-            elif n%9 ==3:
-                brainData[3].append(self.twoscomplement2integer(myData[0][n]))
-            elif n%9 ==4:
-                brainData[4].append(self.twoscomplement2integer(myData[0][n]))
-            elif n%9 ==5:
-                brainData[5].append(self.twoscomplement2integer(myData[0][n]))
-            elif n%9 ==6:
-                brainData[6].append(self.twoscomplement2integer(myData[0][n]))
-            elif n%9 ==7:
-                brainData[7].append(self.twoscomplement2integer(myData[0][n]))
-            elif n%9 ==8:
-                brainData[8].append(self.twoscomplement2integer(myData[0][n]))            
-        print brainData[1]
             
     def on_timer(self):
         """ Executed periodically when the monitor update timer
@@ -2719,12 +2699,26 @@ class BrainInterface(QtGui.QMainWindow):
         self.Labeldatarate.setText(QtGui.QApplication.translate("MainWindow", "Data Rate:", None, QtGui.QApplication.UnicodeUTF8))  
         self.RTDisplayContLayout.addWidget(self.Labeldatarate)
                 
-        self.OutputDTRate = QtGui.QLineEdit()
-        self.OutputDTRate.setMinimumHeight(20)
-        self.OutputDTRate.setText(QtGui.QApplication.translate("MainWindow", "250SPS", None, QtGui.QApplication.UnicodeUTF8))
-        self.OutputDTRate.setReadOnly(True)        
+#        self.OutputDTRate = QtGui.QLineEdit()
+#        self.OutputDTRate.setMinimumHeight(20)
+#        self.OutputDTRate.setText(QtGui.QApplication.translate("MainWindow", "250SPS", None, QtGui.QApplication.UnicodeUTF8))
+#        self.OutputDTRate.setReadOnly(True)  
+        listDatarate = [
+        self.tr('250SPS'),
+        self.tr('500SPS'),
+        self.tr('1000SPS'),
+        self.tr('2000SPS'),
+        self.tr('4000SPS'),
+        self.tr('8000SPS'),
+        self.tr('16000SPS')
+        ]      
+        self.OutputDTRate = QtGui.QComboBox()
+        self.OutputDTRate.addItems(listDatarate)
+
         self.RTDisplayContLayout.addWidget(self.OutputDTRate)
+        self.OutputDTRate.currentIndexChanged.connect(self.myDRateChange)
         
+
         self.continuousdata = QtGui.QPushButton()
         self.continuousdata.setMinimumHeight(50)
         self.continuousdata.setText(QtGui.QApplication.translate("MainWindow", "Start RT Data", None, QtGui.QApplication.UnicodeUTF8))
@@ -2746,6 +2740,23 @@ class BrainInterface(QtGui.QMainWindow):
         self.RTDisplayAddVariable.clicked.connect(self.RTDisplayAddPlot)
         self.RTDisplayStopRTData.clicked.connect(self.StopStartRTData)
         self.continuousdata.clicked.connect(self.startThread2)
+        
+    def myDRateChange(self):
+        cText = self.OutputDTRate.currentIndex()        
+        if cText == 1:
+            self.dataRate(500)
+        elif cText == 2:
+            self.dataRate(1000)
+        elif cText == 3:
+            self.dataRate(2000)
+        elif cText == 4:
+            self.dataRate(4000)
+        elif cText == 5:
+            self.dataRate(8000)
+        elif cText == 6:
+            self.dataRate(16000)
+        elif cText == 0:
+            self.dataRate(250)
         
     def startThread2(self):        
         threading.Thread(target=self._serialReceiver, name="readSerial thread, {}".format(str(self))).start()   
@@ -2789,7 +2800,6 @@ class BrainInterface(QtGui.QMainWindow):
 
         self.ConversionSTOP()
         self.SDATAC()
-
         
     def _serialReceiver(self):
         while self.isAppRunning:
@@ -2825,42 +2835,32 @@ class AboutDialog(QtGui.QDialog):
         QtGui.QDialog.__init__(self, parent)
         self.resize(400, 194)
         self.setWindowTitle("About EEG Analysis")
-        self.setWindowIcon(QtGui.QIcon('CSNELogo.jpg'))
-        
+        self.setWindowIcon(QtGui.QIcon('CSNELogo.jpg'))        
         self.label = QtGui.QLabel(self)
         self.label.setGeometry(QtCore.QRect(120, 50, 151, 80))
         self.label.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
         self.label.setObjectName("label")
-        self.label.setText("EEG Analysis\n\nVersion 0.0.1\n\nSan Diego State University")
-        
+        self.label.setText("EEG Analysis\n\nVersion 0.0.1\n\nSan Diego State University")       
         self.buttonBox = QtGui.QDialogButtonBox(parent = self)
         self.buttonBox.setGeometry(QtCore.QRect(210, 140, 156, 23))
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close)
-
         self.buttonBox.rejected.connect(self.close) 
         
-def main():
-    
-    app = QtGui.QApplication(sys.argv)
-
-    
-    splash_pix = QtGui.QPixmap('CSNELogo.jpg')
-    splash = QtGui.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
-    splash.setMask(splash_pix.mask())
-    splash.show()
-
-    time.sleep(1)
-    
-    tdapp = BrainInterface()
-    
-    app.processEvents()
-    tdapp.show()
-    tdapp.showMaximized()
-    
-    splash.finish(tdapp)
-
+def main():    
+    app = QtGui.QApplication(sys.argv)   
+    global device
+    if ctsBrain():
+        if device == 'ADS1299': 
+            tdapp = BrainInterface()    
+            app.processEvents()
+            tdapp.show()
+            tdapp.showMaximized()    
+        elif device == 'RHD2216':
+            rhd = BrainInterface2()
+            app.processEvents()
+            rhd.show()
+            rhd.showMaximized()
     sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
     main()

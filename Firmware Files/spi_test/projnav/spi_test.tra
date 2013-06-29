@@ -16,7 +16,7 @@
 ### ADS-LD Output File: 'spi_test.axf'
 ### ADS-LD Command File: 'spi_test.l2p'
 ### Checking for dirty Components...
-### Creating CmdFile 'spi_test.l2p', Handle=0x0000067C
+### Creating CmdFile 'spi_test.l2p', Handle=0x00000764
 ### Writing '.lnp' file
 ### ADS-LD Command file 'spi_test.l2p' is ready.
 ### ADS-LD: About to start ADS-LD Thread.

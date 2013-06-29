@@ -348,7 +348,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>NRF51 SETUPA</Define>
+              <Define>NRF51 SETUPA BOARD_NRF6310</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\nordic_library\nrf51822\Include;..\source</IncludePath>
             </VariousControls>

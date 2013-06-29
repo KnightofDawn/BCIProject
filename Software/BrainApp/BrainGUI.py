@@ -8,6 +8,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+from spyderlib.qt.QtGui import QMessageBox
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -56,6 +57,15 @@ class Ui_MainWindow(object):
         self.actionQuit = QtGui.QAction(MainWindow)
         self.actionQuit.setText(QtGui.QApplication.translate("MainWindow", "Quit", None, QtGui.QApplication.UnicodeUTF8))
         self.actionQuit.setObjectName(_fromUtf8("actionQuit"))
+
+        self.actionAbout = QtGui.QAction(MainWindow)
+        self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionAbout.setObjectName(_fromUtf8("actionAbout"))     
+        
+        self.actionHelp = QtGui.QAction(MainWindow)
+        self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionHelp.setObjectName(_fromUtf8("actionHelp")) 
+        
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave)
@@ -65,9 +75,13 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
+    
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        
+
+
 
     def retranslateUi(self, MainWindow):
         pass

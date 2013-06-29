@@ -1,77 +1,77 @@
 Dependencies for Project 'spi_test', Target 'nrf51822': (DO NOT MODIFY !)
-F (..\source\main.c)(0x514CF8A1)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Device\Nordic\nRF51822\Include" -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "main.o" --omf_browse "main.crf" --depend "main.d")
-I (..\..\nordic_library\nrf51822\Include\spi_master.h)(0x5119A0D6)
-I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x4EB1B388)
-I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1B384)
-I (..\source\spi_master_config.h)(0x514CE6B7)
-I (..\..\nordic_library\nrf51822\Include\nrf_delay.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x50984FC8)
-I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5119762C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50070A82)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A3D8C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB755C)
-I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x50A2DB1E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5119762E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x51084BBA)
-I (..\..\nordic_library\nrf51822\Include\common.h)(0x5119A0D8)
-I (..\..\nordic_library\nrf51822\Include\nrf_gpio.h)(0x514CC3C2)
-I (..\..\nordic_library\nrf51822\Include\boards.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\boards/nrf6310.h)(0x5119A0D8)
-F (..\..\nordic_library\nrf51822\Source\keil_arm_uv4.lnt)(0x5119A0D2)()
-F (..\..\nordic_library\nrf51822\Source\templates\arm\arm_startup_nrf51.s)(0x51197630)(--cpu Cortex-M0 --li -g --apcs=interwork --pd "__MICROLIB SETA 1" -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Device\Nordic\nRF51822\Include" --list ".\arm_startup_nrf51.lst" --xref -o ".\arm_startup_nrf51.o" --depend ".\arm_startup_nrf51.d")
-F (..\..\nordic_library\nrf51822\Source\templates\system_nrf51.c)(0x50CA6D92)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Device\Nordic\nRF51822\Include" -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "system_nrf51.o" --omf_browse "system_nrf51.crf" --depend "system_nrf51.d")
-I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1B384)
-I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x50984FC8)
-I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5119762C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50070A82)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A3D8C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB755C)
-I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x50A2DB1E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5119762E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x51084BBA)
-F (..\..\nordic_library\nrf51822\Source\spi_master\spi_master.c)(0x514CF9CF)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Device\Nordic\nRF51822\Include" -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "spi_master.o" --omf_browse "spi_master.crf" --depend "spi_master.d")
-I (..\..\nordic_library\nrf51822\Include\spi_master.h)(0x5119A0D6)
-I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x4EB1B388)
-I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1B384)
-I (..\..\nordic_library\nrf51822\Include\nrf_delay.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x50984FC8)
-I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5119762C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50070A82)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A3D8C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB755C)
-I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x50A2DB1E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5119762E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x51084BBA)
-I (..\..\nordic_library\nrf51822\Include\nrf_gpio.h)(0x514CC3C2)
-I (..\..\nordic_library\nrf51822\Include\common.h)(0x5119A0D8)
-I (..\source\spi_master_config.h)(0x514CE6B7)
-F (..\..\nordic_library\nrf51822\Source\nrf_delay\nrf_delay.c)(0x5119A0D0)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Device\Nordic\nRF51822\Include" -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "nrf_delay.o" --omf_browse "nrf_delay.crf" --depend "nrf_delay.d")
-I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x50984FC8)
-I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5119762C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50070A82)
-I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1B384)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A3D8C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB755C)
-I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x50A2DB1E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5119762E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x51084BBA)
-I (..\..\nordic_library\nrf51822\Include\nrf_delay.h)(0x5119A0D6)
-F (..\..\nordic_library\nrf51822\Source\simple_uart\simple_uart.c)(0x514C0586)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Device\Nordic\nRF51822\Include" -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "simple_uart.o" --omf_browse "simple_uart.crf" --depend "simple_uart.d")
-I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB1B384)
-I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x50984FC8)
-I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5119762C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50070A82)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x505A3D8C)
-I (C:\Program Files\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDB755C)
-I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x50A2DB1E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5119762E)
-I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x51084BBA)
-I (..\..\nordic_library\nrf51822\Include\simple_uart.h)(0x5119A0D8)
-I (C:\Program Files\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x4EB1B388)
-I (..\..\nordic_library\nrf51822\Include\nrf_delay.h)(0x5119A0D6)
-I (..\..\nordic_library\nrf51822\Include\nrf_gpio.h)(0x514CC3C2)
+F (..\source\main.c)(0x5178800B)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__EVAL -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I D:\Keil\ARM\RV31\INC -I D:\Keil\ARM\CMSIS\Include -I D:\Keil\ARM\Device\Nordic\nRF51822\Include -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "main.o" --omf_browse "main.crf" --depend "main.d")
+I (..\..\nordic_library\nrf51822\Include\spi_master.h)(0x5171DE8F)
+I (D:\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x50FA4250)
+I (D:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x50FA4250)
+I (..\source\spi_master_config.h)(0x51785A94)
+I (..\..\nordic_library\nrf51822\Include\nrf_delay.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5171DE8F)
+I (D:\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x50882E6E)
+I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\common.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf_gpio.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\boards.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\boards/nrf6310.h)(0x51785A94)
+F (..\..\nordic_library\nrf51822\Source\keil_arm_uv4.lnt)(0x5171DE8F)()
+F (..\..\nordic_library\nrf51822\Source\templates\arm\arm_startup_nrf51.s)(0x5171DE8F)(--cpu Cortex-M0 --li --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1" -I D:\Keil\ARM\RV31\INC -I D:\Keil\ARM\CMSIS\Include -I D:\Keil\ARM\Device\Nordic\nRF51822\Include --list ".\arm_startup_nrf51.lst" --xref -o ".\arm_startup_nrf51.o" --depend ".\arm_startup_nrf51.d")
+F (..\..\nordic_library\nrf51822\Source\templates\system_nrf51.c)(0x5171DE8F)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__EVAL -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I D:\Keil\ARM\RV31\INC -I D:\Keil\ARM\CMSIS\Include -I D:\Keil\ARM\Device\Nordic\nRF51822\Include -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "system_nrf51.o" --omf_browse "system_nrf51.crf" --depend "system_nrf51.d")
+I (D:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x50FA4250)
+I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5171DE8F)
+I (D:\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x50882E6E)
+I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x5171DE8F)
+F (..\..\nordic_library\nrf51822\Source\spi_master\spi_master.c)(0x5171DE8F)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__EVAL -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I D:\Keil\ARM\RV31\INC -I D:\Keil\ARM\CMSIS\Include -I D:\Keil\ARM\Device\Nordic\nRF51822\Include -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "spi_master.o" --omf_browse "spi_master.crf" --depend "spi_master.d")
+I (..\..\nordic_library\nrf51822\Include\spi_master.h)(0x5171DE8F)
+I (D:\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x50FA4250)
+I (D:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x50FA4250)
+I (..\..\nordic_library\nrf51822\Include\nrf_delay.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5171DE8F)
+I (D:\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x50882E6E)
+I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf_gpio.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\common.h)(0x5171DE8F)
+I (..\source\spi_master_config.h)(0x51785A94)
+F (..\..\nordic_library\nrf51822\Source\nrf_delay\nrf_delay.c)(0x5171DE8F)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__EVAL -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I D:\Keil\ARM\RV31\INC -I D:\Keil\ARM\CMSIS\Include -I D:\Keil\ARM\Device\Nordic\nRF51822\Include -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "nrf_delay.o" --omf_browse "nrf_delay.crf" --depend "nrf_delay.d")
+I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5171DE8F)
+I (D:\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50882E6E)
+I (D:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x50FA4250)
+I (D:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x50882E6E)
+I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf_delay.h)(0x5171DE8F)
+F (..\..\nordic_library\nrf51822\Source\simple_uart\simple_uart.c)(0x5171DE8F)(--feedback "spi_test.fed" -c --cpu Cortex-M0 -D__EVAL -D__MICROLIB --li -g -O0 --apcs=interwork --split_sections -I..\..\nordic_library\nrf51822\Include -I..\source --c99 -I D:\Keil\ARM\RV31\INC -I D:\Keil\ARM\CMSIS\Include -I D:\Keil\ARM\Device\Nordic\nRF51822\Include -DNRF51 -DSETUPA -DBOARD_NRF6310 -o "simple_uart.o" --omf_browse "simple_uart.crf" --depend "simple_uart.d")
+I (D:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x50FA4250)
+I (..\..\nordic_library\nrf51822\Include\nrf.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\compiler_abstraction.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51.h)(0x5171DE8F)
+I (D:\Keil\ARM\CMSIS\Include\core_cm0.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x50882E6E)
+I (D:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x50882E6E)
+I (..\..\nordic_library\nrf51822\Include\system_nrf51.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_bitfields.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf51_deprecated.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\simple_uart.h)(0x5171DE8F)
+I (D:\Keil\ARM\ARMCC\bin\..\include\stdbool.h)(0x50FA4250)
+I (..\..\nordic_library\nrf51822\Include\nrf_delay.h)(0x5171DE8F)
+I (..\..\nordic_library\nrf51822\Include\nrf_gpio.h)(0x5171DE8F)
